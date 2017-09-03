@@ -9,12 +9,13 @@ module xtal.elements {
     * Dynamically load custom elements from central config file. 
     *
     * @customElement
+    * @polymer
     * @demo demo/index.html
     */
     class XtalSip extends HTMLElement{
         _href = '/web_component_ref.json';
         _lookupMap: {[key: string] : string | IReference};
-
+        static get is(){return 'xtal-sip';}
         static get observedAttributes() {
             return [
                 /** @type {string} 

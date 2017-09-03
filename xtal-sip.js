@@ -7,6 +7,7 @@ var xtal;
         * Dynamically load custom elements from central config file.
         *
         * @customElement
+        * @polymer
         * @demo demo/index.html
         */
         class XtalSip extends HTMLElement {
@@ -14,6 +15,7 @@ var xtal;
                 super(...arguments);
                 this._href = '/web_component_ref.json';
             }
+            static get is() { return 'xtal-sip'; }
             static get observedAttributes() {
                 return [
                     /** @type {string}
