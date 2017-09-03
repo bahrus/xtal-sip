@@ -42,6 +42,9 @@ var xtal;
                 return str.replace(new RegExp(find, 'g'), replace);
             }
             loadDependency(tagName) {
+                if (this._alreadyAdded[tagName])
+                    return;
+                this._alreadyAdded[tagName] = true;
                 let lookup = this._lookupMap[tagName];
                 if (!lookup) {
                     for (const key in this._lookupMap) {
@@ -62,6 +65,7 @@ var xtal;
             }
             connectedCallback() {
                 const _this = this;
+                this._alreadyAdded = {};
                 fetch(this._href).then(resp => {
                     resp.json().then(val => {
                         this._lookupMap = val;

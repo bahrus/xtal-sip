@@ -15,6 +15,7 @@ module xtal.elements {
     class XtalSip extends HTMLElement{
         _href = '/web_component_ref.json';
         _lookupMap: {[key: string] : string | IReference};
+        _alreadyAdded: {[key: string] : boolean};
         static get is(){return 'xtal-sip';}
         static get observedAttributes() {
             return [
@@ -45,6 +46,8 @@ module xtal.elements {
         }
 
         loadDependency(tagName: string){
+            if(this._alreadyAdded[tagName]) return;
+            this._alreadyAdded[tagName] = true;
             let lookup = this._lookupMap[tagName];
             if(!lookup) {
                 for(const key in this._lookupMap){
@@ -64,6 +67,7 @@ module xtal.elements {
         
         connectedCallback(){
             const _this = this;
+            this._alreadyAdded = {};
             fetch(this._href).then(resp =>{
                 resp.json().then(val => {
                     this._lookupMap = val;

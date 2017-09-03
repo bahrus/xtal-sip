@@ -22,7 +22,7 @@ That's where \<xtal-sip\> fits in.
 
 Whether using HTML Imports, or simple JavaScript references, or ES6 Modules, there's a pretty good principle that we can assume regarding web components:  *For any web component, it will depend on only one top-level reference*.  (One small exception to that rule appears to be with components that depend on icon libraries, like paper-icon-button).  Of course, that reference file itself will likely specify multiple other references recursively following standardized module conventions, which is all fine and good.  \<xtal-sip\> is meant for content-heavy, non reusable web compositions, as opposed to highly reusable web components.  
 
-xtal-sip uses a mapping file to be used to create the look-up between web component tag names and href paths to HTML or JavaScript files.  Because it is meant to serve as a mapping file for all components, regardless of the contextual path of the component itself, it is best not to use relative paths for the hrefs. The format of the mapping file ("web_component_ref.json") is as follows:
+xtal-sip uses a mapping file to locate the resource (HTML or JavaScript) that needs loading keyed off of the tag name.  The format of the mapping file ("web_component_ref.json") is as follows:
 
 ```json
 {
@@ -47,18 +47,18 @@ The default setting is to *not* add the async attribute (or invoke dynamic impor
 ### List of features:
 
 - [x] Exact matching to mapping file.
-- [ ] Pattern matching to mapping file.
+- [x] Pattern matching to mapping file.
 - [ ] Support specific settings of how to import (async, etc)
-- [ ] Autogenerate .html references.
+- [x] Autogenerate .html references.
 - [ ] Autogenerate .js script references.
 - [ ] Autogenerate .mjs script references.
 - [ ] Autogenerate ES6 module script references.
 - [ ] Add some sort of TBD mechanism to help with builds / push strategies (suggestions welcome).
   
 
-Custom elements wishing to be activated with the help of the mapping file can advertise themselves by adding the attribute _upgrade-me_ \<my-custom-element upgrade-me/>
+Custom elements wishing to be activated with the help of the mapping file can advertise themselves by adding the attribute _upgrade-me_ as shown here: \<my-custom-element upgrade-me/>
 
-When \<xtal-sip/> is instantiated, it searches its neighbors (starting from the parent, and then doing a parent.querySelectorAll('[upgrade-me]')) for any such nodes that need watering.  If it finds some matching nodes, then for each one, it checks if the custom element tag name has already been registered.  If not, it goes through web_component_ref.json file, top to bottom, searching for a matching file path to import. Files ending with .html will be added as HTML Imports, and files ending with .js or .mjs will either add standard script tags, or ES6 module tags, depending on the setting _useES6Module_.
+When \<xtal-sip/> is instantiated, it searches its neighbors (starting from the parent, and then doing a parent.querySelectorAll('[upgrade-me]')) for any such nodes that need "watering".  If it finds some matching nodes, then for each one, it checks if the custom element tag name has already been registered.  If not, it goes through web_component_ref.json file, top to bottom, searching for a matching file path to import. Files ending with .html will be added as HTML Imports, and files ending with .js or .mjs will either add standard script tags, or ES6 module tags, depending on the setting _useES6Module_.
 
 Note that \<xtal-sip> will *not* monitor for DOM Node changes.  The thinking is once the top level references are added, the (typically reusable) components will manage loading their own dependencies following standard import mechanisms.
 
