@@ -46,10 +46,13 @@ The default setting is to *not* add the async attribute (or invoke dynamic impor
 
 ### List of features:
 
-- [ ] Autogenerate .html references
-- [ ] Autogenerate .js script references
-- [ ] Autogenerate .mjs script references
-- [ ] Autogenerate ES6 module script references
+- [x] Exact matching to mapping file.
+- [ ] Pattern matching to mapping file.
+- [ ] Support specific settings of how to import (async, etc)
+- [ ] Autogenerate .html references.
+- [ ] Autogenerate .js script references.
+- [ ] Autogenerate .mjs script references.
+- [ ] Autogenerate ES6 module script references.
 - [ ] Add some sort of TBD mechanism to help with builds / push strategies (suggestions welcome).
   
 

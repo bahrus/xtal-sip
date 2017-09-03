@@ -6,7 +6,7 @@ module xtal.elements {
     }
     class XtalSip extends HTMLElement{
         _href = '/web_component_ref.json';
-        lookupMap: {[key: string] : string | IReference};
+        _lookupMap: {[key: string] : string | IReference};
 
         static get observedAttributes() {
             return [
@@ -26,17 +26,25 @@ module xtal.elements {
         }
 
         loadDependency(tagName: string){
-            
+            const lookup = this._lookupMap[tagName];
+            if(!lookup) return;
+            if(customElements.get(tagName)) return;
+            const link = document.createElement("link");
+            link.setAttribute("rel", "import");
+            link.setAttribute("href", lookup as string);
+            document.head.appendChild(link);
         }
         
         connectedCallback(){
             const _this = this;
             fetch(this._href).then(resp =>{
                 resp.json().then(val => {
+                    this._lookupMap = val;
                     const parentNode = _this.parentNode;
                     
                 })
             })
         }
     }
+    customElements.define('xtal-sip', XtalSip);
 }
