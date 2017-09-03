@@ -1,5 +1,5 @@
 {
-    "wired-card": "/bower_components/wired-card/wired-card.html",
+    "wired-card": "../bower_components/wired-card/wired-card.html",
     "paper-{0}": "//myCDN.com/bower_components/paper-{0}/paper-{0}.html",
     "dom-if": "/node_modules/@polymer/lib/elents/dom-if.js",
     "iron-{0}": {
