@@ -9,7 +9,6 @@ module xtal.elements {
     * Dynamically load custom elements from central config file. 
     *
     * @customElement
-    * @polymer
     * @demo demo/index.html
     */
     class XtalSip extends HTMLElement{
