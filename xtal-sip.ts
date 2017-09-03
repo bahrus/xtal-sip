@@ -40,8 +40,15 @@ module xtal.elements {
             fetch(this._href).then(resp =>{
                 resp.json().then(val => {
                     this._lookupMap = val;
-                    const parentNode = _this.parentNode;
-                    
+                    const parentNode = _this.parentNode as HTMLElement;
+                    if(parentNode.hasAttribute("upgrade-me")){
+                        this.loadDependency(parentNode.tagName.toLowerCase());
+                    }
+                    const descendants = parentNode.querySelectorAll('[upgrade-me]');
+                    for(let i = 0, ii = descendants.length; i < ii; i++){
+                        const descendant = descendants[i];
+                        this.loadDependency(descendant.tagName.toLowerCase());
+                    }
                 })
             })
         }

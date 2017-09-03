@@ -1,18 +1,14 @@
-[
-    {"my-specific-tag-name": "/bower_components/my-specific-tag-name.html"},
-    {"paper-{0}": "//myCDN.com/bower_components/paper-{0}/paper-{0}.html"},
-    {"dom-if": "/node_modules/@polymer/lib/elents/dom-if.js"},
-    {"iron-{0}": 
-        {
-            "path": "//myIoTServerRunningFromMyMicrowaveOven.com/bower_components/iron-{0}/iron-{0}.html",
-            "async": true
-        }
+{
+    "wired-card": "/bower_components/wired-card/wired-card.html",
+    "paper-{0}": "//myCDN.com/bower_components/paper-{0}/paper-{0}.html",
+    "dom-if": "/node_modules/@polymer/lib/elents/dom-if.js",
+    "iron-{0}": {
+        "path": "//myIoTServerRunningFromMyMicrowaveOven.com/bower_components/iron-{0}/iron-{0}.html",
+        "async": true
     },
-    {"platinum-{0}": 
-        {
-            "path": "/node_modules/platinimum-{0}/platinum-{0}.js",
-            "async": true,
-            "useES6Module": true
-        }
+    "platinum-{0}": {
+        "path": "/node_modules/platinimum-{0}/platinum-{0}.js",
+        "async": true,
+        "useES6Module": true
     }
-]
+}

@@ -1,3 +1,5 @@
+[![Published on webcomponents.org](https://img.shields.io/badge/webcomponents.org-published-blue.svg)](https://www.webcomponents.org/element/bahrus/xtal-sip)
+
 # \<xtal-sip\>
 
 Dynamically "water" a custom element tag with the necessary dependency to sprout the tag from an inert seedling to a thing of beauty.
@@ -21,24 +23,20 @@ Whether using HTML Imports, or simple JavaScript references, or ES6 Modules, the
 xtal-sip uses a mapping file to be used to create the look-up between web component tag names and href paths to HTML or JavaScript files.  Because it is meant to serve as a mapping file for all components, regardless of the contextual path of the component itself, it is best not to use relative paths for the hrefs. The format of the mapping file ("web_component_ref.json") is as follows:
 
 ```json
-[
-    {"my-specific-tag-name": "/bower_components/my-specific-tag-name.html"},
-    {"paper-{0}": "//myCDN.com/bower_components/paper-{0}/paper-{0}.html"},
-    {"dom-if": "/node_modules/@polymer/lib/elents/dom-if.js"},
-    {"iron-{0}": 
-        {
-            "path": "//myIoTServerRunningFromMyMicrowaveOven.com/bower_components/iron-{0}/iron-{0}.html",
-            "async": true
-        }
+{
+    "my-specific-tag-name": "/bower_components/my-specific-tag-name.html",
+    "paper-{0}": "//myCDN.com/bower_components/paper-{0}/paper-{0}.html",
+    "dom-if": "/node_modules/@polymer/lib/elents/dom-if.js",
+    "iron-{0}":{
+        "path": "//myIoTServerRunningFromMyMicrowaveOven.com/bower_components/iron-{0}/iron-{0}.html",
+        "async": true
     },
-    {"platinum-{0}": 
-        {
-            "path": "/node_modules/platinimum-{0}/platinum-{0}.js",
-            "async": true,
-            "useES6Module": true
-        }
+    "platinum-{0}":{
+        "path": "/node_modules/platinimum-{0}/platinum-{0}.js",
+        "async": true,
+        "useES6Module": true
     }
-]
+}
 ```
 Realistically, the combination shown above probably wouldn't work, as paper elements depend on iron elements, and mixing where they come from will likely result in errors, or in many duplicate resources being downloaded from multiple places. 
 
