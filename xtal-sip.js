@@ -2,6 +2,14 @@ var xtal;
 (function (xtal) {
     var elements;
     (function (elements) {
+        /**
+        * `xtal-sip`
+        * Dynamically load custom elements from central config file.
+        *
+        * @customElement
+        * @polymer
+        * @demo demo/index.html
+        */
         class XtalSip extends HTMLElement {
             constructor() {
                 super(...arguments);
