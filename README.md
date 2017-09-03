@@ -2,6 +2,8 @@
 
 # \<xtal-sip\>
 
+<a href="demo/index.html">Demo</a>
+
 Dynamically "water" a custom element tag with the necessary dependency to sprout the tag from an inert seedling to a thing of beauty.
 
 Importing the files needed for web components is about to become a lot more complicated.  Some references will come from bower_components, some from node_modules.  Some will be references to html files, others js files.  And the references are likely to be in a state of flux, as components migrate to npm, and support for HTML Imports wanes.  *.html files may be converted to *.js files, then to *.mjs files, then back to *.mhtml files once the W3C Ents show some HTML love.  That will shortly be followed by converting them to *.wasm, followed by the Universal binary format that includes HTML, JS, CSS, WASM: *.xap.
