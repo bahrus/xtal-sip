@@ -2,7 +2,7 @@
 
 # \<xtal-sip\>
 
-<a href="demo/index.html">Demo</a>
+<a href="https://www.webcomponents.org/element/bahrus/xtal-sip/demo/index.html">Demo</a>
 
 Dynamically "water" a custom element tag with the necessary dependency to sprout the tag from an inert seedling to a thing of beauty.
 
