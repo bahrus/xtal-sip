@@ -23,17 +23,17 @@
       <demo-snippet>
         <template>
           <xtal-sip href="../web_component_ref.json"></xtal-sip>
-          Note:  No imports for wired-card contained in this file.<br>
+          Note:  No imports for wired-* contained in this file.<br>
           <wired-card class="form" upgrade-me>
             <h3>Form Title</h3>
             <div>
-              <wired-input placeholder="full name"></wired-input>
+              <wired-input placeholder="full name" upgrade-me></wired-input>
             </div>
             <div>
               <wired-input placeholder="location"></wired-input>
             </div>
-            <wired-radio-group>
-              <wired-radio name="male" text="male"></wired-radio>
+            <wired-radio-group upgrade-me>
+              <wired-radio upgrade-me name="male" text="male"></wired-radio>
               <wired-radio name="female" text="female"></wired-radio>
             </wired-radio-group>
           </wired-card>

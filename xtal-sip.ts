@@ -24,6 +24,13 @@ module xtal.elements {
                 'href',
             ];
         }
+        static get properties(){
+            return{
+                href:{
+                    type: String
+                }
+            }
+        }
 
         attributeChangedCallback(name, oldValue, newValue) {
             switch (name) {
@@ -33,9 +40,21 @@ module xtal.elements {
             }
         }
 
+        replaceAll(str, find, replace) {
+            return str.replace(new RegExp(find, 'g'), replace);
+        }
+
         loadDependency(tagName: string){
-            const lookup = this._lookupMap[tagName];
-            if(!lookup) return;
+            let lookup = this._lookupMap[tagName];
+            if(!lookup) {
+                for(const key in this._lookupMap){
+                    const noWildCard = key.replace('{0}', '');
+                    if(!tagName.startsWith(noWildCard)) continue;
+                    const sub = tagName.substr(noWildCard.length);
+                    lookup = this._lookupMap[key];
+                    lookup = this.replaceAll(lookup, "\\{0\\}", sub);
+                }
+            }
             if(customElements.get(tagName)) return;
             const link = document.createElement("link");
             link.setAttribute("rel", "import");

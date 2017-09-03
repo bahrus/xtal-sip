@@ -3,7 +3,9 @@
   "main": "xtal-sip.html",
   "dependencies": {
     "polymer": "Polymer/polymer#^2.0.0",
-    "wired-card": "wiredjs/wired-card#^0.1.1"
+    "wired-card": "wiredjs/wired-card#^0.1.1",
+    "wired-input": "wiredjs/wired-input#^0.2.0",
+    "wired-radio-group": "wiredjs/wired-radio-group#^0.1.0"
   },
   "devDependencies": {
     "iron-demo-helpers": "PolymerElements/iron-demo-helpers#^2.0.0",
