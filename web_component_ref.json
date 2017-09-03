@@ -1,5 +1,5 @@
 {
-    "wired-{0}": "../bower_components/wired-{0}/wired-{0}.html",
+    "wired-{0}": "../../wired-{0}/wired-{0}.html",
     "paper-{0}": "//myCDN.com/bower_components/paper-{0}/paper-{0}.html",
     "dom-if": "/node_modules/@polymer/lib/elents/dom-if.js",
     "iron-{0}": {
