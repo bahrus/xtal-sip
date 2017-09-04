@@ -63,7 +63,11 @@ When \<xtal-sip/> is instantiated, it searches its neighbors (starting from the 
 
 Note that \<xtal-sip> will *not* monitor for DOM Node changes.  The thinking is once the top level references are added, the (typically reusable) components will manage loading their own dependencies following standard import mechanisms.
 
-NB:  This component does not yet have a good story in terms of web component IDE support, nor build tooling.  Use with extreme caution.
+NB:  
+
+1)  This component does not yet have a good story in terms of web component IDE support, nor build tooling.  Use with extreme caution.
+
+2)  Although this component _appears_ to depend on Polymer (2.0), those appearances are there only to help the webcomponents.org analyzer work.  You in fact only need to reference xtal-sip.js.
 
 ## Install the Polymer-CLI
 
