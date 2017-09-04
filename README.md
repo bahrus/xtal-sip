@@ -48,6 +48,7 @@ The default setting is to *not* add the async attribute (or invoke dynamic impor
 
 - [x] Exact matching to mapping file.
 - [x] Pattern matching to mapping file.
+- [ ] Remove "upgrade-me" once upgraded, so styling changes can take place
 - [ ] Support specific settings of how to import (async, etc)
 - [x] Autogenerate .html references.
 - [ ] Autogenerate .js script references.
