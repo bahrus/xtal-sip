@@ -4,7 +4,7 @@
 
 <a href="https://www.webcomponents.org/element/bahrus/xtal-sip/demo/index.html">Demo</a>
 
-Dynamically "water" a custom element tag with the necessary dependency to sprout the tag from an inert seedling to a thing of beauty.
+Dynamically "water" a custom element tag with the necessary dependency to sprout the tag from an inert seedling to a thing of beauty.  Dependency free.
 
 Importing the files needed for web components is about to become a lot more complicated.  Some references will come from bower_components, some from node_modules.  Some will be references to html files, others js files.  And the references are likely to be in a state of flux, as the [whims of elite developers](https://codeburst.io/the-javascript-modules-limbo-585eedbb182e) change.  Components will first migrate to npm, as support for HTML Imports wanes.  *.html files may be converted to *.js files, then to *.mjs files, then back to *.mhtml files, once the W3C Ents show some HTML love.  That will shortly be followed by converting them to *.wasm, followed by the Universal binary format that includes HTML, JS, CSS, WASM: *.xap.
 
@@ -73,39 +73,15 @@ Even more aggressive:
 
 ## Bundling
 
-====================  TODO ================================
-## Build cues
-
-When xtal-sip observes
-
-================================== Deprecated ================================
-xtal-sip uses a mapping file to locate the resource (HTML or JavaScript) that needs loading keyed off of the tag name.  The format of the mapping file ("web_component_ref.json") is as follows:
-
-```json
-{
-    "my-specific-tag-name": "/bower_components/my-specific-tag-name.html",
-    "paper-{0}": "//myCDN.com/bower_components/paper-{0}/paper-{0}.html",
-    "dom-if": "/node_modules/@polymer/lib/elents/dom-if.js",
-    "iron-{0}":{
-        "path": "//myIoTServerRunningFromMyMicrowaveOven.com/bower_components/iron-{0}/iron-{0}.html",
-        "async": true
-    },
-    "platinum-{0}":{
-        "path": "/node_modules/platinimum-{0}/platinum-{0}.js",
-        "async": true,
-        "useES6Module": true
-    }
-}
-```
-Realistically, the combination shown above probably wouldn't work, as paper elements depend on iron elements, and mixing where they come from will likely result in errors, or in many duplicate resources being downloaded from multiple places. 
+## Async
 
 The default setting is to *not* add the async attribute (or invoke dynamic import).
 
 ### List of features:
 
 - [x] Exact matching to mapping file.
-- [x] Pattern matching to mapping file.
-- [x] Remove "upgrade-me" once upgraded, so styling changes can take place
+- [ ] Pattern matching to mapping file.
+- [ ] Remove "upgrade-me" once upgraded, so styling changes can take place
 - [ ] For non async, specify whether to add a setTimeout before adding import tag (defaults to true)
 - [ ] Support specific settings of how to import (async, etc)
 - [x] Autogenerate .html references.
@@ -115,17 +91,16 @@ The default setting is to *not* add the async attribute (or invoke dynamic impor
 - [ ] Add some sort of TBD mechanism to help with builds / push strategies (suggestions welcome).
   
 
-Custom elements wishing to be activated with the help of the mapping file can advertise themselves by adding the attribute _upgrade-me_ as shown here: \<my-custom-element upgrade-me/>
 
-When \<xtal-sip/> is instantiated, it searches its neighbors (starting from the parent, and then doing a parent.querySelectorAll('[upgrade-me]')) for any such nodes that need "watering".  If it finds some matching nodes, then for each one, it checks if the custom element tag name has already been registered.  If not, it goes through web_component_ref.json file, top to bottom, searching for a matching file path to import. Files ending with .html will be added as HTML Imports, and files ending with .js or .mjs will either add standard script tags, or ES6 module tags, depending on the setting _useES6Module_.
+When \<xtal-sip/> is instantiated, it searches its neighbors (starting from the parent for any such nodes that need "watering".  If it finds some matching nodes, then for each one, it checks if the custom element tag name has already been registered.  
 
 Note that \<xtal-sip> will *not* monitor for DOM Node changes.  The thinking is once the top level references are added, the (typically reusable) components will manage loading their own dependencies following standard import mechanisms.
 
 NB:  
 
-1)  This component does not yet have a good story in terms of web component IDE support, nor build tooling.  Use with extreme caution.
+This component does not yet have a good story in terms of web component IDE support, nor build tooling.  Use with extreme caution.
 
-2)  Although this component _appears_ to depend on Polymer (2.0), those appearances are there only to help the webcomponents.org analyzer work.  You in fact only need to reference xtal-sip.js.
+
 
 ## Install the Polymer-CLI
 
