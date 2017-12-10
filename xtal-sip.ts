@@ -1,8 +1,8 @@
 module xtal.elements {
-    interface IReference{
+    interface IReference {
         path?: string;
         async?: boolean;
-        useES6Module?: boolean; 
+        useES6Module?: boolean;
     }
     /**
     * `xtal-sip`
@@ -12,11 +12,11 @@ module xtal.elements {
     * @polymer
     * @demo demo/index.html
     */
-    class XtalSip extends HTMLElement{
+    class XtalSip extends HTMLElement {
         //_href = '/web_component_ref.json';
-        static _lookupMap: {[key: string] : string | IReference};
-        static _alreadyAdded: {[key: string] : boolean} = {};
-        static get is(){return 'xtal-sip';}
+        static _lookupMap: { [key: string]: string | IReference };
+        static _alreadyAdded: { [key: string]: boolean } = {};
+        static get is() { return 'xtal-sip'; }
         // static get observedAttributes() {
         //     return [
         //         /** @type {string} 
@@ -41,13 +41,13 @@ module xtal.elements {
         //     }
         // }
 
-        // replaceAll(str, find, replace) {
-        //     return str.replace(new RegExp(find, 'g'), replace);
-        // }
-        removeAttr(node: HTMLElement){
-            node.removeAttribute('upgrade-me');
+        replaceAll(str, find, replace) {
+            return str.replace(new RegExp(find, 'g'), replace);
         }
-        loadDependency(tagName: string){
+        // removeAttr(node: HTMLElement) {
+        //     node.removeAttribute('upgrade-me');
+        // }
+        loadDependency(tagName: string) {
             //if(XtalSip._alreadyAdded[tagName]) return this.removeAttr(node);
             XtalSip._alreadyAdded[tagName] = true;
             //if(customElements.get(tagName)) return this.removeAttr(node);
@@ -61,11 +61,11 @@ module xtal.elements {
             //         lookup = this.replaceAll(lookup, "\\{0\\}", sub);
             //     }
             // }
-            
+
             const link = document.createElement("link");
             link.setAttribute("rel", "import");
             link.setAttribute("href", lookup as string);
-            setTimeout(() =>{
+            setTimeout(() => {
                 document.head.appendChild(link);
             }, 50);
             // customElements.whenDefined(tagName).then(() =>{
@@ -73,35 +73,54 @@ module xtal.elements {
             // })
 
         }
-        qsa(css, from?: HTMLElement | Document) : HTMLElement[]{
-            return  [].slice.call((from ? from : this).querySelectorAll(css));
+        qsa(css, from?: HTMLElement | Document): HTMLElement[] {
+            return [].slice.call((from ? from : this).querySelectorAll(css));
         }
-        get_h(){
+        get_h() {
             let parentElement = this.parentElement;
-            while(parentElement){
-                if(parentElement.shadowRoot) return parentElement.shadowRoot;
+            while (parentElement) {
+                if (parentElement.shadowRoot) return parentElement.shadowRoot;
                 parentElement = parentElement.parentElement;
             }
             return document.body;
         }
-        connectedCallback(){
-            if(!XtalSip._lookupMap){
+        connectedCallback() {
+            if (!XtalSip._lookupMap) {
                 XtalSip._lookupMap = {};
-                this.qsa('link[rel="preload"][data-tag]', document.head).forEach(el =>{
+                this.qsa('link[rel-ish="preload', document.head).forEach(el => {
+                    const href = el.getAttribute('href');
+                    el.dataset.tags.split(',').forEach(tag => {
+                        let modifiedHref = href;
+                        let counter = 0;
+                        tag.split('-').forEach(token => {
+                            modifiedHref = this.replaceAll(modifiedHref, '\\{' + counter + '\\}', token);
+                            counter++;
+                        });
+                        //from https://developer.mozilla.org/en-US/docs/Web/HTML/Preloading_content
+                        const preloadLink = document.createElement("link");
+                        preloadLink.href = modifiedHref;
+                        preloadLink.rel = "preload";
+                        preloadLink['as'] = "script";
+                        preloadLink.dataset.tag = tag;
+                        document.head.appendChild(preloadLink);
+                    });
+
+                });
+                this.qsa('link[rel="preload"][data-tag]', document.head).forEach(el => {
                     XtalSip._lookupMap[el.dataset.tag] = el['href'];
-                })
+                });
             }
             const h = this.get_h();
-            for(const key in XtalSip._lookupMap){
-                if(XtalSip._alreadyAdded[key]) continue;
-                if(h.querySelector(key) || this.parentElement.querySelector(key)){
+            for (const key in XtalSip._lookupMap) {
+                if (XtalSip._alreadyAdded[key]) continue;
+                if (h.querySelector(key) || this.parentElement.querySelector(key)) {
                     this.loadDependency(key);
 
                 }
             }
 
-            
-//            const _this = this;
+
+            //            const _this = this;
             // fetch(this._href).then(resp =>{
             //     resp.json().then(val => {
             //         this._lookupMap = val;
@@ -118,7 +137,7 @@ module xtal.elements {
             // })
         }
 
-        
+
     }
     customElements.define('xtal-sip', XtalSip);
 }

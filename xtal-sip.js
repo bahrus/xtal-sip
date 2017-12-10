@@ -34,12 +34,12 @@ var xtal;
             //             break;
             //     }
             // }
-            // replaceAll(str, find, replace) {
-            //     return str.replace(new RegExp(find, 'g'), replace);
-            // }
-            removeAttr(node) {
-                node.removeAttribute('upgrade-me');
+            replaceAll(str, find, replace) {
+                return str.replace(new RegExp(find, 'g'), replace);
             }
+            // removeAttr(node: HTMLElement) {
+            //     node.removeAttribute('upgrade-me');
+            // }
             loadDependency(tagName) {
                 //if(XtalSip._alreadyAdded[tagName]) return this.removeAttr(node);
                 XtalSip._alreadyAdded[tagName] = true;
@@ -79,6 +79,24 @@ var xtal;
             connectedCallback() {
                 if (!XtalSip._lookupMap) {
                     XtalSip._lookupMap = {};
+                    this.qsa('link[rel-ish="preload', document.head).forEach(el => {
+                        const href = el.getAttribute('href');
+                        el.dataset.tags.split(',').forEach(tag => {
+                            let modifiedHref = href;
+                            let counter = 0;
+                            tag.split('-').forEach(token => {
+                                modifiedHref = this.replaceAll(modifiedHref, '\\{' + counter + '\\}', token);
+                                counter++;
+                            });
+                            //from https://developer.mozilla.org/en-US/docs/Web/HTML/Preloading_content
+                            const preloadLink = document.createElement("link");
+                            preloadLink.href = modifiedHref;
+                            preloadLink.rel = "preload";
+                            preloadLink['as'] = "script";
+                            preloadLink.dataset.tag = tag;
+                            document.head.appendChild(preloadLink);
+                        });
+                    });
                     this.qsa('link[rel="preload"][data-tag]', document.head).forEach(el => {
                         XtalSip._lookupMap[el.dataset.tag] = el['href'];
                     });

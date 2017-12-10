@@ -40,7 +40,7 @@ So what does xtal-sip add to the \<link rel="preload"\> functionality?
 <link rel="preload" type="text/html" as="scripts" href="//myCDN.com/@bower_components/paper-checkbox/paper-checkbox.html" data-tag="paper-checkbox">
 ```
 
-When \<xtal-sip\> encounters a \<paper-checkbox\> tag (how it encounters it will be discussed later), it will search for link preload tags with tag "data-tag-paper-checkbox", and it will formally load the reference.  If as is document and type is text/html, it will use HTMLImport.  If as="script" it will use class script referencing, unless data-type="module" (TBD:  can type="module"?)
+When \<xtal-sip\> encounters a \<paper-checkbox\> tag (how it encounters it will be discussed later), it will search for link preload tags with tag "data-tag-paper-checkbox", and it will formally load the reference.  
 
 ## Compact dependency preloading
 
@@ -80,8 +80,7 @@ The default setting is to *not* add the async attribute (or invoke dynamic impor
 ### List of features:
 
 - [x] Exact matching to mapping file.
-- [ ] Pattern matching to mapping file.
-- [ ] Remove "upgrade-me" once upgraded, so styling changes can take place
+- [x] Pattern matching to mapping file.
 - [ ] For non async, specify whether to add a setTimeout before adding import tag (defaults to true)
 - [ ] Support specific settings of how to import (async, etc)
 - [x] Autogenerate .html references.
