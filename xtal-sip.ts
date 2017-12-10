@@ -85,11 +85,15 @@ module xtal.elements {
             return document.body;
         }
         connectedCallback() {
+            const preemptive : {[key: string] :  boolean} = {}; 
             if (!XtalSip._lookupMap) {
                 XtalSip._lookupMap = {};
+                
                 this.qsa('link[rel-ish="preload', document.head).forEach(el => {
+                    const isPreemptive = el.dataset.preemptive !== null;
                     const href = el.getAttribute('href');
                     el.dataset.tags.split(',').forEach(tag => {
+                        if(isPreemptive) preemptive[tag] = true;
                         let modifiedHref = href;
                         let counter = 0;
                         tag.split('-').forEach(token => {
@@ -107,13 +111,15 @@ module xtal.elements {
 
                 });
                 this.qsa('link[rel="preload"][data-tag]', document.head).forEach(el => {
-                    XtalSip._lookupMap[el.dataset.tag] = el['href'];
+                    const tag = el.dataset.tag;
+                    XtalSip._lookupMap[tag] = el['href'];
+                    preemptive[tag] = true;
                 });
             }
             const h = this.get_h();
             for (const key in XtalSip._lookupMap) {
                 if (XtalSip._alreadyAdded[key]) continue;
-                if (h.querySelector(key) || this.parentElement.querySelector(key)) {
+                if (preemptive[key] || h.querySelector(key) || this.parentElement.querySelector(key)) {
                     this.loadDependency(key);
 
                 }

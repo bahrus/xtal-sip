@@ -44,7 +44,9 @@ When \<xtal-sip\> encounters a \<paper-checkbox\> tag (how it encounters it will
 
 ## Compact dependency preloading
 
-It was mentioned that listing all the elements with the same prefix can be boring and add to the footprint.
+It was mentioned above that listing all the elements with the same prefix can be boring and add to the footprint.
+
+The markup below allows for more compact dependency.
 
 ```html
 <link rel="preload-ish"  as="script" href="//myCDN.com/@bower_components/paper-{1}/paper-{1}.html" data-tags="paper-checkbox,paper-input,paper-button">
@@ -60,6 +62,18 @@ Even more aggressive:
 ```html
 <link rel-ish="preload" type="text/html" as="script" href="//myIoTServerRunningFromMyMicrowaveOven.com/npm/{0}-{1}/{0}-{1}.html" data-tags="paper-checkbox,paper-input,paper-button,iron-input">
 >
+```
+
+When xtal-sip encounters this kind of shorthand notation, it dynamically adds \<link rel="preload"\> to the header, one for each tag name in the data-tags attribute.
+
+## Preemptive loading
+
+By default, xtal-sip doesn't actually add the live import tag to the header until it actually spots such a tag in the live markup.  This allows us to stay on the conservative side and only load what's really needed.
+
+However, if preemptive loading is desired, add the data-preemptive attribute:
+
+```html
+<link rel="preload" type="text/html" as="scripts" href="../bower_components/paper-checkbox/paper-checkbox.html" data-tag="paper-checkbox" data-preemptive>
 ```
 
 ## Script references
@@ -79,8 +93,9 @@ The default setting is to *not* add the async attribute (or invoke dynamic impor
 
 ### List of features:
 
-- [x] Exact matching to mapping file.
-- [x] Pattern matching to mapping file.
+- [x] Auto triggering based on tag name.
+- [x] Compact dependency loading.
+- [x] Optional preemptive loading.
 - [ ] For non async, specify whether to add a setTimeout before adding import tag (defaults to true)
 - [ ] Support specific settings of how to import (async, etc)
 - [x] Autogenerate .html references.
