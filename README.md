@@ -30,13 +30,51 @@ xtal-sip builds on the one crumb the W3C has thrown [our way thus far](https://d
 <link rel="preload" href="..."> 
 ```
 
-For performance reasons, it is useful to use these to proload all these references ahead of time.  Might as build on this support to provide the mappings we need:
+For performance reasons, it is useful to use these to proload all these references ahead of time.  Might as well build on this support to provide the mappings we need:
 
 So what does xtal-sip add to the \<link rel="preload"\> functionality?
 
 ## Auto triggering based on tag name
 
+```html
+<link rel="preload" type="text/html" as="scripts" href="//myCDN.com/@bower_components/paper-checkbox/paper-checkbox.html" data-tag="paper-checkbox">
+```
+
+When \<xtal-sip\> encounters a \<paper-checkbox\> tag (how it encounters it will be discussed later), it will search for link preload tags with tag "data-tag-paper-checkbox", and it will formally load the reference.  If as is document and type is text/html, it will use HTMLImport.  If as="script" it will use class script referencing, unless data-type="module" (TBD:  can type="module"?)
+
 ## Compact dependency preloading
+
+It was mentioned that listing all the elements with the same prefix can be boring and add to the footprint.
+
+```html
+<link rel="preload-ish"  as="script" href="//myCDN.com/@bower_components/paper-{1}/paper-{1}.html" data-tags="paper-checkbox,paper-input,paper-button">
+>
+```
+
+The tag name is split using the dash "-" delimiter.  {1} refers to the split array, index = 1.
+
+xtal-sip will "autoexapand" this, and create multiple preload tags in the header where each file is listed explictly
+
+Even more aggressive:
+
+```html
+<link rel-ish="preload" type="text/html" as="script" href="//myIoTServerRunningFromMyMicrowaveOven.com/npm/{0}-{1}/{0}-{1}.html" data-tags="paper-checkbox,paper-input,paper-button,iron-input">
+>
+```
+
+## Script references
+
+```html
+<link rel="preload" as="script" type="module" href="node_modules/platinimum-{1}/platinum-{1}.js" platinum-sw
+>
+```
+
+## ES5 alternative references
+
+## Bundling
+
+====================  TODO ================================
+## Build cues
 
 When xtal-sip observes
 

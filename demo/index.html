@@ -10,20 +10,23 @@
 
     <link rel="import" href="../../iron-demo-helpers/demo-pages-shared-styles.html">
     <link rel="import" href="../../iron-demo-helpers/demo-snippet.html">
-    <link rel="import" href="../xtal-sip.html">
+    <link rel="preload" data-tag="wired-input" as="script" href="../../wired-input/wired-input.html">
+    <!-- <link rel="import" href="../xtal-sip.html"> -->
+    <script async src="../xtal-sip.js"></script>
 
     <custom-style>
       <style is="custom-style" include="demo-pages-shared-styles">
       </style>
     </custom-style>
+    
   </head>
   <body>
     <div class="vertical-section-container centered">
       <h3>Basic xtal-sip demo</h3>
       <demo-snippet>
         <template>
-          <xtal-sip href="../web_component_ref.json"></xtal-sip>
-          Note:  No imports for wired-* contained in this file.<br>
+          <xtal-sip></xtal-sip>
+          <!-- Note:  No imports for wired-* contained in this file.<br> -->
           <wired-card class="form" upgrade-me>
             <h3>Form Title</h3>
             <div>
