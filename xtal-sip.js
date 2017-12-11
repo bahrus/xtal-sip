@@ -56,7 +56,9 @@ var xtal;
                 // }
                 const link = document.createElement("link");
                 link.setAttribute("rel", "import");
-                link.setAttribute("href", lookup);
+                link.setAttribute("href", lookup.path);
+                if (lookup.async)
+                    link.setAttribute('async', '');
                 setTimeout(() => {
                     document.head.appendChild(link);
                 }, 50);
@@ -82,6 +84,7 @@ var xtal;
                     XtalSip._lookupMap = {};
                     this.qsa('link[rel-ish="preload', document.head).forEach(el => {
                         const isPreemptive = el.dataset.preemptive !== null;
+                        const isAsync = el.dataset.async !== null;
                         const href = el.getAttribute('href');
                         el.dataset.tags.split(',').forEach(tag => {
                             if (isPreemptive)
@@ -103,7 +106,11 @@ var xtal;
                     });
                     this.qsa('link[rel="preload"][data-tag]', document.head).forEach(el => {
                         const tag = el.dataset.tag;
-                        XtalSip._lookupMap[tag] = el['href'];
+                        XtalSip._lookupMap[tag] = {
+                            //hre el['href']
+                            path: el.getAttribute('href'),
+                            async: el.dataset.async !== null,
+                        };
                         preemptive[tag] = true;
                     });
                 }

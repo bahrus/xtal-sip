@@ -1,3 +1,5 @@
+import { isClassBody } from "babel-types";
+
 module xtal.elements {
     interface IReference {
         path?: string;
@@ -14,7 +16,7 @@ module xtal.elements {
     */
     class XtalSip extends HTMLElement {
         //_href = '/web_component_ref.json';
-        static _lookupMap: { [key: string]: string | IReference };
+        static _lookupMap: { [key: string]: IReference };
         static _alreadyAdded: { [key: string]: boolean } = {};
         static get is() { return 'xtal-sip'; }
         // static get observedAttributes() {
@@ -64,7 +66,8 @@ module xtal.elements {
 
             const link = document.createElement("link");
             link.setAttribute("rel", "import");
-            link.setAttribute("href", lookup as string);
+            link.setAttribute("href", lookup.path);
+            if(lookup.async) link.setAttribute('async', '');
             setTimeout(() => {
                 document.head.appendChild(link);
             }, 50);
@@ -91,6 +94,7 @@ module xtal.elements {
                 
                 this.qsa('link[rel-ish="preload', document.head).forEach(el => {
                     const isPreemptive = el.dataset.preemptive !== null;
+                    const isAsync = el.dataset.async !== null;
                     const href = el.getAttribute('href');
                     el.dataset.tags.split(',').forEach(tag => {
                         if(isPreemptive) preemptive[tag] = true;
@@ -101,7 +105,7 @@ module xtal.elements {
                             counter++;
                         });
                         //from https://developer.mozilla.org/en-US/docs/Web/HTML/Preloading_content
-                        const preloadLink = document.createElement("link");
+                        const preloadLink = document.createElement("link") as HTMLLinkElement;
                         preloadLink.href = modifiedHref;
                         preloadLink.rel = "preload";
                         preloadLink['as'] = "script";
@@ -112,7 +116,11 @@ module xtal.elements {
                 });
                 this.qsa('link[rel="preload"][data-tag]', document.head).forEach(el => {
                     const tag = el.dataset.tag;
-                    XtalSip._lookupMap[tag] = el['href'];
+                    XtalSip._lookupMap[tag] = {
+                        //hre el['href']
+                        path: el.getAttribute('href'),
+                        async: el.dataset.async !== null,
+                    } as IReference;
                     preemptive[tag] = true;
                 });
             }

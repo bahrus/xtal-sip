@@ -76,6 +76,10 @@ However, if preemptive loading is desired, add the data-preemptive attribute:
 <link rel="preload" type="text/html" as="scripts" href="../bower_components/paper-checkbox/paper-checkbox.html" data-tag="paper-checkbox" data-preemptive>
 ```
 
+## Async loading
+
+If the preload tag has attribute data-async, then live references will use async capabilities (async import, async script reference, or dynamic loading of modules).
+
 ## Script references
 
 ```html
@@ -96,6 +100,7 @@ The default setting is to *not* add the async attribute (or invoke dynamic impor
 - [x] Auto triggering based on tag name.
 - [x] Compact dependency loading.
 - [x] Optional preemptive loading.
+- [x] Support async loading
 - [ ] For non async, specify whether to add a setTimeout before adding import tag (defaults to true)
 - [ ] Support specific settings of how to import (async, etc)
 - [x] Autogenerate .html references.
