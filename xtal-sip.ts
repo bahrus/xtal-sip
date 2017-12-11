@@ -1,6 +1,5 @@
-import { isClassBody } from "babel-types";
 
-module xtal.elements {
+(function () {
     interface IReference {
         path?: string;
         async?: boolean;
@@ -154,4 +153,4 @@ module xtal.elements {
 
     }
     customElements.define('xtal-sip', XtalSip);
-}
+})();
