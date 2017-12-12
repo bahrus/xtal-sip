@@ -124,12 +124,12 @@ If the preload tag has attribute data-async, then live references will use async
 - [x] Auto triggering based on tag name.
 - [x] Compact dependency loading.
 - [x] Optional preemptive loading.
-- [x] Support async loading
+- [x] Support async loading.
+- [x] Process dom-change events
 - [ ] For non async, specify whether to add a setTimeout before adding import tag (defaults to true)
 - [ ] Support specific settings of how to import (async, etc)
 - [x] Autogenerate .html references.
-- [ ] Autogenerate .js script references.
-- [ ] Autogenerate .mjs script references.
+- [x] Autogenerate .js classic script references.
 - [ ] Autogenerate ES6 module script references.
 - [ ] Add some sort of TBD mechanism to help with builds / push strategies (suggestions welcome).
   

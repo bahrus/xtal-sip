@@ -13,21 +13,24 @@
             return str.replace(new RegExp(find, 'g'), replace);
         }
         loadDependency(tagName) {
-            //if(XtalSip._alreadyAdded[tagName]) return this.removeAttr(node);
             XtalSip._alreadyAdded[tagName] = true;
-            //if(customElements.get(tagName)) return this.removeAttr(node);
             let lookup = XtalSip._lookupMap[tagName];
-            const link = document.createElement("link");
-            link.setAttribute("rel", "import");
-            link.setAttribute("href", lookup.path);
+            let newTag;
+            if (lookup.isScript) {
+                newTag = document.createElement('script');
+                newTag.src = lookup.path;
+                //if(lookup.async) scriptTag.setAttribute('async', '');
+            }
+            else {
+                newTag = document.createElement("link");
+                newTag.setAttribute("rel", "import");
+                newTag.setAttribute("href", lookup.path);
+            }
             if (lookup.async)
-                link.setAttribute('async', '');
+                newTag.setAttribute('async', '');
             setTimeout(() => {
-                document.head.appendChild(link);
+                document.head.appendChild(newTag);
             }, 50);
-            // customElements.whenDefined(tagName).then(() =>{
-            //     this.removeAttr(node);
-            // })
         }
         qsa(css, from) {
             return [].slice.call((from ? from : this).querySelectorAll(css));
@@ -89,6 +92,7 @@
                         //hre el['href']
                         path: el.getAttribute('href'),
                         async: el.dataset.async !== undefined,
+                        isScript: el['as'] === 'script',
                     };
                     XtalSip._preemptive[tag] = el.dataset.preemptive !== undefined;
                 });
