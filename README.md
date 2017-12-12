@@ -78,14 +78,15 @@ Here's an even more aggressive example, that uses {0} and {1}:
 <link 
     rel-ish="preload" 
     as="document" 
-    href="//myIoTServerRunningFromMyMicrowaveOven.com/npm/{0}-{1}/{0}-{1}.html" data-tags="paper-checkbox,paper-input,paper-button,iron-input">
+    href="//myIoTServerRunningFromMyMicrowaveOven.com/npm/{0}-{1}/{0}-{1}.html" 
+    data-tags="paper-checkbox,paper-input,paper-button,iron-input">
 >
 ```
 
 
 ## Preemptive loading
 
-By default, xtal-sip doesn't actually add the live import tag to the header until it actually spots such a tag in the live markup.  This allows us to stay on the conservative side and only load what's really needed.
+By default, xtal-sip doesn't add the live import tag to the header until it actually spots such a tag in the live markup.  This allows us to stay on the conservative side and only load what's really needed.
 
 However, if preemptive loading is desired, add the data-preemptive attribute:
 
