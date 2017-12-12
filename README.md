@@ -136,7 +136,7 @@ If the preload tag has attribute data-async, then live references will use async
   
 
 
-When \<xtal-sip/> is instantiated, it searches its neighbors (starting from the parent) for any such nodes that need "watering".  If it finds some matching nodes, then for each one, it checks if the custom element tag name has already been registered.  If not, it will dynamically load the starting reference fo the custom element.
+When \<xtal-sip/> is instantiated, it searches its neighbors (starting from the parent) for any such nodes that need "watering".  If it finds some matching nodes, then for each one, it checks if the custom element tag name has already been registered.  If not, it will dynamically load the starting reference for the custom element.
 
 \<xtal-sip\> also adds an event handler to the body tag, for event "dom-change", and checks if any new tags were introduced with each such event.  Many components generate this event when they add DOM.  \<xtal-sip\> does *not* monitor for DOM Node changes using Mutation Observers.  The thinking is once the top level references are added, the (typically reusable) components will manage loading their own dependencies following standard import mechanisms.
 
