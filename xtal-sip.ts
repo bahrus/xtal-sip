@@ -16,6 +16,7 @@
     class XtalSip extends HTMLElement {
         static _lookupMap: { [key: string]: IReference };
         static _alreadyAdded: { [key: string]: boolean } = {};
+        static _preemptive : {[key: string] :  boolean} = {};
         static get is() { return 'xtal-sip'; }
 
 
@@ -53,10 +54,23 @@
             }
             return document.body;
         }
-        connectedCallback() {
-            const preemptive : {[key: string] :  boolean} = {}; 
-            if (!XtalSip._lookupMap) {
+        process_h(h: HTMLElement | ShadowRoot){
+            if(!h) return;
+            for (const key in XtalSip._lookupMap) {
+                if (XtalSip._alreadyAdded[key]) continue;
+                if (XtalSip._preemptive[key] || h.querySelector(key) || this.parentElement.querySelector(key)) {
+                    this.loadDependency(key);
 
+                }
+            }
+        }
+        connectedCallback() {
+            if (!XtalSip._lookupMap) {
+                document.body.addEventListener('dom-change', e =>{
+                    const src = e.srcElement as HTMLElement
+                    this.process_h(src);
+                    this.process_h(src.previousElementSibling as HTMLElement) //for dom bind
+                })
                 XtalSip._lookupMap = {};
                 
                 this.qsa('link[rel-ish="preload"]', document.head).forEach(el => {
@@ -65,7 +79,7 @@
                     //const isPreFetch = el.getAttribute('rel-ish') === 'prefetch'
                     const href = el.getAttribute('href');
                     el.dataset.tags.split(',').forEach(tag => {
-                        if(isPreemptive) preemptive[tag] = true;
+                        if(isPreemptive) XtalSip._preemptive[tag] = true;
                         let modifiedHref = href;
                         let counter = 0;
                         tag.split('-').forEach(token => {
@@ -89,34 +103,14 @@
                         path: el.getAttribute('href'),
                         async: el.dataset.async !== undefined,
                     } as IReference;
-                    preemptive[tag] = el.dataset.preemptive !== undefined;
+                    XtalSip._preemptive[tag] = el.dataset.preemptive !== undefined;
                 });
             }
             const h = this.get_h();
-            for (const key in XtalSip._lookupMap) {
-                if (XtalSip._alreadyAdded[key]) continue;
-                if (preemptive[key] || h.querySelector(key) || this.parentElement.querySelector(key)) {
-                    this.loadDependency(key);
-
-                }
-            }
+            this.process_h(h);
 
 
-            //            const _this = this;
-            // fetch(this._href).then(resp =>{
-            //     resp.json().then(val => {
-            //         this._lookupMap = val;
-            //         const parentNode = _this.parentNode as HTMLElement;
-            //         if(parentNode.hasAttribute("upgrade-me")){
-            //             this.loadDependency(parentNode.tagName.toLowerCase(), parentNode);
-            //         }
-            //         const descendants = parentNode.querySelectorAll('[upgrade-me]');
-            //         for(let i = 0, ii = descendants.length; i < ii; i++){
-            //             const descendant = descendants[i] as HTMLElement;
-            //             this.loadDependency(descendant.tagName.toLowerCase(), descendant);
-            //         }
-            //     })
-            // })
+
         }
 
 

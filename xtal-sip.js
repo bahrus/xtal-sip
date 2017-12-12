@@ -41,9 +41,24 @@
             }
             return document.body;
         }
+        process_h(h) {
+            if (!h)
+                return;
+            for (const key in XtalSip._lookupMap) {
+                if (XtalSip._alreadyAdded[key])
+                    continue;
+                if (XtalSip._preemptive[key] || h.querySelector(key) || this.parentElement.querySelector(key)) {
+                    this.loadDependency(key);
+                }
+            }
+        }
         connectedCallback() {
-            const preemptive = {};
             if (!XtalSip._lookupMap) {
+                document.body.addEventListener('dom-change', e => {
+                    const src = e.srcElement;
+                    this.process_h(src);
+                    this.process_h(src.previousElementSibling); //for dom bind
+                });
                 XtalSip._lookupMap = {};
                 this.qsa('link[rel-ish="preload"]', document.head).forEach(el => {
                     const isPreemptive = el.dataset.preemptive !== undefined;
@@ -52,7 +67,7 @@
                     const href = el.getAttribute('href');
                     el.dataset.tags.split(',').forEach(tag => {
                         if (isPreemptive)
-                            preemptive[tag] = true;
+                            XtalSip._preemptive[tag] = true;
                         let modifiedHref = href;
                         let counter = 0;
                         tag.split('-').forEach(token => {
@@ -75,35 +90,15 @@
                         path: el.getAttribute('href'),
                         async: el.dataset.async !== undefined,
                     };
-                    preemptive[tag] = el.dataset.preemptive !== undefined;
+                    XtalSip._preemptive[tag] = el.dataset.preemptive !== undefined;
                 });
             }
             const h = this.get_h();
-            for (const key in XtalSip._lookupMap) {
-                if (XtalSip._alreadyAdded[key])
-                    continue;
-                if (preemptive[key] || h.querySelector(key) || this.parentElement.querySelector(key)) {
-                    this.loadDependency(key);
-                }
-            }
-            //            const _this = this;
-            // fetch(this._href).then(resp =>{
-            //     resp.json().then(val => {
-            //         this._lookupMap = val;
-            //         const parentNode = _this.parentNode as HTMLElement;
-            //         if(parentNode.hasAttribute("upgrade-me")){
-            //             this.loadDependency(parentNode.tagName.toLowerCase(), parentNode);
-            //         }
-            //         const descendants = parentNode.querySelectorAll('[upgrade-me]');
-            //         for(let i = 0, ii = descendants.length; i < ii; i++){
-            //             const descendant = descendants[i] as HTMLElement;
-            //             this.loadDependency(descendant.tagName.toLowerCase(), descendant);
-            //         }
-            //     })
-            // })
+            this.process_h(h);
         }
     }
     XtalSip._alreadyAdded = {};
+    XtalSip._preemptive = {};
     customElements.define('xtal-sip', XtalSip);
 })();
 //# sourceMappingURL=xtal-sip.js.map
