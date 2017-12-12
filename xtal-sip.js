@@ -45,9 +45,10 @@
             const preemptive = {};
             if (!XtalSip._lookupMap) {
                 XtalSip._lookupMap = {};
-                this.qsa('link[rel-ish="preload', document.head).forEach(el => {
+                this.qsa('link[rel-ish="preload"]', document.head).forEach(el => {
                     const isPreemptive = el.dataset.preemptive !== null;
                     const isAsync = el.dataset.async !== null;
+                    //const isPreFetch = el.getAttribute('rel-ish') === 'prefetch'
                     const href = el.getAttribute('href');
                     el.dataset.tags.split(',').forEach(tag => {
                         if (isPreemptive)
@@ -61,8 +62,8 @@
                         //from https://developer.mozilla.org/en-US/docs/Web/HTML/Preloading_content
                         const preloadLink = document.createElement("link");
                         preloadLink.href = modifiedHref;
-                        preloadLink.rel = "preload";
-                        preloadLink['as'] = "script";
+                        preloadLink.rel = 'preload';
+                        preloadLink['as'] = el['as'];
                         preloadLink.dataset.tag = tag;
                         document.head.appendChild(preloadLink);
                     });

@@ -6,6 +6,8 @@
 
 Dynamically "water" a custom element tag with the necessary dependency to sprout the tag from an inert seedling to a thing of beauty.  Dependency free.
 
+NB:  This component suffers currently in terms of IDE and build support, especially compared to the Polymer supported [lazy-imports](https://github.com/Polymer/lazy-imports).
+
 Importing the files needed for web components seems likely to become a lot more complicated.  Some references will come from bower_components, some from node_modules.  Some will be references to html files, others js files.  And the references are likely to be in a state of flux, as the [whims of elite developers](https://codeburst.io/the-javascript-modules-limbo-585eedbb182e) change.  Components will first migrate to node_modules (how will we explain to our grandkids that web components are node modules?).   As support for HTML Imports wanes, many  *.html files will be converted to *.js files, then to *.mjs files, then back to *.mhtml files, once the W3C Ents show some HTML love.  That will shortly be followed by converting them to *.wasm, followed by the Universal binary format that includes HTML, JS, CSS, WASM: *.xap.
 
 This component, \<xtal-sip\> is intended to "centralize the pain."  Keep the mappings between custom element tags and where to load the references for them all in one place.
@@ -30,7 +32,7 @@ xtal-sip assumes that web sites will want to take advantage of the recent web st
 <link rel="preload" href="..."> 
 ```
 
-For performance reasons, it is useful to use these to proload all these references ahead of time.  Might as well build on this support to provide the mappings we need, and not repeat ourselves.
+For performance reasons, it is useful to use these to preload all these references ahead of time.  Might as well build on this support to provide the mappings we need, and not repeat ourselves.
 
 So what does xtal-sip add to the \<link rel="preload"\> functionality?
 
@@ -39,13 +41,15 @@ So what does xtal-sip add to the \<link rel="preload"\> functionality?
 ```html
 <link 
     rel="preload" 
-    as="scripts" 
+    as="document" 
     href="//myCDN.com/@bower_components/paper-checkbox/paper-checkbox.html" 
     data-tag="paper-checkbox"
 >
 ```
 
-When \<xtal-sip\> encounters a \<paper-checkbox\> tag (how it encounters it will be discussed later), it will search for link preload tags with attribute 'data-tag="checkbox"', and it will formally load the reference.  
+NB:  Currently, Chrome does not preload assets when as="document."  This seems like a bug to me, but what do I [know](https://bugs.chromium.org/p/chromium/issues/detail?id=593267)?  Attempting to work around this unexpected behavior by setting as="script" causes duplicate requests, which is probably worse. 
+
+When \<xtal-sip\> encounters a \<paper-checkbox\> tag (how it encounters it will be discussed later), it will perform a hash lookup for link preload tags with attribute 'data-tag="paper-checkbox"', and it will formally load the reference.  
 
 ## Compact dependency preloading
 
@@ -56,7 +60,7 @@ The markup below allows for more compact dependency.
 ```html
 <link 
     rel-ish="preload"  
-    as="script" 
+    as="document" 
     href="//myCDN.com/@bower_components/paper-{1}/paper-{1}.html" 
     data-tags="paper-checkbox,paper-input,paper-button"
 >
@@ -68,12 +72,12 @@ For each tag name found in the data-tags attribute, that name is split using the
 
 xtal-sip will "autoexpand" this, and dynamically create multiple genuine preload tags in the header where each file is listed explictly.
 
-Even more aggressively than the example above:
+Here's an even more aggressive example, that uses {0} and {1}:
 
 ```html
 <link 
     rel-ish="preload" 
-    as="script" 
+    as="document" 
     href="//myIoTServerRunningFromMyMicrowaveOven.com/npm/{0}-{1}/{0}-{1}.html" data-tags="paper-checkbox,paper-input,paper-button,iron-input">
 >
 ```
@@ -88,7 +92,7 @@ However, if preemptive loading is desired, add the data-preemptive attribute:
 ```html
 <link 
     rel="preload" 
-    as="scripts" 
+    as="document" 
     href="../bower_components/paper-checkbox/paper-checkbox.html" 
     data-tag="paper-checkbox" 
     data-preemptive
@@ -97,7 +101,7 @@ However, if preemptive loading is desired, add the data-preemptive attribute:
 
 ## Async loading
 
-If the preload tag has attribute data-async, then live references will use async capabilities (async import, async script reference4555).
+If the preload tag has attribute data-async, then live references will use async capabilities (async import, async script reference).
 
 ## Script references
 
@@ -115,10 +119,6 @@ If the preload tag has attribute data-async, then live references will use async
 
 ## Bundling
 
-## Async
-
-The default setting is to *not* add the async attribute (or invoke dynamic import).
-
 ### List of features:
 
 - [x] Auto triggering based on tag name.
@@ -135,7 +135,7 @@ The default setting is to *not* add the async attribute (or invoke dynamic impor
   
 
 
-When \<xtal-sip/> is instantiated, it searches its neighbors (starting from the parent for any such nodes that need "watering".  If it finds some matching nodes, then for each one, it checks if the custom element tag name has already been registered.  
+When \<xtal-sip/> is instantiated, it searches its neighbors (starting from the parent for any such nodes that need "watering".  If it finds some matching nodes, then for each one, it checks if the custom element tag name has already been registered.  If not, it will dynamically load the starting reference fo the custom element.
 
 Note that \<xtal-sip> will *not* monitor for DOM Node changes.  The thinking is once the top level references are added, the (typically reusable) components will manage loading their own dependencies following standard import mechanisms.
 
