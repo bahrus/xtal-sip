@@ -46,8 +46,8 @@
             if (!XtalSip._lookupMap) {
                 XtalSip._lookupMap = {};
                 this.qsa('link[rel-ish="preload"]', document.head).forEach(el => {
-                    const isPreemptive = el.dataset.preemptive !== null;
-                    const isAsync = el.dataset.async !== null;
+                    const isPreemptive = el.dataset.preemptive !== undefined;
+                    const isAsync = el.dataset.async !== undefined;
                     //const isPreFetch = el.getAttribute('rel-ish') === 'prefetch'
                     const href = el.getAttribute('href');
                     el.dataset.tags.split(',').forEach(tag => {
@@ -73,9 +73,9 @@
                     XtalSip._lookupMap[tag] = {
                         //hre el['href']
                         path: el.getAttribute('href'),
-                        async: el.dataset.async !== null,
+                        async: el.dataset.async !== undefined,
                     };
-                    preemptive[tag] = true;
+                    preemptive[tag] = el.dataset.preemptive !== undefined;
                 });
             }
             const h = this.get_h();

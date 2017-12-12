@@ -9,6 +9,7 @@
     <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
 
     <link rel="import" href="../../iron-demo-helpers/demo-pages-shared-styles.html">
+    <link rel-ish="preload" as="document" data-tags="dom-bind,dom-if" href="../../polymer/lib/elements/dom-{1}.html">
     <link rel="preload" as="document" data-tag="demo-snippet" href="../../iron-demo-helpers/demo-snippet.html">
     <link rel-ish="preload" as="document" data-tags="wired-input,wired-radio-group,wired-radio,wired-card" 
         href="../../wired-{1}/wired-{1}.html" data-preemptive data-async>
@@ -27,20 +28,25 @@
       <demo-snippet>
         <template>
           <xtal-sip></xtal-sip>
-          <!-- Note:  No imports for wired-* contained in this file.<br> -->
-          <wired-card class="form">
-            <h3>Form Title</h3>
-            <div>
-              <wired-input placeholder="full name"></wired-input>
-            </div>
-            <div>
-              <wired-input placeholder="location"></wired-input>
-            </div>
-            <wired-radio-group>
-              <wired-radio name="male" text="male"></wired-radio>
-              <wired-radio name="female" text="female"></wired-radio>
-            </wired-radio-group>
-          </wired-card>
+          <dom-bind>
+            <template>
+              <xtal-sip></xtal-sip>  
+              <wired-card class="form">
+                  <h3>Form Title</h3>
+                  <div>
+                    <wired-input placeholder="full name"></wired-input>
+                  </div>
+                  <div>
+                    <wired-input placeholder="location"></wired-input>
+                  </div>
+                  <wired-radio-group>
+                    <wired-radio name="male" text="male"></wired-radio>
+                    <wired-radio name="female" text="female"></wired-radio>
+                  </wired-radio-group>
+                </wired-card>
+                </template>
+              </dom-bind>
+
         </template>
       </demo-snippet>
     </div>
