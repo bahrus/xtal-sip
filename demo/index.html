@@ -9,7 +9,7 @@
     <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
 
     <link rel="import" href="../../iron-demo-helpers/demo-pages-shared-styles.html">
-    <link rel="import" href="../../iron-demo-helpers/demo-snippet.html">
+    <link rel="preload" as="script" data-tag="demo-snippet" href="../../iron-demo-helpers/demo-snippet.html">
     <link rel-ish="preload" data-tags="wired-input,wired-radio-group,wired-radio,wired-card" 
         as="script" href="../../wired-{1}/wired-{1}.html" data-preemptive data-async>
     <script async src="../xtal-sip.js"></script>
@@ -23,6 +23,7 @@
   <body>
     <div class="vertical-section-container centered">
       <h3>Basic xtal-sip demo</h3>
+      <xtal-sip></xtal-sip>
       <demo-snippet>
         <template>
           <xtal-sip></xtal-sip>

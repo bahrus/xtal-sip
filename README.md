@@ -62,11 +62,11 @@ The markup below allows for more compact dependency.
 >
 ```
 
-This is a "fake" preload tag, that is used as the foundation for dynamically generating valid preload tag.
+This is a "fake" preload tag, that is used as the foundation for dynamically generating multiple valid preload tags.
 
 For each tag name found in the data-tags attribute, that name is split using the dash "-" delimiter.  {1} refers to the split array, index = 1.
 
-xtal-sip will "autoexapand" this, and dynamically create multiple genuine preload tags in the header where each file is listed explictly.
+xtal-sip will "autoexpand" this, and dynamically create multiple genuine preload tags in the header where each file is listed explictly.
 
 Even more aggressively than the example above:
 
