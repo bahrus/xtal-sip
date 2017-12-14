@@ -8,6 +8,7 @@
     * @demo demo/index.html
     */
     class XtalSip extends HTMLElement {
+        //static _preemptive: { [key: string]: boolean } = {};
         static get is() { return 'xtal-sip'; }
         replaceAll(str, find, replace) {
             return str.replace(new RegExp(find, 'g'), replace);
@@ -47,30 +48,37 @@
         process_h(h) {
             if (!h)
                 return;
-            for (const key in XtalSip._lookupMap) {
-                if (XtalSip._alreadyAdded[key])
+            const lm = XtalSip._lookupMap;
+            for (const key in XtalSip._alreadyAdded) {
+                delete lm[key];
+            }
+            XtalSip._alreadyAdded = {};
+            for (const key in lm) {
+                const ref = lm[key];
+                if (ref.preemptive) {
+                    this.loadDependency(key);
                     continue;
-                if (XtalSip._preemptive[key] || h.querySelector(key) || this.parentElement.querySelector(key)) {
+                }
+                if (h.querySelector(key)) {
                     this.loadDependency(key);
                 }
             }
         }
         connectedCallback() {
             if (!XtalSip._lookupMap) {
-                document.body.addEventListener('dom-change', e => {
-                    const src = e.srcElement;
-                    this.process_h(src);
-                    this.process_h(src.previousElementSibling); //for dom bind
-                });
+                // document.body.addEventListener('dom-change', e => {
+                //     const src = e.srcElement as HTMLElement
+                //     this.process_h(src);
+                //     this.process_h(src.previousElementSibling as HTMLElement) //for dom bind
+                // })
                 XtalSip._lookupMap = {};
                 this.qsa('link[rel-ish="preload"]', document.head).forEach(el => {
-                    const isPreemptive = el.dataset.preemptive !== undefined;
+                    //const isPreemptive = el.dataset.preemptive !== undefined;
                     const isAsync = el.dataset.async !== undefined;
                     //const isPreFetch = el.getAttribute('rel-ish') === 'prefetch'
                     const href = el.getAttribute('href');
                     el.dataset.tags.split(',').forEach(tag => {
-                        if (isPreemptive)
-                            XtalSip._preemptive[tag] = true;
+                        //if (isPreemptive) XtalSip._preemptive[tag] = true;
                         let modifiedHref = href;
                         let counter = 0;
                         tag.split('-').forEach(token => {
@@ -83,6 +91,7 @@
                         preloadLink.rel = 'preload';
                         preloadLink['as'] = el['as'];
                         preloadLink.dataset.tag = tag;
+                        preloadLink.dataset.preemptive = el.dataset.preemptive;
                         document.head.appendChild(preloadLink);
                     });
                 });
@@ -93,16 +102,14 @@
                         path: el.getAttribute('href'),
                         async: el.dataset.async !== undefined,
                         isScript: el['as'] === 'script',
+                        preemptive: el.dataset.preemptive !== undefined
                     };
-                    XtalSip._preemptive[tag] = el.dataset.preemptive !== undefined;
                 });
             }
-            const h = this.get_h();
-            this.process_h(h);
+            this.process_h(this.parentElement);
         }
     }
     XtalSip._alreadyAdded = {};
-    XtalSip._preemptive = {};
     customElements.define('xtal-sip', XtalSip);
 })();
 //# sourceMappingURL=xtal-sip.js.map

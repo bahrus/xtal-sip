@@ -120,6 +120,14 @@ If the preload tag has attribute data-async, then live references will use async
 
 ## Bundling
 
+Some CDN's, [like jsdelivr](https://www.jsdelivr.com/features) allow you to combine multiple assets together with one http request.
+
+> https://cdn.jsdelivr.net/combine/gh/jquery/jquery@3.2/dist/jquery.min.js,gh/twbs/bootstrap@3.3/dist/js/bootstrap.min.js
+
+[Support](https://www.nginx.com/resources/wiki/modules/concat/) [is](https://code.google.com/archive/p/modconcat/) also available on some web servers.
+
+
+
 ### List of features:
 
 - [x] Auto triggering based on tag name.
