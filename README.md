@@ -128,7 +128,9 @@ Some CDN's, [like jsdelivr](https://www.jsdelivr.com/features) allow you to comb
 
 [Support](https://www.nginx.com/resources/wiki/modules/concat/) [is](https://code.google.com/archive/p/modconcat/) also available on some web servers.
 
+One can also utilize build processes that generate bundled resources that contain definitions for multiple custom elegant tag names.
 
+While xtal-sip doesn't do anything to create these bundled resources, or build the url's needed for concatenated resource requests, it does check if it has already requested a request before for other tag names, and if so, doesn't reload that url.
 
 ### List of features:
 

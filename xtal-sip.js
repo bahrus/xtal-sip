@@ -18,6 +18,8 @@
             let lookup = XtalSip._lookupMap[tagName];
             if (!lookup)
                 return;
+            if (XtalSip._alreadyLoaded[lookup.path])
+                return;
             let newTag;
             if (lookup.isScript) {
                 newTag = document.createElement('script');
@@ -119,6 +121,7 @@
         }
     }
     XtalSip._alreadyAdded = {};
+    XtalSip._alreadyLoaded = {};
     customElements.define('xtal-sip', XtalSip);
 })();
 //# sourceMappingURL=xtal-sip.js.map

@@ -20,6 +20,7 @@ import { delay } from "bluebird";
     class XtalSip extends HTMLElement {
         static _lookupMap: { [key: string]: IReference };
         static _alreadyAdded: { [key: string]: boolean } = {};
+        static _alreadyLoaded: {[key: string] : string} = {};
         //static _preemptive: { [key: string]: boolean } = {};
         static get is() { return 'xtal-sip'; }
 
@@ -32,6 +33,7 @@ import { delay } from "bluebird";
             XtalSip._alreadyAdded[tagName] = true;
             let lookup = XtalSip._lookupMap[tagName];
             if(!lookup) return;
+            if(XtalSip._alreadyLoaded[lookup.path]) return;
             let newTag;
             if (lookup.isScript) {
                 newTag = document.createElement('script');
