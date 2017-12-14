@@ -116,9 +116,9 @@ If the preload tag has attribute data-async, then live references will use async
 >
 ```
 
-
-
 ## ES5 alternative references
+
+TODO:  Use attribute href_es5="..." to provide an alternative url to use for ES6-challenged browsers.
 
 ## Bundling
 
