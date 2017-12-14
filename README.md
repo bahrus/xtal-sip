@@ -116,6 +116,8 @@ If the preload tag has attribute data-async, then live references will use async
 >
 ```
 
+
+
 ## ES5 alternative references
 
 ## Bundling
@@ -133,8 +135,8 @@ Some CDN's, [like jsdelivr](https://www.jsdelivr.com/features) allow you to comb
 - [x] Auto triggering based on tag name.
 - [x] Compact dependency loading.
 - [x] Optional preemptive loading.
+- [x] Explicit tag dependency listing for optimal performance.
 - [x] Support async loading.
-- [x] Process dom-change events
 - [ ] For non async, specify whether to add a setTimeout before adding import tag (defaults to true)
 - [ ] Support specific settings of how to import (async, etc)
 - [x] Autogenerate .html references.
@@ -146,7 +148,13 @@ Some CDN's, [like jsdelivr](https://www.jsdelivr.com/features) allow you to comb
 
 When \<xtal-sip/> is instantiated, it searches its neighbors (starting from the parent) for any such nodes that need "watering".  If it finds some matching nodes, then for each one, it checks if the custom element tag name has already been registered.  If not, it will dynamically load the starting reference for the custom element.
 
-\<xtal-sip\> also adds an event handler to the body tag, for event "dom-change", and checks if any new tags were introduced with each such event.  Many components generate this event when they add DOM.  \<xtal-sip\> does *not* monitor for DOM Node changes using Mutation Observers.  The thinking is once the top level references are added, the (typically reusable) components will manage loading their own dependencies following standard import mechanisms.
+## Performance Optimizing
+
+The guesswork involved in searching a DOM tree for matching tag names comes with a (minor) cost.  This can be eliminated by adding explicit tags to load, as the data-tags attribute:
+
+```html
+<xtal-sip data-tags="paper-input,iron-ajax"></xtal-sip>
+```
 
 
 ## Install the Polymer-CLI

@@ -16,6 +16,8 @@
         loadDependency(tagName) {
             XtalSip._alreadyAdded[tagName] = true;
             let lookup = XtalSip._lookupMap[tagName];
+            if (!lookup)
+                return;
             let newTag;
             if (lookup.isScript) {
                 newTag = document.createElement('script');
@@ -106,7 +108,14 @@
                     };
                 });
             }
-            this.process_h(this.parentElement);
+            if (this.dataset.tags) {
+                this.dataset.tags.split(',').forEach(tag => {
+                    this.loadDependency(tag);
+                });
+            }
+            else {
+                this.process_h(this.parentElement);
+            }
         }
     }
     XtalSip._alreadyAdded = {};
