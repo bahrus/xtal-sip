@@ -20,6 +20,8 @@
                 return;
             if (XtalSip._alreadyLoaded[lookup.path])
                 return;
+            if (customElements.get(tagName))
+                return;
             let newTag;
             if (lookup.isScript) {
                 newTag = document.createElement('script');

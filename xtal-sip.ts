@@ -34,6 +34,7 @@ import { delay } from "bluebird";
             let lookup = XtalSip._lookupMap[tagName];
             if(!lookup) return;
             if(XtalSip._alreadyLoaded[lookup.path]) return;
+            if(customElements.get(tagName)) return;
             let newTag;
             if (lookup.isScript) {
                 newTag = document.createElement('script');
