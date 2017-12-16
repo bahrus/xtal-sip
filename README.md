@@ -80,7 +80,7 @@ Here's an even more aggressive example, that uses {0} and {1}:
 <link 
     rel-ish="preload" 
     as="document" 
-    href="//myIoTServerRunningFromMyMicrowaveOven.com/npm/{0}-{1}/{0}-{1}.html" 
+    href="//myIoTServerRunningFromMyMicrowaveOven.com/npm/@polymer/{0}-{1}/{0}-{1}.html" 
     data-tags="paper-checkbox,paper-input,paper-button,iron-input">
 >
 ```
