@@ -115,11 +115,6 @@ If the preload tag has attribute data-async, then live references will use async
     platinum-sw
 >
 ```
-
-## ES5 alternative references
-
-TODO:  Use attribute href_es5="..." to provide an alternative url to use for ES6-challenged browsers.
-
 ## Bundling
 
 Some CDN's, [like jsdelivr](https://www.jsdelivr.com/features) allow you to combine multiple assets together with one http request.
@@ -131,6 +126,45 @@ Some CDN's, [like jsdelivr](https://www.jsdelivr.com/features) allow you to comb
 One can also utilize build processes that generate bundled resources that contain definitions for multiple custom elegant tag names.
 
 While xtal-sip doesn't do anything to create these bundled resources, or build the url's needed for concatenated resource requests, it does check if it has already requested a request before for other tag names, and if so, doesn't reload that url.
+
+## ES5 / HTTP/1 alternative references
+
+One of the more complex pieces to consider is the issue of browsers that don't support ES6 classes, a cornerstone of web components.  And also, browsers / servers (or proxies) that don't support HTTP/2.  These should all be temporary problems, but unfortunately "temporary" could be several years.
+
+I'm sure anyone reading this has thought about the "Fiddler on the roof" conundrum of how best to package and serve all users optimally.  On the one hand, the simplest thing to do is assume only the browsers that support ES6 will also suppport HTTP/2 and just build a giant bundle for ES5, and treat those users separately.  On the other hand even HTTP/1 users would benefit from some code splitting / progressive enhancement caching.  On the third hand...
+
+The goal of xtal-sip is to be flexible enough that developers can find a way to apply the best strategy for their use case.
+
+We basically need some support for an if condition on the link tag, or even better, a switch statement.
+
+Since think the easiest approach to this is to have the developer define a (gasp) (namespaced protected) global viariable.  In the example below, I use xtal_sip_browser_env. One of the (if not the) top most script tag of the header can be used to set the global variable.  Something like:
+
+```html
+<script>
+    customElements.whenDefined('xtal-sip').then(xs =>{
+        
+    })
+    const xtal_sip_browser_env = []; 
+    if(/*test for IE*/){
+        xtal_sip_browser_env.push('ES6Challenged');
+    }
+    if(/*test for Dev*/){
+        xtal_sip_browser_env.push('Dev');
+    }
+    if(/*test for HTTP/2 somehow*/){
+        xtal_sip_browser_env.push('H2');
+    }
+</script>
+
+<link 
+    rel="preload"
+
+```
+
+
+TODO:  Use attribute href_es5="..." to provide an alternative url to use for ES6-challenged browsers.
+
+
 
 ### List of features:
 

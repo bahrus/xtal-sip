@@ -1,5 +1,3 @@
-import { delay } from "bluebird";
-
 
 (function () {
     interface IReference {
@@ -8,6 +6,7 @@ import { delay } from "bluebird";
         isScript?: boolean;
         useES6Module?: boolean;
         preemptive?: boolean;
+        element: HTMLLinkElement;
     }
     /**
     * `xtal-sip`
@@ -18,20 +17,32 @@ import { delay } from "bluebird";
     * @demo demo/index.html
     */
     class XtalSip extends HTMLElement {
-        static _lookupMap: { [key: string]: IReference };
+        static _lookupMap: { [key: string]: IReference[] };
         static _alreadyAdded: { [key: string]: boolean } = {};
         static _alreadyLoaded: {[key: string] : string} = {};
         //static _preemptive: { [key: string]: boolean } = {};
         static get is() { return 'xtal-sip'; }
-
+        static _tieBreaker: (tagName: string, options: IReference[], instance: XtalSip) => IReference;
+        static set tieBreaker(val: (tagName: string, options: IReference[], instance: XtalSip) => IReference){
+            XtalSip._tieBreaker = val;
+        }
 
         replaceAll(str, find, replace) {
             return str.replace(new RegExp(find, 'g'), replace);
         }
-
+        getLookup(tagName){
+            const lookupOptions = XtalSip._lookupMap[tagName];
+            if(!lookupOptions) return;
+            if(lookupOptions.length > 1){
+                if(!XtalSip.tieBreaker) throw "Duplicate tagname found: " + tagName;
+                return XtalSip.tieBreaker(tagName, lookupOptions, this);
+            }else{
+                return lookupOptions[0];
+            }
+        }
         loadDependency(tagName: string) {
             XtalSip._alreadyAdded[tagName] = true;
-            let lookup = XtalSip._lookupMap[tagName];
+            const lookup = this.getLookup(tagName);
             if(!lookup) return;
             if(XtalSip._alreadyLoaded[lookup.path]) return;
             if(customElements.get(tagName)) return;
@@ -70,7 +81,8 @@ import { delay } from "bluebird";
             }
             XtalSip._alreadyAdded = {};
             for (const key in lm) {
-                const ref = lm[key];
+                if(XtalSip._alreadyAdded[key]) continue;
+                const ref = this.getLookup(key);
                 if(ref.preemptive){
                     this.loadDependency(key);
                     continue;
@@ -116,13 +128,15 @@ import { delay } from "bluebird";
                 });
                 this.qsa('link[rel="preload"][data-tag]', document.head).forEach(el => {
                     const tag = el.dataset.tag;
-                    XtalSip._lookupMap[tag] = {
+                    if(!XtalSip._lookupMap[tag]) XtalSip._lookupMap[tag] = [];
+                    XtalSip._lookupMap[tag].push ( {
                         //hre el['href']
                         path: el.getAttribute('href'),
                         async: el.dataset.async !== undefined,
                         isScript: el['as'] === 'script',
-                        preemptive: el.dataset.preemptive !== undefined
-                    } as IReference;
+                        preemptive: el.dataset.preemptive !== undefined,
+                        element: el
+                    } as IReference);
                 });
             }
             if(this.dataset.tags){

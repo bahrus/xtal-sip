@@ -10,12 +10,28 @@
     class XtalSip extends HTMLElement {
         //static _preemptive: { [key: string]: boolean } = {};
         static get is() { return 'xtal-sip'; }
+        static set tieBreaker(val) {
+            XtalSip._tieBreaker = val;
+        }
         replaceAll(str, find, replace) {
             return str.replace(new RegExp(find, 'g'), replace);
         }
+        getLookup(tagName) {
+            const lookupOptions = XtalSip._lookupMap[tagName];
+            if (!lookupOptions)
+                return;
+            if (lookupOptions.length > 1) {
+                if (!XtalSip.tieBreaker)
+                    throw "Duplicate tagname found: " + tagName;
+                return XtalSip.tieBreaker(tagName, lookupOptions, this);
+            }
+            else {
+                return lookupOptions[0];
+            }
+        }
         loadDependency(tagName) {
             XtalSip._alreadyAdded[tagName] = true;
-            let lookup = XtalSip._lookupMap[tagName];
+            const lookup = this.getLookup(tagName);
             if (!lookup)
                 return;
             if (XtalSip._alreadyLoaded[lookup.path])
@@ -60,7 +76,9 @@
             }
             XtalSip._alreadyAdded = {};
             for (const key in lm) {
-                const ref = lm[key];
+                if (XtalSip._alreadyAdded[key])
+                    continue;
+                const ref = this.getLookup(key);
                 if (ref.preemptive) {
                     this.loadDependency(key);
                     continue;
@@ -103,13 +121,16 @@
                 });
                 this.qsa('link[rel="preload"][data-tag]', document.head).forEach(el => {
                     const tag = el.dataset.tag;
-                    XtalSip._lookupMap[tag] = {
+                    if (!XtalSip._lookupMap[tag])
+                        XtalSip._lookupMap[tag] = [];
+                    XtalSip._lookupMap[tag].push({
                         //hre el['href']
                         path: el.getAttribute('href'),
                         async: el.dataset.async !== undefined,
                         isScript: el['as'] === 'script',
-                        preemptive: el.dataset.preemptive !== undefined
-                    };
+                        preemptive: el.dataset.preemptive !== undefined,
+                        element: el
+                    });
                 });
             }
             if (this.dataset.tags) {
