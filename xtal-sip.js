@@ -16,20 +16,23 @@
         replaceAll(str, find, replace) {
             return str.replace(new RegExp(find, 'g'), replace);
         }
-        getLookup(tagName) {
+        static getLookup(tagName) {
             const lookupOptions = XtalSip._lookupMap[tagName];
             if (!lookupOptions)
                 return;
             if (lookupOptions.length > 1) {
                 if (!XtalSip.tieBreaker)
                     throw "Duplicate tagname found: " + tagName;
-                return XtalSip.tieBreaker(tagName, lookupOptions, this);
+                return XtalSip.tieBreaker(tagName, lookupOptions);
             }
             else {
                 return lookupOptions[0];
             }
         }
-        loadDependency(tagName) {
+        static loadDependencies(tagNames) {
+            tagNames.forEach(tagName => XtalSip.loadDependency(tagName));
+        }
+        static loadDependency(tagName) {
             XtalSip._alreadyAdded[tagName] = true;
             const lookup = this.getLookup(tagName);
             if (!lookup)
@@ -78,13 +81,13 @@
             for (const key in lm) {
                 if (XtalSip._alreadyAdded[key])
                     continue;
-                const ref = this.getLookup(key);
+                const ref = XtalSip.getLookup(key);
                 if (ref.preemptive) {
-                    this.loadDependency(key);
+                    XtalSip.loadDependency(key);
                     continue;
                 }
                 if (h.querySelector(key)) {
-                    this.loadDependency(key);
+                    XtalSip.loadDependency(key);
                 }
             }
         }
@@ -96,6 +99,7 @@
                 //     this.process_h(src.previousElementSibling as HTMLElement) //for dom bind
                 // })
                 XtalSip._lookupMap = {};
+                //if (!XtalSip.useJITLoading) {
                 this.qsa('link[rel-ish="preload"]', document.head).forEach(el => {
                     //const isPreemptive = el.dataset.preemptive !== undefined;
                     const isAsync = el.dataset.async !== undefined;
@@ -119,6 +123,7 @@
                         document.head.appendChild(preloadLink);
                     });
                 });
+                //}
                 this.qsa('link[rel="preload"][data-tag]', document.head).forEach(el => {
                     const tag = el.dataset.tag;
                     if (!XtalSip._lookupMap[tag])
@@ -133,9 +138,10 @@
                     });
                 });
             }
-            if (this.dataset.tags) {
-                this.dataset.tags.split(',').forEach(tag => {
-                    this.loadDependency(tag);
+            const load = this.getAttribute('load');
+            if (load) {
+                load.split(',').forEach(tag => {
+                    XtalSip.loadDependency(tag);
                 });
             }
             else {
@@ -145,6 +151,7 @@
     }
     XtalSip._alreadyAdded = {};
     XtalSip._alreadyLoaded = {};
+    XtalSip.useJITLoading = false;
     customElements.define('xtal-sip', XtalSip);
 })();
 //# sourceMappingURL=xtal-sip.js.map

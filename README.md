@@ -88,7 +88,7 @@ Here's an even more aggressive example, that uses {0} and {1}:
 
 ## Preemptive loading
 
-By default, xtal-sip doesn't add the live script or link import tag to the header until it actually spots such a custom element tag in the live markup that depends on that import (but we are adding such references to the link rel="preload" in order to reduce the delay when the live custom element is observed.  This allows us to stay on the conservative side and only load into memory what's really needed.
+By default, xtal-sip doesn't add the live script or link import tag to the header until it actually spots such a custom element tag in the live markup that depends on that import (but we are adding such references to the link rel="preload" in order to reduce the delay when the live custom element is observed).  This allows us to stay on the conservative side and only load into memory what's really needed.
 
 However, if preemptive loading is desired, add the data-preemptive attribute:
 
@@ -106,9 +106,9 @@ This preemptive loading could also be (temporarily?) useful to use for the commo
 
 ## JIT preloading
 
-On the other side of the spectrum, perhaps there are certain locales one is targeting, where we know they pay a high price for downloading unnecessary stuff?
+On the other side of the spectrum, perhaps there are certain locales one is targeting, where we know they pay a high price for downloading unnecessary stuff.
 
-The only benefit we want from this library, then, is to perform concise lookups between tag names and the dependency.  In this case, if you use the "fake" preload tag:
+The only benefit we want from this custom element, in that case, is to perform concise lookups between tag names and the dependency.  In this case, if you use the "fake" preload tag:
 
 ```html
 <link 
@@ -120,9 +120,10 @@ add the following code in the original navigation path:
 ```html
 <script>
     customElements.whenDefined('xtal-sip').then(()=>{
-        //Look at the browser's geolocation, ip address, do a look up to their content provider,
-        //then evaluate the pricing mechanism in place depending on the time of day,
-        // Utilize the recently standardized mobileAccountInfo api, to check if they are getting close to hitting their monthly data limit
+        // Look at the browser's geolocation, ip address, do a look up to their content provider,
+        // then evaluate the pricing mechanism in place depending on the time of day.
+        // Utilize the recently standardized mobileAccountInfo api, to check if they 
+        // are getting close to hitting their monthly data limit
         const isPayingThroughTheNose = ... ;
         //Now let XtalSip know the answer
         customElements.get('xtal-sip').useJITLoading = isPayingThroughTheNose
@@ -154,7 +155,7 @@ Some CDN's, [like jsdelivr](https://www.jsdelivr.com/features) allow you to comb
 
 [Support](https://www.nginx.com/resources/wiki/modules/concat/) [is](https://code.google.com/archive/p/modconcat/) also available on some web servers.
 
-One can also utilize build processes that generate bundled resources that contain definitions for multiple custom elegant tag names.
+One can also utilize build processes that generate bundled resources that contain definitions for multiple custom element tag names.
 
 While xtal-sip doesn't do anything to help create these bundled resources, or build the url's needed for concatenated resource requests, it does check if it has already requested a request before for other tag names, and if so, doesn't reload that url.
 
@@ -162,18 +163,18 @@ While xtal-sip doesn't do anything to help create these bundled resources, or bu
 
 One of the more complex pieces to consider is the issue of browsers that don't support ES6 classes, a cornerstone of web components.  And also, browsers / servers (or proxies) that don't support HTTP/2.  These should all be temporary problems, but unfortunately "temporary" could be several years.
 
-I'm sure anyone reading this has thought about the "Give me a one-handed economist" conundrum of how best to package and serve all users optimally.  On the one hand, the simplest thing to do is assume that the browsers that support ES6 will also suppport HTTP/2, and just build a giant bundle for ES5, and treat those users separately.  On the other hand even HTTP/1 users would benefit from some code splitting / progressive enhancement caching.  On the third hand, even HTTP/2 benefits from some bundline, depending perhaps on the server, etc.
+I'm sure anyone reading this has thought about the "Give me a one-handed economist" conundrum of how best to package and serve all users optimally.  On the one hand, the simplest thing to do is assume that the browsers that support ES6 will also suppport HTTP/2, and just build a giant bundle for ES5, and treat those users separately.  On the other hand even HTTP/1 users would benefit from some code splitting / progressive enhancement caching.  On the third hand, even HTTP/2 benefits from some bundling, depending perhaps on the server, etc.
 
 ### Tie breaking
 
 The goal of xtal-sip is to be flexible enough that developers can find a way to apply the best strategy for their use case.  Hopefully, the need for this kind of trade-off guesswork will diminish over time, so xtal-sip provides no ready-made solutions for this. 
 
-Instead, what you can is this.  Define multiple fake "rel-ish" preload link tags, that match the same custom element name.  The developer can define a static "tie breaker" function used by all instances of the xtal-sip element, that may take into account numerous factors in their environment to determine which one to use from the matching set.
+Instead, what it provides is this:  Define multiple fake "rel-ish" preload link tags, that match the same custom element name.  The developer can define a static "tie breaker" function used by all instances of the xtal-sip element, that may take into account numerous factors in their environment to determine which one to use from the matching set.
 
 ```html
 <script>
     customElements.whenDefined('xtal-sip').then(()=>{
-        customElements.get('xta.-sip').tieBreaker = (tagName, candidates, instance) =>{
+        customElements.get('xta.-sip').tieBreaker = (tagName, candidates) =>{
             //put your complex trade-off logic here, that picks from the candidates array.
             return thisIsTheBestCandidate;
         }
@@ -185,16 +186,26 @@ Instead, what you can is this.  Define multiple fake "rel-ish" preload link tags
 
 The argument "candidates" is an array of different link "rel-ish" preload tags.  The developer could add their own custom attributes to these link tags, which, combined with the browser type in play and other factors, could choose which of the overlapping references to use.
 
+## Discovering custom elements that need watering
+
+
+By default, if you irrigate some markup with an  /<xtal-sip/> tag, /<xtal-sip/> searches the vicinity of the tag (starting from its parent) for any instances of custom element tag names not yet registered, but expected to be used eventually.  While this achieves (hopefully) simple, low-maintenance markup as one is building an application, it can grow in cost as the number of tag references grows, and the size of the DOM tree to inspect grows in complexity.
+
 ### Explicit declaration
 
-By default, the presense of the <xtal-sip> tag causes the browser to search within the vicinity of the tag for any instances.  While this is low-maintenance, as one is building a view / screen, it can grow in cost as the number of tag references grows, and the size of the DOM tree to inspect grows in complexity.
-
-An optimizing step is supported, where you can list the specific tags that need loading for that view:
+An optimizing step is supported, where you can list the specific tags that need loading for that view.  These can be added as the application matures, when the production deployment nears.
 
 ```html
 <xtal-sip load="paper-input,iron-ajax"></xtal-sip>
 ```
 
+### Programmatic import
+
+If the sight of \<xtal-sip\>'s is unpleasant to see in the markup, an alternative way of explicitly declararing which tags should become active is to call the static method:
+
+```JavaScript
+customElements.get('xtal-sip').loadDependencies('paper-input,iron-ajax');
+```
 
 ### List of features:
 
@@ -205,7 +216,7 @@ An optimizing step is supported, where you can list the specific tags that need 
 - [x] Support async loading.
 - [x] Tie breaking
 - [ ] Just-in-time loading static property
-- [ ] Explicit declaration
+- [x]  Explicit declaration
 - [ ] For non async, specify whether to add a setTimeout before adding import tag (defaults to true)
 - [ ] Support specific settings of how to import (async, etc)
 - [x] Autogenerate .html references.
@@ -215,15 +226,7 @@ An optimizing step is supported, where you can list the specific tags that need 
   
 
 
-When \<xtal-sip/> is instantiated, it searches its neighbors (starting from the parent) for any such nodes that need "watering".  If it finds some matching nodes, then for each one, it checks if the custom element tag name has already been registered.  If not, it will dynamically load the starting reference for the custom element.
 
-## Performance Optimizing
-
-The guesswork involved in searching a DOM tree for matching tag names comes with a (minor) cost.  This can be eliminated by adding explicit tags to load, as the data-tags attribute:
-
-```html
-<xtal-sip data-tags="paper-input,iron-ajax"></xtal-sip>
-```
 
 
 ## Install the Polymer-CLI
