@@ -136,7 +136,7 @@
                             preloadLink.rel = 'preload';
                             preloadLink['as'] = el['as'];
                             preloadLink.dataset.tag = tag;
-                            preloadLink.dataset.preemptive = el.dataset.preemptive;
+                            Object.assign(preloadLink.dataset, el.dataset);
                             document.head.appendChild(preloadLink);
                         });
 
