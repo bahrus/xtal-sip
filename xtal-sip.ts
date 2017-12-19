@@ -157,7 +157,7 @@
             const load = this.getAttribute('load')
             if (load) {
                 load.split(',').forEach(tag => {
-                    console.log('loading ' + tag);
+                    //console.log('loading ' + tag);
                     XtalSip.loadDependency(tag);
                 })
             } else {
