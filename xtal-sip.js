@@ -162,12 +162,12 @@
     XtalSip._alreadyAdded = {};
     XtalSip._alreadyLoaded = {};
     XtalSip.useJITLoading = false;
-    customElements.define('xtal-sip', XtalSip);
     const detail = {};
     document.head.dispatchEvent(new CustomEvent('xtal-sip-init', {
         detail: detail,
     }));
     XtalSip.tieBreaker = detail['tieBreaker'];
+    customElements.define('xtal-sip', XtalSip);
     setTimeout(() => {
         const xs = document.createElement('xtal-sip');
         xs.setAttribute('load', 'dom-bind');
