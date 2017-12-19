@@ -26,9 +26,9 @@
         //static _preemptive: { [key: string]: boolean } = {};
         static get is() { return 'xtal-sip'; }
         static _tieBreaker: (tagName: string, options: IReference[]) => IReference;
-        static set tieBreaker(val: (tagName: string, options: IReference[]) => IReference) {
-            XtalSip._tieBreaker = val;
-        }
+        // static set tieBreaker(val: (tagName: string, options: IReference[]) => IReference) {
+        //     XtalSip._tieBreaker = val;
+        // }
 
         replaceAll(str, find, replace) {
             return str.replace(new RegExp(find, 'g'), replace);
@@ -37,8 +37,8 @@
             const lookupOptions = XtalSip._lookupMap[tagName];
             if (!lookupOptions) return;
             if (lookupOptions.length > 1) {
-                if (!XtalSip.tieBreaker) throw "Duplicate tagname found: " + tagName;
-                return XtalSip.tieBreaker(tagName, lookupOptions);
+                if (!XtalSip._tieBreaker) throw "Duplicate tagname found: " + tagName;
+                return XtalSip._tieBreaker(tagName, lookupOptions);
             } else {
                 return lookupOptions[0];
             }
@@ -172,7 +172,7 @@
     document.head.dispatchEvent(new CustomEvent('xtal-sip-init', {
         detail: detail,
     } as CustomEventInit));
-    XtalSip.tieBreaker = detail['tieBreaker'];
+    XtalSip._tieBreaker = detail['tieBreaker'];
     customElements.define('xtal-sip', XtalSip);
 
     setTimeout(() =>{

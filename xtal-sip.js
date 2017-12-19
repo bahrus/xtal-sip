@@ -10,9 +10,9 @@
     class XtalSip extends HTMLElement {
         //static _preemptive: { [key: string]: boolean } = {};
         static get is() { return 'xtal-sip'; }
-        static set tieBreaker(val) {
-            XtalSip._tieBreaker = val;
-        }
+        // static set tieBreaker(val: (tagName: string, options: IReference[]) => IReference) {
+        //     XtalSip._tieBreaker = val;
+        // }
         replaceAll(str, find, replace) {
             return str.replace(new RegExp(find, 'g'), replace);
         }
@@ -21,9 +21,9 @@
             if (!lookupOptions)
                 return;
             if (lookupOptions.length > 1) {
-                if (!XtalSip.tieBreaker)
+                if (!XtalSip._tieBreaker)
                     throw "Duplicate tagname found: " + tagName;
-                return XtalSip.tieBreaker(tagName, lookupOptions);
+                return XtalSip._tieBreaker(tagName, lookupOptions);
             }
             else {
                 return lookupOptions[0];
@@ -166,7 +166,7 @@
     document.head.dispatchEvent(new CustomEvent('xtal-sip-init', {
         detail: detail,
     }));
-    XtalSip.tieBreaker = detail['tieBreaker'];
+    XtalSip._tieBreaker = detail['tieBreaker'];
     customElements.define('xtal-sip', XtalSip);
     setTimeout(() => {
         const xs = document.createElement('xtal-sip');
