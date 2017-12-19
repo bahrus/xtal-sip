@@ -121,6 +121,13 @@
                                 modifiedHref = this.replaceAll(modifiedHref, '\\{' + counter + '\\}', token);
                                 counter++;
                             });
+                            let base = el.dataset.base;
+                            if(!base){
+                                const baseId = el.dataset.baseRef;
+                                if(baseId) base = document.getElementById(baseId).dataset.base;
+                            }
+                            if(!base) base = '';
+                            modifiedHref = base + modifiedHref;
                             //from https://developer.mozilla.org/en-US/docs/Web/HTML/Preloading_content
 
                             const preloadLink = document.createElement("link") as HTMLLinkElement;
@@ -150,6 +157,7 @@
             const load = this.getAttribute('load')
             if (load) {
                 load.split(',').forEach(tag => {
+                    console.log('loading ' + tag);
                     XtalSip.loadDependency(tag);
                 })
             } else {
@@ -161,5 +169,6 @@
     }
     customElements.define('xtal-sip', XtalSip);
     const xs = document.createElement('xtal-sip');
+    xs.setAttribute('load', 'dom-bind');
     document.body.appendChild(xs);
 })();
