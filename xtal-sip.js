@@ -21,9 +21,8 @@
             if (!lookupOptions)
                 return;
             if (lookupOptions.length > 1) {
-                if (!XtalSip._tieBreaker)
-                    throw "Duplicate tagname found: " + tagName;
-                return XtalSip._tieBreaker(tagName, lookupOptions);
+                throw "Duplicate tagname found: " + tagName;
+                // return XtalSip._tieBreaker(tagName, lookupOptions);
             }
             else {
                 return lookupOptions[0];
@@ -135,16 +134,25 @@
                 //}
                 this.qsa('link[rel="preload"][data-tag]', document.head).forEach(el => {
                     const tag = el.dataset.tag;
-                    if (!XtalSip._lookupMap[tag])
-                        XtalSip._lookupMap[tag] = [];
-                    XtalSip._lookupMap[tag].push({
+                    let needTieBreaking = false;
+                    const newRef = {
                         //hre el['href']
                         path: el.getAttribute('href'),
                         async: el.dataset.async !== undefined,
                         isScript: el['as'] === 'script',
                         preemptive: el.dataset.preemptive !== undefined,
                         element: el
-                    });
+                    };
+                    const oldRef = XtalSip._lookupMap[tag];
+                    if (!oldRef) {
+                        XtalSip._lookupMap[tag] = [newRef];
+                    }
+                    else if (XtalSip._tieBreaker) {
+                        const test = [oldRef[0], newRef];
+                        const bestRef = XtalSip._tieBreaker(tag, test);
+                        XtalSip._lookupMap[tag] = [bestRef];
+                    }
+                    //XtalSip._lookupMap[tag].push();
                 });
             }
             const load = this.getAttribute('load');
