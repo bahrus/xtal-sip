@@ -1,4 +1,3 @@
-import { setTimeout } from "timers";
 
 
 (function () {
