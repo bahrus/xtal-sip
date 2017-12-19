@@ -160,4 +160,6 @@
 
     }
     customElements.define('xtal-sip', XtalSip);
+    const xs = document.createElement('xtal-sip');
+    document.body.appendChild(xs);
 })();

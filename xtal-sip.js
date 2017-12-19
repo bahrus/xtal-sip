@@ -153,5 +153,7 @@
     XtalSip._alreadyLoaded = {};
     XtalSip.useJITLoading = false;
     customElements.define('xtal-sip', XtalSip);
+    const xs = document.createElement('xtal-sip');
+    document.body.appendChild(xs);
 })();
 //# sourceMappingURL=xtal-sip.js.map
