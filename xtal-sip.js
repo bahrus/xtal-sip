@@ -1,3 +1,4 @@
+import { setTimeout } from "timers";
 (function () {
     /**
     * `xtal-sip`
@@ -163,8 +164,15 @@
     XtalSip._alreadyLoaded = {};
     XtalSip.useJITLoading = false;
     customElements.define('xtal-sip', XtalSip);
-    const xs = document.createElement('xtal-sip');
-    xs.setAttribute('load', 'dom-bind');
-    document.body.appendChild(xs);
+    const detail = {};
+    document.head.dispatchEvent(new CustomEvent('xtal-sip-init', {
+        detail: detail,
+    }));
+    XtalSip.tieBreaker = detail['tieBreaker'];
+    setTimeout(() => {
+        const xs = document.createElement('xtal-sip');
+        xs.setAttribute('load', 'dom-bind');
+        document.body.appendChild(xs);
+    }, 50);
 })();
 //# sourceMappingURL=xtal-sip.js.map

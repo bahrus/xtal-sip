@@ -1,3 +1,5 @@
+import { setTimeout } from "timers";
+
 
 (function () {
     interface IReference {
@@ -168,7 +170,15 @@
 
     }
     customElements.define('xtal-sip', XtalSip);
-    const xs = document.createElement('xtal-sip');
-    xs.setAttribute('load', 'dom-bind');
-    document.body.appendChild(xs);
+    const detail = {};
+    document.head.dispatchEvent(new CustomEvent('xtal-sip-init', {
+        detail: detail,
+    } as CustomEventInit));
+    XtalSip.tieBreaker = detail['tieBreaker'];
+    setTimeout(() =>{
+        const xs = document.createElement('xtal-sip');
+        xs.setAttribute('load', 'dom-bind');
+        document.body.appendChild(xs);
+    }, 50);
+
 })();
