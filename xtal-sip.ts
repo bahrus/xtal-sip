@@ -38,12 +38,12 @@
             if (!lookupOptions) return;
             if (lookupOptions.length > 1) {
                 throw "Duplicate tagname found: " + tagName;
-               // return XtalSip._tieBreaker(tagName, lookupOptions);
+                // return XtalSip._tieBreaker(tagName, lookupOptions);
             } else {
                 return lookupOptions[0];
             }
         }
-        static loadDependencies(tagNames: string[]){
+        static loadDependencies(tagNames: string[]) {
             tagNames.forEach(tagName => XtalSip.loadDependency(tagName))
         }
         static loadDependency(tagName: string) {
@@ -108,41 +108,68 @@
                 // })
                 XtalSip._lookupMap = {};
                 //if (!XtalSip.useJITLoading) {
-
-                    this.qsa('link[rel-ish="preload"]', document.head).forEach(el => {
-                        //const isPreemptive = el.dataset.preemptive !== undefined;
-                        const isAsync = el.dataset.async !== undefined;
-                        //const isPreFetch = el.getAttribute('rel-ish') === 'prefetch'
-                        const href = el.getAttribute('href');
-                        el.dataset.tags.split(',').forEach(tag => {
-                            //if (isPreemptive) XtalSip._preemptive[tag] = true;
-                            let modifiedHref = href;
-                            let counter = 0;
-                            tag.split('-').forEach(token => {
-                                modifiedHref = this.replaceAll(modifiedHref, '\\{' + counter + '\\}', token);
-                                counter++;
-                            });
-                            let base = el.dataset.base;
-                            if(!base){
-                                const baseId = el.dataset.baseRef;
-                                if(baseId) base = document.getElementById(baseId).dataset.base;
-                            }
-                            if(!base) base = '';
-                            modifiedHref = base + modifiedHref;
-                            //from https://developer.mozilla.org/en-US/docs/Web/HTML/Preloading_content
-
-                            const preloadLink = document.createElement("link") as HTMLLinkElement;
-                            preloadLink.href = modifiedHref;
-                            preloadLink.rel = 'preload';
-                            preloadLink['as'] = el['as'];
-                            preloadLink.dataset.tag = tag;
-                            Object.assign(preloadLink.dataset, el.dataset);
-                            document.head.appendChild(preloadLink);
+                //filter out duplicate tags for same tag name
+                const tagToFakeLink = {};
+                this.qsa('link[rel-ish="preload"]', document.head).forEach(el => {
+                    el.dataset.tags.split(',').forEach(tag => {
+                        if(!tagToFakeLink[tag]) tagToFakeLink[tag] = [];
+                        tagToFakeLink[tag].push(el);
+                    })
+                });
+                const goodEls = [];
+                //const alreadyAdded = {};
+                //debugger;
+                for(var key in tagToFakeLink){
+                    const els = tagToFakeLink[key];
+                    let elToAdd;
+                    if(els.length === 1) {
+                        elToAdd = els[0];
+                    }else{
+                        if(XtalSip._tieBreaker){
+                            elToAdd = XtalSip._tieBreaker(key, els);
+                        }
+                    }
+                    if(elToAdd){
+                        if(elToAdd['alreadyAdded']) continue;
+                        elToAdd['alreadyAdded'] = true;
+                        goodEls.push(elToAdd);
+                    }
+                }
+                // this.qsa('link[rel-ish="preload"]', document.head).forEach(el => {
+                goodEls.forEach(el =>{
+                    //const isPreemptive = el.dataset.preemptive !== undefined;
+                    const isAsync = el.dataset.async !== undefined;
+                    //const isPreFetch = el.getAttribute('rel-ish') === 'prefetch'
+                    const href = el.getAttribute('href');
+                    el.dataset.tags.split(',').forEach(tag => {
+                        //if (isPreemptive) XtalSip._preemptive[tag] = true;
+                        let modifiedHref = href;
+                        let counter = 0;
+                        tag.split('-').forEach(token => {
+                            modifiedHref = this.replaceAll(modifiedHref, '\\{' + counter + '\\}', token);
+                            counter++;
                         });
+                        let base = el.dataset.base;
+                        if (!base) {
+                            const baseId = el.dataset.baseRef;
+                            if (baseId) base = document.getElementById(baseId).dataset.base;
+                        }
+                        if (!base) base = '';
+                        modifiedHref = base + modifiedHref;
+                        //from https://developer.mozilla.org/en-US/docs/Web/HTML/Preloading_content
 
+                        const preloadLink = document.createElement("link") as HTMLLinkElement;
+                        preloadLink.href = modifiedHref;
+                        preloadLink.rel = 'preload';
+                        preloadLink['as'] = el['as'];
+                        preloadLink.dataset.tag = tag;
+                        Object.assign(preloadLink.dataset, el.dataset);
+                        document.head.appendChild(preloadLink);
                     });
+
+                });
                 //}
-                this.qsa( 'link[rel="preload"][data-tag]', document.head).forEach(el => {
+                this.qsa('link[rel="preload"][data-tag]', document.head).forEach(el => {
                     const tag = el.dataset.tag;
                     let needTieBreaking = false;
                     const newRef = {
@@ -155,12 +182,9 @@
                     } as IReference;
                     const oldRef = XtalSip._lookupMap[tag]
                     if (!oldRef) {
-                        XtalSip._lookupMap[tag] = [newRef];
-                    }else if(XtalSip._tieBreaker){
-                        const test = [oldRef[0], newRef];
-                        const bestRef = XtalSip._tieBreaker(tag, test);
-                        XtalSip._lookupMap[tag] = [bestRef];
-                    }
+                        XtalSip._lookupMap[tag] = [];
+                    } 
+                    XtalSip._lookupMap[tag].push(newRef);
                     //XtalSip._lookupMap[tag].push();
                 });
 
@@ -185,7 +209,7 @@
     XtalSip._tieBreaker = detail['tieBreaker'];
     customElements.define('xtal-sip', XtalSip);
 
-    setTimeout(() =>{
+    setTimeout(() => {
         const xs = document.createElement('xtal-sip');
         xs.setAttribute('load', 'dom-bind');
         document.body.appendChild(xs);

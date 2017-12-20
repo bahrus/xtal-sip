@@ -99,7 +99,38 @@
                 // })
                 XtalSip._lookupMap = {};
                 //if (!XtalSip.useJITLoading) {
+                //filter out duplicate tags for same tag name
+                const tagToFakeLink = {};
                 this.qsa('link[rel-ish="preload"]', document.head).forEach(el => {
+                    el.dataset.tags.split(',').forEach(tag => {
+                        if (!tagToFakeLink[tag])
+                            tagToFakeLink[tag] = [];
+                        tagToFakeLink[tag].push(el);
+                    });
+                });
+                const goodEls = [];
+                //const alreadyAdded = {};
+                //debugger;
+                for (var key in tagToFakeLink) {
+                    const els = tagToFakeLink[key];
+                    let elToAdd;
+                    if (els.length === 1) {
+                        elToAdd = els[0];
+                    }
+                    else {
+                        if (XtalSip._tieBreaker) {
+                            elToAdd = XtalSip._tieBreaker(key, els);
+                        }
+                    }
+                    if (elToAdd) {
+                        if (elToAdd['alreadyAdded'])
+                            continue;
+                        elToAdd['alreadyAdded'] = true;
+                        goodEls.push(elToAdd);
+                    }
+                }
+                // this.qsa('link[rel-ish="preload"]', document.head).forEach(el => {
+                goodEls.forEach(el => {
                     //const isPreemptive = el.dataset.preemptive !== undefined;
                     const isAsync = el.dataset.async !== undefined;
                     //const isPreFetch = el.getAttribute('rel-ish') === 'prefetch'
@@ -145,13 +176,9 @@
                     };
                     const oldRef = XtalSip._lookupMap[tag];
                     if (!oldRef) {
-                        XtalSip._lookupMap[tag] = [newRef];
+                        XtalSip._lookupMap[tag] = [];
                     }
-                    else if (XtalSip._tieBreaker) {
-                        const test = [oldRef[0], newRef];
-                        const bestRef = XtalSip._tieBreaker(tag, test);
-                        XtalSip._lookupMap[tag] = [bestRef];
-                    }
+                    XtalSip._lookupMap[tag].push(newRef);
                     //XtalSip._lookupMap[tag].push();
                 });
             }
