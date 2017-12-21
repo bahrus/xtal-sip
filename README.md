@@ -8,6 +8,8 @@ Dynamically "water" a custom element tag with the necessary dependency to sprout
 
 NB:  This component suffers currently in terms of IDE and build support, especially compared to the Polymer supported [lazy-imports](https://github.com/Polymer/lazy-imports).
 
+The goal of this web component is to allow for easier maintenance of references, and reducing redundancy.  For example, this component allows the same index.html page to serve both IE11 and modern browsers fairly seemlessly.
+
 Importing the files needed for web components seems likely to become a lot more complicated.  Some references will come from bower_components, some from node_modules.  Some will be references to html files, others js files.  And the references are likely to be in a state of flux, as the [whims of elite developers](https://codeburst.io/the-javascript-modules-limbo-585eedbb182e) change.  Components will first migrate to node_modules (how will we explain to our grandkids that web components are node modules?).   As support for HTML Imports wanes, many  *.html files will be converted to *.js files, then to *.mjs files, then back to *.mhtml files, once the W3C Ents show some HTML love.  That will shortly be followed by converting them to *.wasm, followed by the Universal binary format that includes HTML, JS, CSS, WASM: *.xap.
 
 This component, \<xtal-sip\>, is intended to "centralize the pain."  Keep the mappings between custom element tags and where to load the references for them all in one place.
