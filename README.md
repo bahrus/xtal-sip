@@ -173,11 +173,12 @@ Instead, what it provides is this:  Define multiple fake "rel-ish" preload link 
 
 ```html
 <script>
-    customElements.whenDefined('xtal-sip').then(()=>{
-        customElements.get('xta.-sip').tieBreaker = (tagName, candidates) =>{
-            //put your complex trade-off logic here, that picks from the candidates array.
-            return thisIsTheBestCandidate;
-        }
+    document.head.addEventListener('xtal-sip-init', e =>{
+      e.detail.tieBreaker = (tagName, candidates) =>{
+         //put your complex trade-off logic here, that picks from the candidates array.
+         var thisIsTheBestCandidate = candidates[1]; //just as an example
+         return thisIsTheBestCandidate;
+      }
     })
 
 </script>
