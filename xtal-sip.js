@@ -156,7 +156,7 @@
                         const preloadLink = document.createElement("link");
                         preloadLink.href = modifiedHref;
                         preloadLink.rel = 'preload';
-                        preloadLink['as'] = el['as'];
+                        preloadLink.setAttribute('as', el.getAttribute('as'));
                         preloadLink.dataset.tag = tag;
                         Object.assign(preloadLink.dataset, el.dataset);
                         document.head.appendChild(preloadLink);
