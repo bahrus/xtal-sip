@@ -1,6 +1,8 @@
 {
   "sources":[
-    "xtal-sip.js"
+    "xtal-sip.js",
+    "xtal-sip-loader.js",
+    "ES5Compat.js"
   ],
   "lint": {
     "rules": [
