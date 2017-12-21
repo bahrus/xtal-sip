@@ -176,7 +176,7 @@
                         //hre el['href']
                         path: el.getAttribute('href'),
                         async: el.dataset.async !== undefined,
-                        isScript: el['as'] === 'script',
+                        isScript: el.getAttribute('as') === 'script',
                         preemptive: el.dataset.preemptive !== undefined,
                         element: el
                     } as IReference;
