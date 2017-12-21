@@ -16,7 +16,7 @@
         var es5Compat = document.createElement('script');
         es5Compat.src = cs_src.replace('xtal-sip-loader.js', 'ES5Compat.js');
         es5Compat.async = false;
-        es5Compat.onload = () =>{
+        es5Compat.onload = function(){
             loadSip();
         }
         document.head.appendChild(es5Compat);
