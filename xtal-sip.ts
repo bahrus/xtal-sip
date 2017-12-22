@@ -25,7 +25,8 @@
 
         //static _preemptive: { [key: string]: boolean } = {};
         static get is() { return 'xtal-sip'; }
-        static _tieBreaker: (tagName: string, options: IReference[]) => IReference;
+        static _tieBreaker: (tagName: string, candidates: HTMLLinkElement[]) => IReference;
+        static _substitutor: (link: HTMLLinkElement) => void;
         // static set tieBreaker(val: (tagName: string, options: IReference[]) => IReference) {
         //     XtalSip._tieBreaker = val;
         // }
@@ -111,6 +112,7 @@
                 //filter out duplicate tags for same tag name
                 const tagToFakeLink = {};
                 this.qsa('link[rel-ish="preload"]', document.head).forEach(el => {
+                    if(XtalSip._substitutor) XtalSip._substitutor(el as HTMLLinkElement);
                     el.dataset.tags.split(',').forEach(tag => {
                         if(!tagToFakeLink[tag]) tagToFakeLink[tag] = [];
                         tagToFakeLink[tag].push(el);
@@ -207,6 +209,7 @@
         detail: detail,
     } as CustomEventInit));
     XtalSip._tieBreaker = detail['tieBreaker'];
+    XtalSip._substitutor = detail['substitutor'];
     customElements.define('xtal-sip', XtalSip);
 
     setTimeout(() => {

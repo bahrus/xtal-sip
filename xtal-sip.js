@@ -102,6 +102,8 @@
                 //filter out duplicate tags for same tag name
                 const tagToFakeLink = {};
                 this.qsa('link[rel-ish="preload"]', document.head).forEach(el => {
+                    if (XtalSip._substitutor)
+                        XtalSip._substitutor(el);
                     el.dataset.tags.split(',').forEach(tag => {
                         if (!tagToFakeLink[tag])
                             tagToFakeLink[tag] = [];
@@ -202,6 +204,7 @@
         detail: detail,
     }));
     XtalSip._tieBreaker = detail['tieBreaker'];
+    XtalSip._substitutor = detail['substitutor'];
     customElements.define('xtal-sip', XtalSip);
     setTimeout(() => {
         const xs = document.createElement('xtal-sip');

@@ -117,18 +117,18 @@ The only benefit we want from this custom element, in that case, is to perform c
     rel-ish="preload" ...>
 ```
 
-add the following code in the original navigation path:
+add the following code in the original navigation path (i.e. top of the header in index.html):
 
 ```html
 <script>
-    customElements.whenDefined('xtal-sip').then(()=>{
+    document.head.addEventListener('xtal-sip-init', e =>{
         // Look at the browser's geolocation, ip address, do a look up to their content provider,
         // then evaluate the pricing mechanism in place depending on the time of day.
         // Utilize the recently standardized mobileAccountInfo api, to check if they 
         // are getting close to hitting their monthly data limit
         const isPayingThroughTheNose = ... ;
         //Now let XtalSip know the answer
-        customElements.get('xtal-sip').useJITLoading = isPayingThroughTheNose
+        e.detail.useJITLoading = isPayingThroughTheNose;
     })
 </script>
 ```
@@ -137,6 +137,8 @@ add the following code in the original navigation path:
 ## Async loading
 
 If the preload tag has attribute data-async, then live references will use async capabilities (async import, async script reference).
+
+
 
 ## Script references
 
@@ -167,6 +169,21 @@ One of the more complex pieces to consider is the issue of browsers that don't s
 
 I'm sure anyone reading this has thought about the "Give me a one-handed economist" conundrum of how best to package and serve all users optimally.  On the one hand, the simplest thing to do is assume that the browsers that support ES6 will also suppport HTTP/2, and just build a giant bundle for ES5, and treat those users separately.  On the other hand even HTTP/1 users would benefit from some code splitting / progressive enhancement caching.  On the third hand, even HTTP/2 benefits from some bundling, depending perhaps on the server, etc.
 
+
+### Bootstrapping: Referencing xtal-sip
+
+In the build folder of xtal-sip is an ES6 and an ES5 version.
+
+To decide which to use, I recommend loading the xtal-sip-loader.js file in the root folder.  This will load the correct version of xtal-sip.  It will also had the boilerplate webpack snippet of code polymer inserts during the build for ES5 builds.
+
+To reference xtal-sip-loader.js, use a script tag as follows:
+
+```html
+<script src="https://cdn.jsdelivr.net/npm/xtal-sip/xtal-sip-loader.js" data-tag="xtal-sip"></script>
+```
+
+Note the presence of the data-tag attribute.  This helps overcome a limitation IE11 has with the document.currentScript object.  Whereas document.currentScript is well supported in modern browsers, in IE11, it's support is kind of there, but it doesn't work reliably.  This is a recipe for disaster.  So xtal-sip-loader searches for that attribute to determine for certain where the reference came from, so it can dynamically load xtal-sip.js (and ES5Compat.js) with confidence regaring the location.
+
 ### Tie breaking
 
 The goal of xtal-sip is to be flexible enough that developers can find a way to apply the best strategy for their use case.  Hopefully, the need for this kind of trade-off guesswork will diminish over time, so xtal-sip provides no ready-made solutions for this. 
@@ -189,10 +206,67 @@ Instead, what it provides is this:  Define multiple fake "rel-ish" preload link 
 
 The argument "candidates" is an array of different link "rel-ish" preload tags.  The developer could add their own custom attributes to these link tags, which, combined with the browser type in play and other factors, could choose which of the overlapping references to use.
 
+### Suggestion on how to resolve static dependencies
+
+If 1) you are creating a custom element wrapper around a third-party api, which has dependencies (like d3.js or css files), and 2)  you want to avoid adding a require.js dependency, and 3) you are trying to avoid the (deprecated?) HTMLImport, you might be faced with the dilemma of how to find the location of the dependencies.
+
+As mentioned above, document.currentScript is extremely buggy in IE11.  I suggest using the following approach to find the location of the script associated with the custom element tag name you are working with:
+
+```JavaScript
+    let cs_src = '';
+    let link = document.head.querySelector('link[data-tag="my-tag-name"]');
+    if(link){
+        cs_src = link.getAttribute('href');
+    }else{
+        let cs = document.currentScript;
+        if(cs) {
+            cs_src = cs['src'];
+        }else{
+            cs_src = '/bower_components/my-tag-name/my-tag-name.js'; //or node_modules soon
+        }
+    }
+```
+
+### Substitution
+
+Using the tie breaking approach described above to differentiate between ES5 and ES6 references can get redundant, particularly if there's symmetry between how bundling is done for ES5 vs ES6.  For example, suppose we do no bundling.  We would be apt to end up with lots of "double references":
+
+```html
+  <link rel-ish="preload" async as="script" data-es="6" data-base-ref="hasBaseCdnUrl"
+    href="xtal-json-editor/build/ES6/xtal-json-editor.js" data-tags="xtal-json-editor">
+
+    <link rel-ish="preload" async as="script" data-es="5" data-base-ref="hasBaseCdnUrl"
+    href="xtal-json-editor/build/ES5/xtal-json-editor.js" data-tags="xtal-json-editor">
+```
+
+That's a nuisance to maintain, and won't help reducing the bandwidth of the application.
+
+One can provide xtal-sip a preprocessing function that will subsitute (say) ES6 with ES5:
+
+```html
+<script>
+    document.head.addEventListener('xtal-sip-init', e =>{
+      e.detail.tieBreaker = ...;
+      e.detail.substitutor = (relishLink =>{
+          switch(navigator.userAgent){
+              case 'Lynx/2.8.7rel.2 libwww-FM/2.14 SSL-MM/1.4.1 OpenSSL/1.0.0a':
+                relishLink.href = relishLink.href.replace('/ES6/MyWebGLPanorma.js','console.asciiArt.dots');
+                break;
+              case 'Mozilla/5.0 (compatible; bingbot/2.0 +http://www.bing.com/bingbot.htm)':
+                relishLink.href = relishLink.href.replace('/ES6/BoringBundleOfBlah.js', '/ES3/ClickBait.js');
+                break;
+          }
+      });
+    })
+
+</script>
+
+```
+
 ## Discovering custom elements that need watering
 
 
-By default, if you irrigate some markup with an  /<xtal-sip/> tag, /<xtal-sip/> searches the vicinity of the tag (starting from its parent) for any instances of custom element tag names not yet registered, but expected to be used eventually.  While this achieves (hopefully) simple, low-maintenance markup as one is building an application, it can grow in cost as the number of tag references grows, and the size of the DOM tree to inspect grows in complexity.
+By default, if you irrigate some markup with an  \<xtal-sip\> tag, \<xtal-sip\> searches the vicinity of the tag (starting from its parent) for any instances of custom element tag names not yet registered, but expected to be used eventually.  While this achieves (hopefully) simple, low-maintenance markup as one is building an application, it can grow in cost as the number of tag references grows, and the size of the DOM tree to inspect grows in complexity.  It could also result in excessive sprinkling of the </xtal >
 
 ### Explicit declaration
 
@@ -218,6 +292,7 @@ customElements.get('xtal-sip').loadDependencies('paper-input,iron-ajax');
 - [x] Explicit tag dependency listing for optimal performance.
 - [x] Support async loading.
 - [x] Tie breaking
+- [x] Substitution
 - [ ] Just-in-time loading static property
 - [x]  Explicit declaration
 - [ ] For non async, specify whether to add a setTimeout before adding import tag (defaults to true)
