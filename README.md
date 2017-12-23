@@ -4,7 +4,7 @@
 
 <a href="https://www.webcomponents.org/element/bahrus/xtal-sip/demo/index.html">Demo</a>
 
-Dynamically "water" a custom element tag with the necessary dependency to sprout the tag from an inert seedling to a thing of beauty.  Dependency free.
+Dynamically "water" a custom element tag with the necessary dependency to sprout the tag from an inert seedling to a thing of beauty.  Dependency free.  950B minified and gzipped.
 
 NB:  This component suffers currently in terms of IDE and build support, especially compared to the Polymer supported [lazy-imports](https://github.com/Polymer/lazy-imports).
 
@@ -35,6 +35,11 @@ xtal-sip assumes that web sites will want to take advantage of the recent web st
 ```
 
 For performance reasons, it is beneficial to use these to preload all these references ahead of time.  Might as well build on this support to provide the mappings we need, and not repeat ourselves.
+
+### What about prefetch
+
+An older alternative to \<link rel="preload"\> is \<link rel="prefetch"\>.  However, from my experiments, this directive seems quite messed up, always resulting in duplicate downloads.  If I run across a good explanation of how to use prefetch properly, this component will support it as well.
+
 
 So what does xtal-sip add to the \<link rel="preload"\> functionality?
 
@@ -286,9 +291,6 @@ If the sight of \<xtal-sip\>'s is unpleasant to see in the markup, an alternativ
 customElements.get('xtal-sip').loadDependencies('paper-input,iron-ajax');
 ```
 
-## Mix-in mischief
-
-
 ## List of features:
 
 - [x] Auto triggering based on tag name.
@@ -307,9 +309,37 @@ customElements.get('xtal-sip').loadDependencies('paper-input,iron-ajax');
 - [ ] Autogenerate ES6 module script references.
 - [ ] Add some sort of TBD mechanism to help with builds / push strategies (suggestions welcome).
   
+# Marinating Ideas
 
+## Mix-in mischief
 
+The \<xtal-sip\> element takes the philosophical stance that web components are more than just some mundane JavaScript libraries.  They enhance the DOM vocabulary.  They create a mapping between a tag and something that, yes, is a JavaScript class. But typically no code needs to interact directly with that class -- only the browser.
 
+But I conceded that the case for using this alternative approach to loading the libraries is strongest when adopting this at the "web composition" level -- i.e. application specific, content heavy, non reusable assemblies of components.  But once we get into more generic web components, formal module importing systems is the way to go. 
+
+But what follows is an extremely hand wavy thought experiment of what things would look like if we carried the idea to another level, and applied it to web component mixins.  These mixins would also benefit from preloading and from centrally managing their locations / providing ES5 alternative resources.  But what would the actual implementation look like?  Would it do more harm than good?
+ 
+One of the challenges of mixins is that a web component must wait until all the mixins it relies on are fully loaded before the custom element class can be defined and registered.  Granted, this is an area ES6 modules should solve rather handily.  But how would we solve this with declarative link tags?
+
+We would start with a preemptive link preload tag for the mixins:
+
+```html
+<link id="myMixinA" rel(-ish)="preload" as="script" href="myMixinA.js" onload="clearMixinDependency('myMixinA')">
+<link id="myMixinB" rel(-ish)="preload" as="script" href="myMixinB.js" onload="clearMixinDependency('myMixinB')">
+```
+
+The link for the custom element would indicate it needs that mixin.  
+
+```html
+<link rel(-ish)="preload" as="script" href="myCustomElement.js" data-mixin-myMixinA data-mixin-myMixinB>
+```
+
+Even if a "my-custom-element" tag is encountered, \<xtal-sip\> wouldn't make it "live" until all the attributes starting with data-mixin were gone.
+
+The function clearMixinDependency(mixinName) would find all the links with the corresponding data-mixin attribute, and set a property of the link tag equal to the mixin (maybe use one property of type array, called "mixins" and keep appending the mixin's to it).  The mixin property would be set also for the live script reference, and the code for creating the custom element class would retrieve the array of mixins.   (hopefully order doesn't matter) and maybe use the with(...mixins) [found here](http://justinfagnani.com/2015/12/21/real-mixins-with-javascript-classes/) to apply them.  It would retrieve
+the mixins via document.currentScript or import.meta.
+
+This last sentence in the paragraph above is probably the weakest point -- it means the class definition for the web component needs to have some [optional?] logic that looks for the mixins from a "physical" tag -- document.currentScript.mixins or import.meta.mixins.
 
 
 ## Install the Polymer-CLI
