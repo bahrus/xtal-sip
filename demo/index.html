@@ -10,8 +10,9 @@
   <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
 
   <link rel="import" href="../../iron-demo-helpers/demo-pages-shared-styles.html">
-  <!-- <link rel="preload" as="script" data-tag="xtal-link-preview" async href="https://rawgit.com/bahrus/xtal-link-preview/master/xtal-link-preview.js"> -->
+  
   <link rel="preload" async as="script" data-tag="xtal-link-preview" href="https://cdn.jsdelivr.net/npm/xtal-link-preview/build/ES6/xtal-link-preview.js">
+  <link rel="preload" as="script" data-tag="c-c" href="https://cdn.jsdelivr.net/npm/carbon-copy/build/ES6/carbon-copy.js">
   <script>
     // customElements.whenDefined('xtal-sip').then(() =>{
     //     const xs = customElements.get('xtal-sip');
@@ -45,6 +46,7 @@
           <template>
             <div style="height:400px">
               <xtal-sip></xtal-sip>
+              <c-c href="include.html#myTemplate"></c-c>
               <wired-card class="form">
                 <h3>Form Title</h3>
                 <div>
