@@ -149,7 +149,7 @@ Now add the following code in the original navigation path (i.e. top of the head
 </script>
 ```
 
-This will cirumvent the generation of individual real rel="preload" tags.  Instead, it will create multiple rel-ish tags with individual data-tag attributes, allowing for fast lookup between tagname and the url.
+This will circumvent the generation of individual real rel="preload" tags.  Instead, it will create multiple rel-ish tags with individual data-tag attributes, allowing for fast lookup between tagname and the url.
 
 ## Async loading
 
@@ -192,7 +192,7 @@ The following features assist in our goal of supporting all browser types withou
 
 In the build folder of xtal-sip is an ES6 and an ES5 version.
 
-To decide which to use, I recommend loading the xtal-sip-loader.js file in the root folder.  This will load the correct version of xtal-sip.  It will also had the boilerplate webpack snippet of code Polymer inserts during the build for ES5 builds.
+To decide which to use, I recommend loading the xtal-sip-loader.js file in the root folder.  This will load the correct version of xtal-sip.  It will also add the boilerplate webpack snippet of code Polymer inserts during the build for ES5 builds.
 
 To reference xtal-sip-loader.js, use a script tag as follows:
 
