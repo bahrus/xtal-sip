@@ -4,7 +4,7 @@
 
 <a href="https://www.webcomponents.org/element/bahrus/xtal-sip/demo/index.html">Demo</a>
 
-Dynamically "water" a custom element tag with the necessary dependency to sprout the tag from an inert seedling to a thing of beauty.  Dependency free.  950B minified and gzipped.
+\<xtal-sip\> is a dependency free, 950B minified and gzipped custom element that dynamically "waters" other custom element tags with the necessary dependencies to sprout the tag from an inert seedling to a thing of beauty. 
 
 NB:  This component suffers currently in terms of IDE and build support, especially compared to the Polymer supported [lazy-imports](https://github.com/Polymer/lazy-imports).
 
@@ -36,7 +36,7 @@ xtal-sip assumes that web sites will want to take advantage of the recent web st
 
 For performance reasons, it is beneficial to use these to preload all these references ahead of time.  Might as well build on this support to provide the mappings we need, and not repeat ourselves.
 
-### What about prefetch
+### What about prefetch?
 
 An older alternative to \<link rel="preload"\> is \<link rel="prefetch"\>.  However, from my experiments, this directive seems quite messed up, always resulting in duplicate downloads.  If I run across a good explanation of how to use prefetch properly, this component will support it as well.
 
@@ -90,6 +90,18 @@ Here's an even more aggressive example, that uses {0} and {1}:
     href="//myIoTServerRunningFromMyMicrowaveOven.com/npm/@polymer/{0}-{1}/{0}-{1}.html" 
     data-tags="paper-checkbox,paper-input,paper-button,iron-input">
 >
+```
+
+### Common base href
+
+It's likely that numerous link tags will want to share the same base url.  This is accomplished using a data-base attribute to set a common path, and then other link tags can refer to it via the id of the first tag:
+
+```html
+<link id="hasBaseCdnUrl" rel-ish="preload" async as="script" data-base="https://cdn.jsdelivr.net/npm/"
+    href="xtal-json-merge/build/ES6/json-merge.js" data-tags="json-merge">
+
+<link rel-ish="preload" async as="script" data-base-ref="hasBaseCdnUrl"
+    href="xtal-json-editor/build/ES6/xtal-json-editor.js" data-tags="xtal-json-editor">    
 ```
 
 ## Preemptive loading
@@ -296,6 +308,7 @@ customElements.get('xtal-sip').loadDependencies('paper-input,iron-ajax');
 - [x] Auto triggering based on tag name.
 - [x] Compact dependency loading.
 - [x] Optional preemptive loading.
+- [x] Common base href's
 - [x] Explicit tag dependency listing for optimal performance.
 - [x] Support async loading.
 - [x] Tie breaking
