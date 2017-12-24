@@ -168,6 +168,21 @@ If the preload tag has attribute data-async, then live references will use async
     platinum-sw
 >
 ```
+
+## c-c reference
+
+[The carbon copy element](https://www.webcomponents.org/element/bahrus/carbon-copy), c-c for short, provides a 1.9 kb alternative to HTML Imports, that can also be used to define HTML-based custom elements.  Unlike HTML Imports, it also supports direct client-side include functionality, including dynamic url references, similar to Polymer's iron-pages.  
+
+Xtal-sip also provides support for lazily loading custom elements defined and imported via the carbon copy element:
+
+```html
+<link 
+    rel="preload" as="document" 
+    data-tag="my-component" type="text/html" 
+    data-importer="c-c" href="include.html#myTemplate">
+    ...
+```
+
 ## Bundling
 
 Some CDN's, [like jsdelivr](https://www.jsdelivr.com/features) allow you to combine multiple assets together with one http request.
