@@ -41,10 +41,15 @@
             if (customElements.get(tagName))
                 return;
             let newTag;
+            let target = document.head;
             if (lookup.isScript) {
                 newTag = document.createElement('script');
                 newTag.src = lookup.path;
-                //if(lookup.async) scriptTag.setAttribute('async', '');
+            }
+            else if (lookup.isCCRef) {
+                newTag = document.createElement('c-c');
+                newTag.setAttribute('href', lookup.path);
+                target = document.body;
             }
             else {
                 newTag = document.createElement("link");
@@ -54,7 +59,7 @@
             if (lookup.async)
                 newTag.setAttribute('async', '');
             setTimeout(() => {
-                document.head.appendChild(newTag);
+                target.appendChild(newTag);
             }, 50);
         }
         qsa(css, from) {
@@ -173,6 +178,7 @@
                         path: el.getAttribute('href'),
                         async: el.dataset.async !== undefined,
                         isScript: el.getAttribute('as') === 'script',
+                        isCCRef: el.dataset.importer === 'c-c',
                         preemptive: el.dataset.preemptive !== undefined,
                         element: el
                     };

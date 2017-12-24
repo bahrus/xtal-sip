@@ -319,6 +319,7 @@ customElements.get('xtal-sip').loadDependencies('paper-input,iron-ajax');
 - [ ] Support specific settings of how to import (async, etc)
 - [x] Autogenerate .html references.
 - [x] Autogenerate .js classic script references.
+- [x] Autogenerate c-c references.
 - [ ] Autogenerate ES6 module script references.
 - [ ] Add some sort of TBD mechanism to help with builds / push strategies (suggestions welcome).
   
