@@ -187,7 +187,7 @@ Xtal-sip also provides support for lazily loading custom elements defined and im
 
 ## Bundling
 
-Some CDN's, [like jsdelivr,0872`](https://www.jsdelivr.com/features) allow you to combine multiple assets together with one http request.
+Some CDN's, [like jsdelivr](https://www.jsdelivr.com/features) allow you to combine multiple assets together with one http request.
 
 > https://cdn.jsdelivr.net/combine/gh/jquery/jquery@3.2/dist/jquery.min.js,gh/twbs/bootstrap@3.3/dist/js/bootstrap.min.js
 
