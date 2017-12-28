@@ -212,10 +212,10 @@
     XtalSip._tieBreaker = detail['tieBreaker'];
     XtalSip._substitutor = detail['substitutor'];
     customElements.define('xtal-sip', XtalSip);
-    setTimeout(() => {
+    document.addEventListener("DOMContentLoaded", e => {
         const xs = document.createElement('xtal-sip');
         xs.setAttribute('load', 'dom-bind');
         document.body.appendChild(xs);
-    }, 50);
+    });
 })();
 //# sourceMappingURL=xtal-sip.js.map

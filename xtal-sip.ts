@@ -217,10 +217,11 @@
     XtalSip._substitutor = detail['substitutor'];
     customElements.define('xtal-sip', XtalSip);
 
-    setTimeout(() => {
+    document.addEventListener("DOMContentLoaded", e => { 
         const xs = document.createElement('xtal-sip');
         xs.setAttribute('load', 'dom-bind');
         document.body.appendChild(xs);
-    }, 50);
+    });
+
 
 })();
