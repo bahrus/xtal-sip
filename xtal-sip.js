@@ -1,4 +1,12 @@
 (function () {
+    const baseCustomElementDefine = customElements.define;
+    customElements.define = (name, cls) => {
+        const lookup = XtalSip.get(name);
+        if (lookup) {
+            Object.assign(cls, lookup.el.dataset);
+        }
+        baseCustomElementDefine(name, cls);
+    };
     /**
     * `xtal-sip`
     * Dynamically load custom elements from central config file.
@@ -13,11 +21,13 @@
         // static set tieBreaker(val: (tagName: string, options: IReference[]) => IReference) {
         //     XtalSip._tieBreaker = val;
         // }
-        replaceAll(str, find, replace) {
+        replace(str, find, replace) {
             return str.replace(new RegExp(find, 'g'), replace);
         }
-        static getLookup(tagName) {
-            const lookupOptions = XtalSip._lookupMap[tagName];
+        static get(tagName) {
+            if (!XtalSip._lM)
+                return; //this happens when boostrapping xtal sip.
+            const lookupOptions = XtalSip._lM[tagName];
             if (!lookupOptions)
                 return;
             if (lookupOptions.length > 1) {
@@ -32,21 +42,21 @@
             tagNames.forEach(tagName => XtalSip.loadDependency(tagName));
         }
         static loadDependency(tagName) {
-            XtalSip._alreadyAdded[tagName] = true;
-            const lookup = this.getLookup(tagName);
+            XtalSip._added[tagName] = true;
+            const lookup = this.get(tagName);
             if (!lookup)
                 return;
-            if (XtalSip._alreadyLoaded[lookup.path])
+            if (XtalSip._loaded[lookup.path])
                 return;
             if (customElements.get(tagName))
                 return;
             let newTag;
             let target = document.head;
-            if (lookup.isScript) {
+            if (lookup.isJS) {
                 newTag = document.createElement('script');
                 newTag.src = lookup.path;
             }
-            else if (lookup.isCCRef) {
+            else if (lookup.isCC) {
                 newTag = document.createElement('c-c');
                 newTag.setAttribute('href', lookup.path);
                 target = document.body;
@@ -77,15 +87,15 @@
         process_h(h) {
             if (!h)
                 return;
-            const lm = XtalSip._lookupMap;
-            for (const key in XtalSip._alreadyAdded) {
+            const lm = XtalSip._lM;
+            for (const key in XtalSip._added) {
                 delete lm[key];
             }
-            XtalSip._alreadyAdded = {};
+            XtalSip._added = {};
             for (const key in lm) {
-                if (XtalSip._alreadyAdded[key])
+                if (XtalSip._added[key])
                     continue;
-                const ref = XtalSip.getLookup(key);
+                const ref = XtalSip.get(key);
                 if (ref.preemptive) {
                     XtalSip.loadDependency(key);
                     continue;
@@ -96,13 +106,13 @@
             }
         }
         connectedCallback() {
-            if (!XtalSip._lookupMap) {
+            if (!XtalSip._lM) {
                 // document.body.addEventListener('dom-change', e => {
                 //     const src = e.srcElement as HTMLElement
                 //     this.process_h(src);
                 //     this.process_h(src.previousElementSibling as HTMLElement) //for dom bind
                 // })
-                XtalSip._lookupMap = {};
+                XtalSip._lM = {};
                 //if (!XtalSip.useJITLoading) {
                 //filter out duplicate tags for same tag name
                 const tagToFakeLink = {};
@@ -147,7 +157,7 @@
                         let modifiedHref = href;
                         let counter = 0;
                         tag.split('-').forEach(token => {
-                            modifiedHref = this.replaceAll(modifiedHref, '\\{' + counter + '\\}', token);
+                            modifiedHref = this.replace(modifiedHref, '\\{' + counter + '\\}', token);
                             counter++;
                         });
                         let base = el.dataset.base;
@@ -177,16 +187,16 @@
                         //hre el['href']
                         path: el.getAttribute('href'),
                         async: el.dataset.async !== undefined,
-                        isScript: el.getAttribute('as') === 'script',
-                        isCCRef: el.dataset.importer === 'c-c',
+                        isJS: el.getAttribute('as') === 'script',
+                        isCC: el.dataset.importer === 'c-c',
                         preemptive: el.dataset.preemptive !== undefined,
-                        element: el
+                        el: el
                     };
-                    const oldRef = XtalSip._lookupMap[tag];
+                    const oldRef = XtalSip._lM[tag];
                     if (!oldRef) {
-                        XtalSip._lookupMap[tag] = [];
+                        XtalSip._lM[tag] = [];
                     }
-                    XtalSip._lookupMap[tag].push(newRef);
+                    XtalSip._lM[tag].push(newRef);
                     //XtalSip._lookupMap[tag].push();
                 });
             }
@@ -202,8 +212,8 @@
             }
         }
     }
-    XtalSip._alreadyAdded = {};
-    XtalSip._alreadyLoaded = {};
+    XtalSip._added = {};
+    XtalSip._loaded = {};
     XtalSip.useJITLoading = false;
     const detail = {};
     document.head.dispatchEvent(new CustomEvent('xtal-sip-init', {
