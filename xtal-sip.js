@@ -1,4 +1,5 @@
 (function () {
+    const xtal_sip = 'xtal-sip';
     const baseCustomElementDefine = customElements.define;
     customElements.define = (name, cls) => {
         const lookup = XtalSip.get(name);
@@ -16,8 +17,6 @@
     * @demo demo/index.html
     */
     class XtalSip extends HTMLElement {
-        //static _preemptive: { [key: string]: boolean } = {};
-        static get is() { return 'xtal-sip'; }
         // static set tieBreaker(val: (tagName: string, options: IReference[]) => IReference) {
         //     XtalSip._tieBreaker = val;
         // }
@@ -38,10 +37,10 @@
                 return lookupOptions[0];
             }
         }
-        static loadDependencies(tagNames) {
-            tagNames.forEach(tagName => XtalSip.loadDependency(tagName));
+        static loadDeps(tagNames) {
+            tagNames.forEach(tagName => XtalSip.loadDep(tagName));
         }
-        static loadDependency(tagName) {
+        static loadDep(tagName) {
             XtalSip._added[tagName] = true;
             const lookup = this.get(tagName);
             if (!lookup)
@@ -78,8 +77,9 @@
         get_h() {
             let parentElement = this.parentElement;
             while (parentElement) {
-                if (parentElement.shadowRoot)
-                    return parentElement.shadowRoot;
+                const sr = parentElement.shadowRoot;
+                if (sr)
+                    return sr;
                 parentElement = parentElement.parentElement;
             }
             return document.body;
@@ -97,11 +97,11 @@
                     continue;
                 const ref = XtalSip.get(key);
                 if (ref.preemptive) {
-                    XtalSip.loadDependency(key);
+                    XtalSip.loadDep(key);
                     continue;
                 }
                 if (h.querySelector(key)) {
-                    XtalSip.loadDependency(key);
+                    XtalSip.loadDep(key);
                 }
             }
         }
@@ -117,8 +117,8 @@
                 //filter out duplicate tags for same tag name
                 const tagToFakeLink = {};
                 this.qsa('link[rel-ish="preload"]', document.head).forEach(el => {
-                    if (XtalSip._substitutor)
-                        XtalSip._substitutor(el);
+                    if (XtalSip._sub)
+                        XtalSip._sub(el);
                     el.dataset.tags.split(',').forEach(tag => {
                         if (!tagToFakeLink[tag])
                             tagToFakeLink[tag] = [];
@@ -135,8 +135,8 @@
                         elToAdd = els[0];
                     }
                     else {
-                        if (XtalSip._tieBreaker) {
-                            elToAdd = XtalSip._tieBreaker(key, els);
+                        if (XtalSip._tB) {
+                            elToAdd = XtalSip._tB(key, els);
                         }
                     }
                     if (elToAdd) {
@@ -204,7 +204,7 @@
             if (load) {
                 load.split(',').forEach(tag => {
                     //console.log('loading ' + tag);
-                    XtalSip.loadDependency(tag);
+                    XtalSip.loadDep(tag);
                 });
             }
             else {
@@ -216,14 +216,14 @@
     XtalSip._loaded = {};
     XtalSip.useJITLoading = false;
     const detail = {};
-    document.head.dispatchEvent(new CustomEvent('xtal-sip-init', {
+    document.head.dispatchEvent(new CustomEvent(xtal_sip + '-init', {
         detail: detail,
     }));
-    XtalSip._tieBreaker = detail['tieBreaker'];
-    XtalSip._substitutor = detail['substitutor'];
-    customElements.define('xtal-sip', XtalSip);
+    XtalSip._tB = detail['tieBreaker'];
+    XtalSip._sub = detail['substitutor'];
+    customElements.define(xtal_sip, XtalSip);
     document.addEventListener("DOMContentLoaded", e => {
-        const xs = document.createElement('xtal-sip');
+        const xs = document.createElement(xtal_sip);
         xs.setAttribute('load', 'dom-bind');
         document.body.appendChild(xs);
     });

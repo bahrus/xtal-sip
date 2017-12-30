@@ -9,7 +9,7 @@ export interface IReference {
 }
 
 (function () {
-
+    const xtal_sip = 'xtal-sip';
     const baseCustomElementDefine = customElements.define;
     customElements.define = (name: string, cls: any) => {
         const lookup = XtalSip.get(name);
@@ -33,9 +33,8 @@ export interface IReference {
         static useJITLoading = false;
 
         //static _preemptive: { [key: string]: boolean } = {};
-        static get is() { return 'xtal-sip'; }
-        static _tieBreaker: (tagName: string, candidates: HTMLLinkElement[]) => IReference;
-        static _substitutor: (link: HTMLLinkElement) => void;
+        static _tB: (tagName: string, candidates: HTMLLinkElement[]) => IReference;
+        static _sub: (link: HTMLLinkElement) => void;
         // static set tieBreaker(val: (tagName: string, options: IReference[]) => IReference) {
         //     XtalSip._tieBreaker = val;
         // }
@@ -54,10 +53,10 @@ export interface IReference {
                 return lookupOptions[0];
             }
         }
-        static loadDependencies(tagNames: string[]) {
-            tagNames.forEach(tagName => XtalSip.loadDependency(tagName))
+        static loadDeps(tagNames: string[]) {
+            tagNames.forEach(tagName => XtalSip.loadDep(tagName))
         }
-        static loadDependency(tagName: string) {
+        static loadDep(tagName: string) {
             XtalSip._added[tagName] = true;
             const lookup = this.get(tagName);
             if (!lookup) return;
@@ -88,7 +87,8 @@ export interface IReference {
         get_h() {
             let parentElement = this.parentElement;
             while (parentElement) {
-                if (parentElement.shadowRoot) return parentElement.shadowRoot;
+                const sr = parentElement.shadowRoot;
+                if (sr) return sr;
                 parentElement = parentElement.parentElement;
             }
             return document.body;
@@ -104,11 +104,11 @@ export interface IReference {
                 if (XtalSip._added[key]) continue;
                 const ref = XtalSip.get(key);
                 if (ref.preemptive) {
-                    XtalSip.loadDependency(key);
+                    XtalSip.loadDep(key);
                     continue;
                 }
                 if (h.querySelector(key)) {
-                    XtalSip.loadDependency(key);
+                    XtalSip.loadDep(key);
 
                 }
             }
@@ -125,7 +125,7 @@ export interface IReference {
                 //filter out duplicate tags for same tag name
                 const tagToFakeLink = {};
                 this.qsa('link[rel-ish="preload"]', document.head).forEach(el => {
-                    if(XtalSip._substitutor) XtalSip._substitutor(el as HTMLLinkElement);
+                    if(XtalSip._sub) XtalSip._sub(el as HTMLLinkElement);
                     el.dataset.tags.split(',').forEach(tag => {
                         if(!tagToFakeLink[tag]) tagToFakeLink[tag] = [];
                         tagToFakeLink[tag].push(el);
@@ -140,8 +140,8 @@ export interface IReference {
                     if(els.length === 1) {
                         elToAdd = els[0];
                     }else{
-                        if(XtalSip._tieBreaker){
-                            elToAdd = XtalSip._tieBreaker(key, els);
+                        if(XtalSip._tB){
+                            elToAdd = XtalSip._tB(key, els);
                         }
                     }
                     if(elToAdd){
@@ -209,7 +209,7 @@ export interface IReference {
             if (load) {
                 load.split(',').forEach(tag => {
                     //console.log('loading ' + tag);
-                    XtalSip.loadDependency(tag);
+                    XtalSip.loadDep(tag);
                 })
             } else {
                 this.process_h(this.parentElement);
@@ -219,15 +219,15 @@ export interface IReference {
 
     }
     const detail = {};
-    document.head.dispatchEvent(new CustomEvent('xtal-sip-init', {
+    document.head.dispatchEvent(new CustomEvent(xtal_sip + '-init', {
         detail: detail,
     } as CustomEventInit));
-    XtalSip._tieBreaker = detail['tieBreaker'];
-    XtalSip._substitutor = detail['substitutor'];
-    customElements.define('xtal-sip', XtalSip);
+    XtalSip._tB = detail['tieBreaker'];
+    XtalSip._sub = detail['substitutor'];
+    customElements.define(xtal_sip, XtalSip);
 
     document.addEventListener("DOMContentLoaded", e => { 
-        const xs = document.createElement('xtal-sip');
+        const xs = document.createElement(xtal_sip);
         xs.setAttribute('load', 'dom-bind');
         document.body.appendChild(xs);
     });
