@@ -8,7 +8,13 @@
   <title>xtal-sip demo</title>
 
   <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
-
+  <!-- <script>
+    const prevDefine = customElements.define;
+    customElements.define = (name, cl) =>{
+      console.log('in pseudo define')
+      prevDefine(name, cl);
+    }
+  </script> -->
   <link rel="import" href="../../iron-demo-helpers/demo-pages-shared-styles.html">
   
   <link rel="preload" async as="script" data-tag="xtal-link-preview" href="https://cdn.jsdelivr.net/npm/xtal-link-preview/build/ES6/xtal-link-preview.js">

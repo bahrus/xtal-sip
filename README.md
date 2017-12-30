@@ -320,6 +320,14 @@ If the sight of \<xtal-sip\>'s is unpleasant to see in the markup, an alternativ
 customElements.get('xtal-sip').loadDependencies('paper-input,iron-ajax');
 ```
 
+## TODO
+
+## Preloading internal dependencies, and configuring global settings for web component definitions
+
+Often the size of the web component itself will be dwarfed by the size of the dependencies the web component relies on.  For example, web component wrappers around complex charting libraries will be tiny compared to d3.js, the d3 charting wrapper, and the associated css file(s).  We would really like to preload those resources too.  Nothing is preventing us from doing that of course.  But once again we have a scenario where the preload tag specify a url which may duplicate, or worse, conflict with the path the component itself expects.
+
+A nice way to resolve this dilemma is to allow the web component to do some IoC dependency inversion -- allow the "container" to tell the web component where the references are.  In order to achieve this, \<xtal-sip\> provides a way of passing valuable configuration information frmo the main link preload tag associated with the custom element tag, to static properties of the web component class.  This is done before customElements.define is called on the element.  The value(s) of the data- (dataset) attribute is passed into the Class definition.
+
 ## List of features:
 
 - [x] Auto triggering based on tag name.
