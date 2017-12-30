@@ -162,9 +162,9 @@
                         });
                         let base = el.dataset.base;
                         if (!base) {
-                            const baseId = el.dataset.baseRef;
-                            if (baseId)
-                                base = document.getElementById(baseId).dataset.base;
+                            const baseRef = el.dataset.baseRef;
+                            if (baseRef)
+                                base = document.querySelector(baseRef).dataset.base;
                         }
                         if (!base)
                             base = '';
