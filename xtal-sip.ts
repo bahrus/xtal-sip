@@ -35,7 +35,7 @@ export interface IReference {
         static useJITLoading = false;
 
         //static _preemptive: { [key: string]: boolean } = {};
-        static _tB: (tagName: string, candidates: HTMLLinkElement[]) => IReference;
+        static _tB: (tagName: string, candidates: HTMLLinkElement[]) => IReference; //tie breaker
         static _sub: (link: HTMLLinkElement) => void;
         // static set tieBreaker(val: (tagName: string, options: IReference[]) => IReference) {
         //     XtalSip._tieBreaker = val;
