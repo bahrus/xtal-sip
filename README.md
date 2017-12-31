@@ -323,9 +323,9 @@ If the sight of \<xtal-sip\>'s is unpleasant to see in the markup, an alternativ
 customElements.get('xtal-sip').loadDependencies('paper-input,iron-ajax');
 ```
 
-## Preloading internal dependencies, and configuring global settings for web component definitions
+## Preloading third party dependencies, and configuring global settings for web component definitions
 
-Often the size of the web component itself will be dwarfed by the size of the dependencies the web component relies on.  For example, web component wrappers around complex d3-based charting libraries will be tiny compared to d3.js, the d3 charting code, and the associated css file(s).  We would really like to preload those resources too.  Nothing is preventing us from doing that of course.  But once again we have a scenario where the preload tag specifies a url which may duplicate, or worse, conflict with the path the component itself expects.  While ES6 modules, due to their ability to avoid polluting the global namespace, and Shadow DOM, with it's style encapsulation, could help avoid conflicts, it is hard to see how inadvertent downloading of the same resource (including version) from different places could be avoided, if we rely on native ES6 module loading of resources.  The only other way I can see to prevent this, is to command that, as a web development community, we all must permanently "marry" our local node_modules folder as our source of files, forevermore.  Anyone publishing a library *must* publish it to npm.  Deviants would be sentenced to 10 years of IE6 development. That's quite a committment!  Maybe I'm missing something.
+Often the size of the web component itself will be dwarfed by the size of the dependencies the web component relies on.  For example, web component wrappers around complex d3-based charting libraries will be tiny compared to d3.js, the d3 charting code, and the associated css file(s).  We would really like to preload those resources too.  Nothing is preventing us from doing that of course.  But once again we have a scenario where the preload tag specifies a url which may duplicate, or worse, conflict with the path the component itself expects.  While ES6 modules, due to their ability to avoid polluting the global namespace, and Shadow DOM, with it's style encapsulation, could help avoid conflicts, it is hard to see how inadvertent downloading of the same resource (including version) from different places could be avoided, if we rely on native ES6 module loading of resources.  The only other way I can see to prevent this, is to command that, as a web development community, we all must permanently "marry" our local node_modules folder as our source of files, forevermore.  Anyone publishing a library *must* publish it to npm, which must be installed locally.  No partial or competing CDN deplohyements.  No competing package manager dare enter. Deviants would be sentenced to 10 years of IE6 development. That's quite a committment!  Maybe I'm missing something.
 
 A nice way to resolve this dilemma is to allow the web component to do some IoC dependency inversion -- allow the "container" to tell the web component where the references are.  In order to achieve this, \<xtal-sip\> provides a way of passing valuable configuration information from the main link preload tag associated with the custom element tag, to static properties of the web component class.  This is done before customElements.define is called on the element.  In particular, the value(s) of the data- (dataset) attribute is passed into the Class definition.  Again, keeping all these url's centrally managed would help identify shared resources -- for example, two components that may rely on the same version of a library.
 
@@ -344,7 +344,11 @@ followed immediately by:
   <link class="billboard css"    rel="preload" as="style"  href="https://naver.github.io/billboard.js/release/latest/dist/billboard.min.css">
 ```
 
-Unfortunately, this solution doesn't work for common mixins that we might want to manage centrally.  Something else is required for that scenario.
+## TODO:  Mixin Mischief
+
+Unfortunately, the solution above for managing third party dependencies for a component, doesn't work for common, loosely coupled mixins that we might want to manage centrally.  Something else is required for that scenario.  
+
+This is a use case where I've not seen much activity, yet, but conceivably could become more of an issue.  Examples I'm thinking of are common "cross cutting concern" mixins, things that do logging / usage tracking, instrumentation, etc, that we may want to layer on top of existing web components without modifying the original code.  More on this topic if and when such mixins appear. 
 
 ## List of features:
 
