@@ -1,7 +1,9 @@
 (function () {
     const xtal_sip = 'xtal-sip';
+    if (customElements.get(xtal_sip))
+        return;
     const baseCustomElementDefine = customElements.define;
-    customElements.define = (name, cls) => {
+    window.customElements.define = function (name, cls) {
         const lookup = XtalSip.get(name);
         if (lookup) {
             Object.assign(cls, lookup.el.dataset);

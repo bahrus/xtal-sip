@@ -10,8 +10,9 @@ export interface IReference {
 
 (function () {
     const xtal_sip = 'xtal-sip';
+    if(customElements.get(xtal_sip)) return;
     const baseCustomElementDefine = customElements.define;
-    customElements.define = (name: string, cls: any) => {
+    window.customElements.define = function(name: string, cls: any){
         const lookup = XtalSip.get(name);
         if(lookup){
             Object.assign(cls, lookup.el.dataset);
