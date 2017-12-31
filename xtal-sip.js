@@ -2,13 +2,14 @@
     const xtal_sip = 'xtal-sip';
     if (customElements.get(xtal_sip))
         return;
-    const baseCustomElementDefine = customElements.define;
+    const originalDefine = window.customElements.define;
+    const boundDefine = originalDefine.bind(window.customElements);
     window.customElements.define = function (name, cls) {
         const lookup = XtalSip.get(name);
         if (lookup) {
             Object.assign(cls, lookup.el.dataset);
         }
-        baseCustomElementDefine(name, cls);
+        boundDefine(name, cls);
     };
     /**
     * `xtal-sip`
