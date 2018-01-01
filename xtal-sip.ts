@@ -12,7 +12,7 @@ export interface IReference {
     const xtal_sip = 'xtal-sip';
     if(customElements.get(xtal_sip)) return;
     const originalDefine = customElements.define;
-    const boundDefine = originalDefine.bind(window.customElements);
+    const boundDefine = originalDefine.bind(customElements);
     customElements.define = function(name: string, cls: any){
         const lookup = XtalSip.get(name);
         if(lookup){
@@ -31,7 +31,7 @@ export interface IReference {
     class XtalSip extends HTMLElement {
         static _lM: { [key: string]: IReference[] };
         static _added: { [key: string]: boolean } = {};
-        static _loaded: { [key: string]: string } = {};
+        //static _loaded: { [key: string]: string } = {};
         static useJITLoading = false;
 
         //static _preemptive: { [key: string]: boolean } = {};
@@ -45,15 +45,9 @@ export interface IReference {
             return str.replace(new RegExp(find, 'g'), replace);
         }
         static get(tagName) {
-            if(!XtalSip._lM) return; //this happens when boostrapping xtal sip.
-            const lookupOptions = XtalSip._lM[tagName];
-            if (!lookupOptions) return;
-            if (lookupOptions.length > 1) {
-                throw "Duplicate tagname found: " + tagName;
-                // return XtalSip._tieBreaker(tagName, lookupOptions);
-            } else {
-                return lookupOptions[0];
-            }
+            let a;
+            if(!(a = XtalSip._lM) || !(a = a[tagName])) return; //this happens when boostrapping xtal sip.
+            return a[0];
         }
         static loadDeps(tagNames: string[]) {
             tagNames.forEach(tagName => XtalSip.loadDep(tagName))
@@ -62,7 +56,7 @@ export interface IReference {
             XtalSip._added[tagName] = true;
             const lookup = this.get(tagName);
             if (!lookup) return;
-            if (XtalSip._loaded[lookup.path]) return;
+            //if (XtalSip._loaded[lookup.path]) return;
             if (customElements.get(tagName)) return;
             let newTag;
             let target = document.head as HTMLElement;

@@ -3,7 +3,7 @@
     if (customElements.get(xtal_sip))
         return;
     const originalDefine = customElements.define;
-    const boundDefine = originalDefine.bind(window.customElements);
+    const boundDefine = originalDefine.bind(customElements);
     customElements.define = function (name, cls) {
         const lookup = XtalSip.get(name);
         if (lookup) {
@@ -27,18 +27,10 @@
             return str.replace(new RegExp(find, 'g'), replace);
         }
         static get(tagName) {
-            if (!XtalSip._lM)
+            let a;
+            if (!(a = XtalSip._lM) || !(a = a[tagName]))
                 return; //this happens when boostrapping xtal sip.
-            const lookupOptions = XtalSip._lM[tagName];
-            if (!lookupOptions)
-                return;
-            if (lookupOptions.length > 1) {
-                throw "Duplicate tagname found: " + tagName;
-                // return XtalSip._tieBreaker(tagName, lookupOptions);
-            }
-            else {
-                return lookupOptions[0];
-            }
+            return a[0];
         }
         static loadDeps(tagNames) {
             tagNames.forEach(tagName => XtalSip.loadDep(tagName));
@@ -48,8 +40,7 @@
             const lookup = this.get(tagName);
             if (!lookup)
                 return;
-            if (XtalSip._loaded[lookup.path])
-                return;
+            //if (XtalSip._loaded[lookup.path]) return;
             if (customElements.get(tagName))
                 return;
             let newTag;
@@ -200,7 +191,7 @@
         }
     }
     XtalSip._added = {};
-    XtalSip._loaded = {};
+    //static _loaded: { [key: string]: string } = {};
     XtalSip.useJITLoading = false;
     const detail = {};
     document.head.dispatchEvent(new CustomEvent(xtal_sip + '-init', {
