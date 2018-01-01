@@ -1,6 +1,6 @@
 {
   "name": "xtal-sip",
-  "version": "0.0.42",
+  "version": "0.0.43",
   "description": "Dynamically \"water\" a custom element tag with the necessary dependencies to sprout the tag from an inert seedling to a thing of beauty.",
   "main": "xtal-sip.js",
   "repository": "https://github.com/bahrus/xtal-sip",
