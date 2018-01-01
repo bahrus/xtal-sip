@@ -2,9 +2,9 @@
     const xtal_sip = 'xtal-sip';
     if (customElements.get(xtal_sip))
         return;
-    const originalDefine = window.customElements.define;
+    const originalDefine = customElements.define;
     const boundDefine = originalDefine.bind(window.customElements);
-    window.customElements.define = function (name, cls) {
+    customElements.define = function (name, cls) {
         const lookup = XtalSip.get(name);
         if (lookup) {
             Object.assign(cls, lookup.el.dataset);
@@ -77,51 +77,41 @@
         qsa(css, from) {
             return [].slice.call((from ? from : this).querySelectorAll(css));
         }
-        get_h() {
-            let parentElement = this.parentElement;
-            while (parentElement) {
-                const sr = parentElement.shadowRoot;
-                if (sr)
-                    return sr;
-                parentElement = parentElement.parentElement;
-            }
-            return document.body;
-        }
-        process_h(h) {
-            if (!h)
-                return;
-            const lm = XtalSip._lM;
-            for (const key in XtalSip._added) {
-                delete lm[key];
-            }
-            XtalSip._added = {};
-            for (const key in lm) {
-                if (XtalSip._added[key])
-                    continue;
-                const ref = XtalSip.get(key);
-                if (ref.preemptive) {
-                    XtalSip.loadDep(key);
-                    continue;
-                }
-                if (h.querySelector(key)) {
-                    XtalSip.loadDep(key);
-                }
-            }
-        }
+        // get_h() {
+        //     let parentElement = this.parentElement;
+        //     while (parentElement) {
+        //         const sr = parentElement.shadowRoot;
+        //         if (sr) return sr;
+        //         parentElement = parentElement.parentElement;
+        //     }
+        //     return document.body;
+        // }
+        // process_h(h: HTMLElement | ShadowRoot) {
+        //     if (!h) return;
+        //     const lm = XtalSip._lM;
+        //     for (const key in XtalSip._added) {
+        //         delete lm[key];
+        //     }
+        //     XtalSip._added = {};
+        //     for (const key in lm) {
+        //         if (XtalSip._added[key]) continue;
+        //         const ref = XtalSip.get(key);
+        //         if (ref.preemptive) {
+        //             XtalSip.loadDep(key);
+        //             continue;
+        //         }
+        //         if (h.querySelector(key)) {
+        //             XtalSip.loadDep(key);
+        //         }
+        //     }
+        // }
         connectedCallback() {
             if (!XtalSip._lM) {
-                // document.body.addEventListener('dom-change', e => {
-                //     const src = e.srcElement as HTMLElement
-                //     this.process_h(src);
-                //     this.process_h(src.previousElementSibling as HTMLElement) //for dom bind
-                // })
                 XtalSip._lM = {};
-                //if (!XtalSip.useJITLoading) {
-                //filter out duplicate tags for same tag name
                 const tagToFakeLink = {};
                 this.qsa('link[rel-ish="preload"]', document.head).forEach(el => {
                     if (XtalSip._sub)
-                        XtalSip._sub(el);
+                        XtalSip._sub(el); //substitution
                     el.dataset.tags.split(',').forEach(tag => {
                         if (!tagToFakeLink[tag])
                             tagToFakeLink[tag] = [];
@@ -203,16 +193,10 @@
                     //XtalSip._lookupMap[tag].push();
                 });
             }
-            const load = this.getAttribute('load');
-            if (load) {
-                load.split(',').forEach(tag => {
-                    //console.log('loading ' + tag);
-                    XtalSip.loadDep(tag);
-                });
-            }
-            else {
-                this.process_h(this.parentElement);
-            }
+            this.getAttribute('load').split(',').forEach(tag => {
+                //console.log('loading ' + tag);
+                XtalSip.loadDep(tag);
+            });
         }
     }
     XtalSip._added = {};
