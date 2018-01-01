@@ -1,10 +1,11 @@
 export interface IReference {
-    path?: string;
-    async?: boolean;
-    isJS?: boolean;
-    isCC?: boolean;
-    useESM?: boolean;
-    preemptive?: boolean;
+    // path?: string;
+    // async?: boolean;
+    // //isJS?: boolean;
+    // //isCC?: boolean;
+    // //useESM?: boolean;
+    // type?: string;
+    // preemptive?: boolean;
     el: HTMLLinkElement;
 }
 
@@ -29,7 +30,7 @@ export interface IReference {
     * @demo demo/index.html
     */
     class XtalSip extends HTMLElement {
-        static _lM: { [key: string]: IReference[] };
+        static _lM: { [key: string]: IReference};
         static _added: { [key: string]: boolean } = {};
         //static _loaded: { [key: string]: string } = {};
         static useJITLoading = false;
@@ -44,10 +45,10 @@ export interface IReference {
         replace(str, find, replace) {
             return str.replace(new RegExp(find, 'g'), replace);
         }
-        static get(tagName) {
+        static get(tagName) : IReference {
             let a;
             if(!(a = XtalSip._lM) || !(a = a[tagName])) return; //this happens when boostrapping xtal sip.
-            return a[0];
+            return a as IReference;
         }
         static loadDeps(tagNames: string[]) {
             tagNames.forEach(tagName => XtalSip.loadDep(tagName))
@@ -56,23 +57,38 @@ export interface IReference {
             XtalSip._added[tagName] = true;
             const lookup = this.get(tagName);
             if (!lookup) return;
-            //if (XtalSip._loaded[lookup.path]) return;
+            const el = lookup.el, d=el.dataset;
             if (customElements.get(tagName)) return;
-            let newTag;
-            let target = document.head as HTMLElement;
-            if (lookup.isJS) {
-                newTag = document.createElement('script');
-                newTag.src = lookup.path;
-            }else if(lookup.isCC){
-                newTag = document.createElement('c-c');
-                newTag.setAttribute('href', lookup.path);
-                target = document.body
-            } else {
-                newTag = document.createElement("link");
-                newTag.setAttribute("rel", "import");
-                newTag.setAttribute("href", lookup.path);
+            let nodeName, pathName;
+            switch(el.getAttribute('as')){
+                case 'document':
+                    nodeName = d['importer'] ? 'c-c' : 'link';
+                    pathName = 'href';
+                    break;
+                case 'script':
+                    nodeName = 'script';
+                    pathName = 'src';
+                    break;
+
             }
-            if (lookup.async) newTag.setAttribute('async', '');
+            //let newTag;
+            let target = document.head as HTMLElement;
+            // if (lookup.isJS) {
+            //     newTag = document.createElement('script');
+            //     newTag.src = lookup.path;
+            // }else if(lookup.isCC){
+            //     newTag = document.createElement('c-c');
+            //     newTag.setAttribute('href', lookup.path);
+            //     target = document.body
+            // } else {
+            //     newTag = document.createElement("link");
+            //     newTag.setAttribute("rel", "import");
+            //     newTag.setAttribute("href", lookup.path);
+            // }
+            const newTag = document.createElement(nodeName);
+            newTag.setAttribute(pathName, el.getAttribute('href'));
+            newTag.setAttribute('rel', 'import');  // no harm done for other types
+            if (el['async']) newTag.setAttribute('async', '');
             setTimeout(() => {
                 target.appendChild(newTag);
             }, 50);
@@ -80,35 +96,7 @@ export interface IReference {
         qsa(css, from?: HTMLElement | Document): HTMLElement[] {
             return [].slice.call((from ? from : this).querySelectorAll(css));
         }
-        // get_h() {
-        //     let parentElement = this.parentElement;
-        //     while (parentElement) {
-        //         const sr = parentElement.shadowRoot;
-        //         if (sr) return sr;
-        //         parentElement = parentElement.parentElement;
-        //     }
-        //     return document.body;
-        // }
-        // process_h(h: HTMLElement | ShadowRoot) {
-        //     if (!h) return;
-        //     const lm = XtalSip._lM;
-        //     for (const key in XtalSip._added) {
-        //         delete lm[key];
-        //     }
-        //     XtalSip._added = {};
-        //     for (const key in lm) {
-        //         if (XtalSip._added[key]) continue;
-        //         const ref = XtalSip.get(key);
-        //         if (ref.preemptive) {
-        //             XtalSip.loadDep(key);
-        //             continue;
-        //         }
-        //         if (h.querySelector(key)) {
-        //             XtalSip.loadDep(key);
 
-        //         }
-        //     }
-        // }
         connectedCallback() {
             if (!XtalSip._lM) {
                 XtalSip._lM = {};
@@ -175,21 +163,21 @@ export interface IReference {
                 //}
                 this.qsa('link[rel="preload"][data-tag]', document.head).forEach(el => {
                     const tag = el.dataset.tag;
-                    let needTieBreaking = false;
+                    //let needTieBreaking = false;
                     const newRef = {
                         //hre el['href']
-                        path: el.getAttribute('href'),
-                        async: el.dataset.async !== undefined,
-                        isJS: el.getAttribute('as') === 'script',
-                        isCC: el.dataset.importer === 'c-c',
-                        preemptive: el.dataset.preemptive !== undefined,
+                        // path: el.getAttribute('href'),
+                        // async: el.dataset.async !== undefined,
+                        // isJS: el.getAttribute('as') === 'script',
+                        // isCC: el.dataset.importer === 'c-c',
+                        // preemptive: el.dataset.preemptive !== undefined,
                         el: el
                     } as IReference;
-                    const oldRef = XtalSip._lM[tag]
-                    if (!oldRef) {
-                        XtalSip._lM[tag] = [];
-                    } 
-                    XtalSip._lM[tag].push(newRef);
+                    // const oldRef = XtalSip._lM[tag]
+                    // if (!oldRef) {
+                    //     XtalSip._lM[tag] = [];
+                    // } 
+                    XtalSip._lM[tag] = newRef;
                     //XtalSip._lookupMap[tag].push();
                 });
 
