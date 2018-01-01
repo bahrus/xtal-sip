@@ -32,16 +32,11 @@ export interface IReference {
     class XtalSip extends HTMLElement {
         static _lM: { [key: string]: IReference};
         static _added: { [key: string]: boolean } = {};
-        //static _loaded: { [key: string]: string } = {};
         static useJITLoading = false;
 
-        //static _preemptive: { [key: string]: boolean } = {};
         static _tB: (tagName: string, candidates: HTMLLinkElement[]) => IReference; //tie breaker
         static _sub: (link: HTMLLinkElement) => void;
-        // static set tieBreaker(val: (tagName: string, options: IReference[]) => IReference) {
-        //     XtalSip._tieBreaker = val;
-        // }
-
+        
         replace(str, find, replace) {
             return str.replace(new RegExp(find, 'g'), replace);
         }
@@ -71,20 +66,8 @@ export interface IReference {
                     break;
 
             }
-            //let newTag;
-            let target = document.head as HTMLElement;
-            // if (lookup.isJS) {
-            //     newTag = document.createElement('script');
-            //     newTag.src = lookup.path;
-            // }else if(lookup.isCC){
-            //     newTag = document.createElement('c-c');
-            //     newTag.setAttribute('href', lookup.path);
-            //     target = document.body
-            // } else {
-            //     newTag = document.createElement("link");
-            //     newTag.setAttribute("rel", "import");
-            //     newTag.setAttribute("href", lookup.path);
-            // }
+            let target = d['importer'] ? document.body : document.head as HTMLElement;
+
             const newTag = document.createElement(nodeName);
             newTag.setAttribute(pathName, el.getAttribute('href'));
             newTag.setAttribute('rel', 'import');  // no harm done for other types
@@ -109,8 +92,6 @@ export interface IReference {
                     })
                 });
                 const goodEls = [];
-                //const alreadyAdded = {};
-                //debugger;
                 for(var key in tagToFakeLink){
                     const els = tagToFakeLink[key];
                     let elToAdd;
@@ -127,14 +108,10 @@ export interface IReference {
                         goodEls.push(elToAdd);
                     }
                 }
-                // this.qsa('link[rel-ish="preload"]', document.head).forEach(el => {
                 goodEls.forEach(el =>{
-                    //const isPreemptive = el.dataset.preemptive !== undefined;
                     const isAsync = el.dataset.async !== undefined;
-                    //const isPreFetch = el.getAttribute('rel-ish') === 'prefetch'
                     const href = el.getAttribute('href');
                     el.dataset.tags.split(',').forEach(tag => {
-                        //if (isPreemptive) XtalSip._preemptive[tag] = true;
                         let modifiedHref = href;
                         let counter = 0;
                         tag.split('-').forEach(token => {
@@ -163,27 +140,14 @@ export interface IReference {
                 //}
                 this.qsa('link[rel="preload"][data-tag]', document.head).forEach(el => {
                     const tag = el.dataset.tag;
-                    //let needTieBreaking = false;
                     const newRef = {
-                        //hre el['href']
-                        // path: el.getAttribute('href'),
-                        // async: el.dataset.async !== undefined,
-                        // isJS: el.getAttribute('as') === 'script',
-                        // isCC: el.dataset.importer === 'c-c',
-                        // preemptive: el.dataset.preemptive !== undefined,
                         el: el
                     } as IReference;
-                    // const oldRef = XtalSip._lM[tag]
-                    // if (!oldRef) {
-                    //     XtalSip._lM[tag] = [];
-                    // } 
                     XtalSip._lM[tag] = newRef;
-                    //XtalSip._lookupMap[tag].push();
                 });
 
             }
             this.getAttribute('load').split(',').forEach(tag => {
-                //console.log('loading ' + tag);
                 XtalSip.loadDep(tag);
             })
 
