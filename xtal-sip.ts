@@ -37,7 +37,7 @@ export interface IReference {
         static _tB: (tagName: string, candidates: HTMLLinkElement[]) => IReference; //tie breaker
         static _sub: (link: HTMLLinkElement) => void;
         
-        replace(str, find, replace) {
+        static replace(str, find, replace) {
             return str.replace(new RegExp(find, 'g'), replace);
         }
         static get(tagName) : IReference {
@@ -76,11 +76,11 @@ export interface IReference {
                 target.appendChild(newTag);
             }, 50);
         }
-        qsa(css, from?: HTMLElement | Document): HTMLElement[] {
-            return [].slice.call((from ? from : this).querySelectorAll(css));
+        static qsa(css, from: HTMLElement | Document): HTMLElement[] {
+            return [].slice.call(from.querySelectorAll(css));
         }
 
-        connectedCallback() {
+        static init(){
             if (!XtalSip._lM) {
                 XtalSip._lM = {};
                 const tagToFakeLink = {}; // accumulate links with same custom element tag
@@ -149,6 +149,10 @@ export interface IReference {
                 });
 
             }
+        }
+
+        connectedCallback() {
+
             this.getAttribute('load').split(',').forEach(tag => {
                 XtalSip.loadDep(tag);
             })
@@ -163,13 +167,14 @@ export interface IReference {
     } as CustomEventInit));
     XtalSip._tB = detail['tieBreaker'];
     XtalSip._sub = detail['substitutor'];
+    XtalSip.init();
     customElements.define(xtal_sip, XtalSip);
 
-    document.addEventListener("DOMContentLoaded", e => { 
-        const xs = document.createElement(xtal_sip);
-        xs.setAttribute('load', 'dom-bind');
-        document.body.appendChild(xs);
-    });
+    // document.addEventListener("DOMContentLoaded", e => { 
+    //     const xs = document.createElement(xtal_sip);
+    //     xs.setAttribute('load', 'dom-bind');
+    //     document.body.appendChild(xs);
+    // });
 
 
 })();

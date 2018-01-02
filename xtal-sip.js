@@ -20,7 +20,7 @@
     * @demo demo/index.html
     */
     class XtalSip extends HTMLElement {
-        replace(str, find, replace) {
+        static replace(str, find, replace) {
             return str.replace(new RegExp(find, 'g'), replace);
         }
         static get(tagName) {
@@ -61,10 +61,10 @@
                 target.appendChild(newTag);
             }, 50);
         }
-        qsa(css, from) {
-            return [].slice.call((from ? from : this).querySelectorAll(css));
+        static qsa(css, from) {
+            return [].slice.call(from.querySelectorAll(css));
         }
-        connectedCallback() {
+        static init() {
             if (!XtalSip._lM) {
                 XtalSip._lM = {};
                 const tagToFakeLink = {}; // accumulate links with same custom element tag
@@ -134,6 +134,8 @@
                     XtalSip._lM[tag] = newRef;
                 });
             }
+        }
+        connectedCallback() {
             this.getAttribute('load').split(',').forEach(tag => {
                 XtalSip.loadDep(tag);
             });
@@ -147,11 +149,12 @@
     }));
     XtalSip._tB = detail['tieBreaker'];
     XtalSip._sub = detail['substitutor'];
+    XtalSip.init();
     customElements.define(xtal_sip, XtalSip);
-    document.addEventListener("DOMContentLoaded", e => {
-        const xs = document.createElement(xtal_sip);
-        xs.setAttribute('load', 'dom-bind');
-        document.body.appendChild(xs);
-    });
+    // document.addEventListener("DOMContentLoaded", e => { 
+    //     const xs = document.createElement(xtal_sip);
+    //     xs.setAttribute('load', 'dom-bind');
+    //     document.body.appendChild(xs);
+    // });
 })();
 //# sourceMappingURL=xtal-sip.js.map
