@@ -17,7 +17,7 @@ export interface IReference {
     customElements.define = function(name: string, cls: any){
         const lookup = XtalSip.get(name);
         if(lookup){
-            Object.assign(cls, lookup.el.dataset);
+            Object.assign(cls, lookup.dataset);
         }
         boundDefine(name, cls);
     }
@@ -30,9 +30,9 @@ export interface IReference {
     * @demo demo/index.html
     */
     class XtalSip extends HTMLElement {
-        static _lM: { [key: string]: IReference};
+        //static _lM: { [key: string]: IReference};
         static _added: { [key: string]: boolean } = {};
-        static useJITLoading = false;
+        //static useJITLoading = false;
 
         static _tB: (tagName: string, candidates: HTMLLinkElement[]) => IReference; //tie breaker
         static _sub: (link: HTMLLinkElement) => void;
@@ -40,10 +40,11 @@ export interface IReference {
         static replace(str, find, replace) {
             return str.replace(new RegExp(find, 'g'), replace);
         }
-        static get(tagName) : IReference {
-            let a;
-            if(!(a = XtalSip._lM) || !(a = a[tagName])) return; //this happens when boostrapping xtal sip.
-            return a as IReference;
+        static get(tagName) : HTMLLinkElement {
+            // let a;
+            // if(!(a = XtalSip._lM) || !(a = a[tagName])) return; //this happens when boostrapping xtal sip.
+            // return a as IReference;
+            return document.head.querySelector(`link[rel="preload"][data-tag="${tagName}"]`);
         }
         static loadDeps(tagNames: string[]) {
             tagNames.forEach(tagName => XtalSip.loadDep(tagName))
@@ -52,7 +53,7 @@ export interface IReference {
             XtalSip._added[tagName] = true;
             const lookup = this.get(tagName);
             if (!lookup) return;
-            const el = lookup.el, d=el.dataset;
+            const el = lookup, d=el.dataset;
             if (customElements.get(tagName)) return;
             let nodeName, pathName;
             switch(el.getAttribute('as')){
@@ -81,8 +82,8 @@ export interface IReference {
         }
 
         static init(){
-            if (!XtalSip._lM) {
-                XtalSip._lM = {};
+            //if (!XtalSip._lM) {
+                //XtalSip._lM = {};
                 const tagToFakeLink = {}; // accumulate links with same custom element tag
                 // so can provide to tie breaker.
                 this.qsa('link[rel-ish="preload"]', document.head).forEach(el => {
@@ -140,15 +141,15 @@ export interface IReference {
 
                 });
                 //}
-                this.qsa('link[rel="preload"][data-tag]', document.head).forEach(el => {
-                    const tag = el.dataset.tag;
-                    const newRef = {
-                        el: el
-                    } as IReference;
-                    XtalSip._lM[tag] = newRef;
-                });
+                // this.qsa('link[rel="preload"][data-tag]', document.head).forEach(el => {
+                //     const tag = el.dataset.tag;
+                //     const newRef = {
+                //         el: el
+                //     } as IReference;
+                //     //XtalSip._lM[tag] = newRef;
+                // });
 
-            }
+            //}
         }
 
         connectedCallback() {

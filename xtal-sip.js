@@ -7,7 +7,7 @@
     customElements.define = function (name, cls) {
         const lookup = XtalSip.get(name);
         if (lookup) {
-            Object.assign(cls, lookup.el.dataset);
+            Object.assign(cls, lookup.dataset);
         }
         boundDefine(name, cls);
     };
@@ -24,10 +24,10 @@
             return str.replace(new RegExp(find, 'g'), replace);
         }
         static get(tagName) {
-            let a;
-            if (!(a = XtalSip._lM) || !(a = a[tagName]))
-                return; //this happens when boostrapping xtal sip.
-            return a;
+            // let a;
+            // if(!(a = XtalSip._lM) || !(a = a[tagName])) return; //this happens when boostrapping xtal sip.
+            // return a as IReference;
+            return document.head.querySelector(`link[rel="preload"][data-tag="${tagName}"]`);
         }
         static loadDeps(tagNames) {
             tagNames.forEach(tagName => XtalSip.loadDep(tagName));
@@ -37,7 +37,7 @@
             const lookup = this.get(tagName);
             if (!lookup)
                 return;
-            const el = lookup.el, d = el.dataset;
+            const el = lookup, d = el.dataset;
             if (customElements.get(tagName))
                 return;
             let nodeName, pathName;
@@ -65,75 +65,75 @@
             return [].slice.call(from.querySelectorAll(css));
         }
         static init() {
-            if (!XtalSip._lM) {
-                XtalSip._lM = {};
-                const tagToFakeLink = {}; // accumulate links with same custom element tag
-                // so can provide to tie breaker.
-                this.qsa('link[rel-ish="preload"]', document.head).forEach(el => {
-                    if (XtalSip._sub)
-                        XtalSip._sub(el); //substitution
-                    el.dataset.tags.split(',').forEach(tag => {
-                        if (!tagToFakeLink[tag])
-                            tagToFakeLink[tag] = [];
-                        tagToFakeLink[tag].push(el);
-                    });
+            //if (!XtalSip._lM) {
+            //XtalSip._lM = {};
+            const tagToFakeLink = {}; // accumulate links with same custom element tag
+            // so can provide to tie breaker.
+            this.qsa('link[rel-ish="preload"]', document.head).forEach(el => {
+                if (XtalSip._sub)
+                    XtalSip._sub(el); //substitution
+                el.dataset.tags.split(',').forEach(tag => {
+                    if (!tagToFakeLink[tag])
+                        tagToFakeLink[tag] = [];
+                    tagToFakeLink[tag].push(el);
                 });
-                const goodFakeLinkEls = [];
-                //tie breaker
-                for (var key in tagToFakeLink) {
-                    const els = tagToFakeLink[key];
-                    let elToAdd;
-                    if (els.length === 1) {
-                        elToAdd = els[0];
-                    }
-                    else {
-                        if (XtalSip._tB) {
-                            elToAdd = XtalSip._tB(key, els);
-                        }
-                    }
-                    if (elToAdd) {
-                        if (elToAdd['_a'])
-                            continue; //already added
-                        elToAdd['_a'] = true;
-                        goodFakeLinkEls.push(elToAdd);
+            });
+            const goodFakeLinkEls = [];
+            //tie breaker
+            for (var key in tagToFakeLink) {
+                const els = tagToFakeLink[key];
+                let elToAdd;
+                if (els.length === 1) {
+                    elToAdd = els[0];
+                }
+                else {
+                    if (XtalSip._tB) {
+                        elToAdd = XtalSip._tB(key, els);
                     }
                 }
-                //Now clone fake els to real preload links to allow browser to preload link
-                goodFakeLinkEls.forEach(el => {
-                    const href = el.getAttribute('href');
-                    el.dataset.tags.split(',').forEach(tag => {
-                        let modifiedHref = href;
-                        let counter = 0;
-                        tag.split('-').forEach(token => {
-                            modifiedHref = this.replace(modifiedHref, '\\{' + counter + '\\}', token);
-                            counter++;
-                        });
-                        let baseRef;
-                        let base = el.dataset.base || (baseRef = el.dataset.baseRef ? document.querySelector(baseRef).dataset.base : '');
-                        modifiedHref = base + modifiedHref;
-                        //from https://developer.mozilla.org/en-US/docs/Web/HTML/Preloading_content
-                        // const preloadLink = document.createElement("link") as HTMLLinkElement;
-                        // preloadLink.href = modifiedHref;
-                        // preloadLink.rel = 'preload';
-                        // preloadLink.setAttribute('as', el.getAttribute('as'));
-                        // preloadLink.dataset.tag = tag;
-                        // Object.assign(preloadLink.dataset, el.dataset);
-                        const preloadLink = el.cloneNode();
-                        preloadLink.href = modifiedHref;
-                        preloadLink.dataset.tag = tag;
-                        preloadLink.rel = 'preload'; //el.getAttribute('rel-ish') if support prefetch
-                        document.head.appendChild(preloadLink);
-                    });
-                });
-                //}
-                this.qsa('link[rel="preload"][data-tag]', document.head).forEach(el => {
-                    const tag = el.dataset.tag;
-                    const newRef = {
-                        el: el
-                    };
-                    XtalSip._lM[tag] = newRef;
-                });
+                if (elToAdd) {
+                    if (elToAdd['_a'])
+                        continue; //already added
+                    elToAdd['_a'] = true;
+                    goodFakeLinkEls.push(elToAdd);
+                }
             }
+            //Now clone fake els to real preload links to allow browser to preload link
+            goodFakeLinkEls.forEach(el => {
+                const href = el.getAttribute('href');
+                el.dataset.tags.split(',').forEach(tag => {
+                    let modifiedHref = href;
+                    let counter = 0;
+                    tag.split('-').forEach(token => {
+                        modifiedHref = this.replace(modifiedHref, '\\{' + counter + '\\}', token);
+                        counter++;
+                    });
+                    let baseRef;
+                    let base = el.dataset.base || (baseRef = el.dataset.baseRef ? document.querySelector(baseRef).dataset.base : '');
+                    modifiedHref = base + modifiedHref;
+                    //from https://developer.mozilla.org/en-US/docs/Web/HTML/Preloading_content
+                    // const preloadLink = document.createElement("link") as HTMLLinkElement;
+                    // preloadLink.href = modifiedHref;
+                    // preloadLink.rel = 'preload';
+                    // preloadLink.setAttribute('as', el.getAttribute('as'));
+                    // preloadLink.dataset.tag = tag;
+                    // Object.assign(preloadLink.dataset, el.dataset);
+                    const preloadLink = el.cloneNode();
+                    preloadLink.href = modifiedHref;
+                    preloadLink.dataset.tag = tag;
+                    preloadLink.rel = 'preload'; //el.getAttribute('rel-ish') if support prefetch
+                    document.head.appendChild(preloadLink);
+                });
+            });
+            //}
+            // this.qsa('link[rel="preload"][data-tag]', document.head).forEach(el => {
+            //     const tag = el.dataset.tag;
+            //     const newRef = {
+            //         el: el
+            //     } as IReference;
+            //     //XtalSip._lM[tag] = newRef;
+            // });
+            //}
         }
         connectedCallback() {
             this.getAttribute('load').split(',').forEach(tag => {
@@ -141,8 +141,8 @@
             });
         }
     }
+    //static _lM: { [key: string]: IReference};
     XtalSip._added = {};
-    XtalSip.useJITLoading = false;
     const detail = {};
     document.head.dispatchEvent(new CustomEvent(xtal_sip + '-init', {
         detail: detail,
