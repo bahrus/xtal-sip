@@ -121,8 +121,8 @@ export interface IReference {
                             modifiedHref = this.replace(modifiedHref, '\\{' + counter + '\\}', token);
                             counter++;
                         });
-                        let baseRef;
-                        let base = el.dataset.base || (baseRef = el.dataset.baseRef ? document.querySelector(baseRef).dataset.base : '');
+                        const d = el.dataset;
+                        let base = d.base || (d.baseRef ? document.querySelector(d.baseRef).dataset.base : '');
                         modifiedHref = base + modifiedHref;
                         //from https://developer.mozilla.org/en-US/docs/Web/HTML/Preloading_content
 
