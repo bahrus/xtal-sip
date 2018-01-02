@@ -67,7 +67,8 @@
         connectedCallback() {
             if (!XtalSip._lM) {
                 XtalSip._lM = {};
-                const tagToFakeLink = {};
+                const tagToFakeLink = {}; // accumulate links with same custom element tag
+                // so can provide to tie breaker.
                 this.qsa('link[rel-ish="preload"]', document.head).forEach(el => {
                     if (XtalSip._sub)
                         XtalSip._sub(el); //substitution
@@ -77,7 +78,8 @@
                         tagToFakeLink[tag].push(el);
                     });
                 });
-                const goodEls = [];
+                const goodFakeLinkEls = [];
+                //tie breaker
                 for (var key in tagToFakeLink) {
                     const els = tagToFakeLink[key];
                     let elToAdd;
@@ -90,14 +92,14 @@
                         }
                     }
                     if (elToAdd) {
-                        if (elToAdd['alreadyAdded'])
-                            continue;
-                        elToAdd['alreadyAdded'] = true;
-                        goodEls.push(elToAdd);
+                        if (elToAdd['_a'])
+                            continue; //already added
+                        elToAdd['_a'] = true;
+                        goodFakeLinkEls.push(elToAdd);
                     }
                 }
-                goodEls.forEach(el => {
-                    const isAsync = el.dataset.async !== undefined;
+                //Now clone fake els to real preload links to allow browser to preload link
+                goodFakeLinkEls.forEach(el => {
                     const href = el.getAttribute('href');
                     el.dataset.tags.split(',').forEach(tag => {
                         let modifiedHref = href;
@@ -106,22 +108,20 @@
                             modifiedHref = this.replace(modifiedHref, '\\{' + counter + '\\}', token);
                             counter++;
                         });
-                        let base = el.dataset.base;
-                        if (!base) {
-                            const baseRef = el.dataset.baseRef;
-                            if (baseRef)
-                                base = document.querySelector(baseRef).dataset.base;
-                        }
-                        if (!base)
-                            base = '';
+                        let baseRef;
+                        let base = el.dataset.base || (baseRef = el.dataset.baseRef ? document.querySelector(baseRef).dataset.base : '');
                         modifiedHref = base + modifiedHref;
                         //from https://developer.mozilla.org/en-US/docs/Web/HTML/Preloading_content
-                        const preloadLink = document.createElement("link");
+                        // const preloadLink = document.createElement("link") as HTMLLinkElement;
+                        // preloadLink.href = modifiedHref;
+                        // preloadLink.rel = 'preload';
+                        // preloadLink.setAttribute('as', el.getAttribute('as'));
+                        // preloadLink.dataset.tag = tag;
+                        // Object.assign(preloadLink.dataset, el.dataset);
+                        const preloadLink = el.cloneNode();
                         preloadLink.href = modifiedHref;
-                        preloadLink.rel = 'preload';
-                        preloadLink.setAttribute('as', el.getAttribute('as'));
                         preloadLink.dataset.tag = tag;
-                        Object.assign(preloadLink.dataset, el.dataset);
+                        preloadLink.rel = 'preload'; //el.getAttribute('rel-ish') if support prefetch
                         document.head.appendChild(preloadLink);
                     });
                 });
