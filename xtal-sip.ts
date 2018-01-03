@@ -168,14 +168,12 @@ export interface IReference {
     } as CustomEventInit));
     XtalSip._tB = detail['tieBreaker'];
     XtalSip._sub = detail['substitutor'];
-    XtalSip.init();
+    
     customElements.define(xtal_sip, XtalSip);
 
-    // document.addEventListener("DOMContentLoaded", e => { 
-    //     const xs = document.createElement(xtal_sip);
-    //     xs.setAttribute('load', 'dom-bind');
-    //     document.body.appendChild(xs);
-    // });
+    document.addEventListener("DOMContentLoaded", e => { 
+        XtalSip.init();
+    });
 
 
 })();
