@@ -169,10 +169,11 @@ export interface IReference {
     XtalSip._tB = detail['tieBreaker'];
     XtalSip._sub = detail['substitutor'];
     
-    customElements.define(xtal_sip, XtalSip);
+    
 
     document.addEventListener("DOMContentLoaded", e => { 
         XtalSip.init();
+        customElements.define(xtal_sip, XtalSip);
     });
 
 
