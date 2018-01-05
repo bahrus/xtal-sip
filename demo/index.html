@@ -8,29 +8,18 @@
   <title>xtal-sip demo</title>
 
   <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
-  <!-- <script>
-    const prevDefine = customElements.define;
-    customElements.define = (name, cl) =>{
-      console.log('in pseudo define')
-      prevDefine(name, cl);
-    }
-  </script> -->
+  
   <link rel="import" href="../../iron-demo-helpers/demo-pages-shared-styles.html">
   
   <link rel="preload" async as="script" data-tag="xtal-link-preview" href="https://cdn.jsdelivr.net/npm/xtal-link-preview/build/ES6/xtal-link-preview.js">
   <link rel="preload" as="script" data-tag="c-c" href="https://cdn.jsdelivr.net/npm/carbon-copy/build/ES6/carbon-copy.js">
-  <script>
-    // customElements.whenDefined('xtal-sip').then(() =>{
-    //     const xs = customElements.get('xtal-sip');
-    //     xs.
-    // })
-  </script>
+  
   <link rel-ish="preload" as="document" data-tags="dom-bind,dom-if" href="../../polymer/lib/elements/dom-{1}.html">
   <link rel="preload" as="document" data-tag="demo-snippet" href="../../iron-demo-helpers/demo-snippet.html">
   <link rel-ish="preload" as="document" data-tags="wired-input,wired-radio-group,wired-radio,wired-card" href="../../wired-{1}/wired-{1}.html"
     data-async>
   <script async src="../xtal-sip.js"></script>
-  <link rel="preload" as="document" data-tag="my-component" type="text/html" data-importer="c-c" href="include.html#myTemplate">
+  <link rel="preload" as="fetch" data-tag="my-component" type="text/html" data-importer="c-c" href="include.html#myTemplate">
   <custom-style>
     <style is="custom-style" include="demo-pages-shared-styles">
     </style>

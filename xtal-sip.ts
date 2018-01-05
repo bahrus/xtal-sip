@@ -58,14 +58,17 @@ export interface IReference {
             let nodeName, pathName;
             switch(el.getAttribute('as')){
                 case 'document':
-                    nodeName = d['importer'] ? 'c-c' : 'link';
+                    nodeName = 'link';
                     pathName = 'href';
                     break;
                 case 'script':
                     nodeName = 'script';
                     pathName = 'src';
                     break;
-
+                case 'fetch':
+                    nodeName = 'c-c';
+                    pathName = 'href'
+                    break;
             }
             let target = d['importer'] ? document.body : document.head as HTMLElement;
 
@@ -169,12 +172,20 @@ export interface IReference {
     XtalSip._tB = detail['tieBreaker'];
     XtalSip._sub = detail['substitutor'];
     
-    
 
-    document.addEventListener("DOMContentLoaded", e => { 
+    function init(){
         XtalSip.init();
         customElements.define(xtal_sip, XtalSip);
-    });
+    }
+
+    if (document.readyState  !== "loading") {
+        init();
+    }else{
+        document.addEventListener("DOMContentLoaded", e => { 
+            init();
+        });
+    }
+
 
 
 })();
