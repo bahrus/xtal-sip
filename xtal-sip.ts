@@ -41,9 +41,6 @@ export interface IReference {
             return str.replace(new RegExp(find, 'g'), replace);
         }
         static get(tagName) : HTMLLinkElement {
-            // let a;
-            // if(!(a = XtalSip._lM) || !(a = a[tagName])) return; //this happens when boostrapping xtal sip.
-            // return a as IReference;
             return document.head.querySelector(`link[rel="preload"][data-tag="${tagName}"]`);
         }
         static loadDeps(tagNames: string[]) {
