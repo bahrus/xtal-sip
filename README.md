@@ -40,7 +40,7 @@ For performance reasons, it is beneficial to use these to preload all these refe
 
 ### What about prefetch?
 
-An older alternative to \<link rel="preload"\> is \<link rel="prefetch"\>.  However, from my experiments, this directive seems quite messed up, always resulting in duplicate downloads.  If I run across a good explanation of how to use prefetch properly, this component will support it as well.
+An older alternative to \<link rel="preload"\> is \<link rel="prefetch"\>.  However, from my experiments, this directive seems quite messed up, at least in Chrome, always resulting in duplicate downloads.  Not sure why such a simple thing would be so difficult to implement.  If I run across a good explanation of how to use prefetch properly in Chrome, this component will support it as well.
 
 
 So what does xtal-sip add to the \<link rel="preload"\> functionality?
@@ -58,7 +58,7 @@ So what does xtal-sip add to the \<link rel="preload"\> functionality?
 
 When \<xtal-sip\> is told to load the \<paper-checkbox\> tag, it will perform a hash lookup for link preload tags with attribute 'data-tag="paper-checkbox"', and it will formally load the reference. 
 
-NB:  Currently, Chrome does not preload assets when as="document."  This seems like a bug to me, but [what do I know](https://bugs.chromium.org/p/chromium/issues/detail?id=593267)?  Attempting to work around this unexpected behavior by setting as="script" causes duplicate requests, which is probably worse. 
+NB:  Currently, Chrome does not preload assets when as="document."  This seems like another  bug to me, but [what do I know](https://bugs.chromium.org/p/chromium/issues/detail?id=593267)?  Attempting to work around this unexpected behavior by setting as="script" causes duplicate requests, which is probably worse. 
 
 ## Declaring custom elements that need watering
 
@@ -195,15 +195,19 @@ Classic script references are handled much the same way.  The biggest difference
 
 [The carbon copy element](https://www.webcomponents.org/element/bahrus/carbon-copy), c-c for short, provides a 1.9 kb alternative to HTML Imports, that can also be used to define HTML-based custom elements.  Unlike HTML Imports, it also supports direct client-side include functionality, including dynamic url references, similar to Polymer's iron-pages.  
 
-Xtal-sip also provides support for lazily loading custom elements defined and imported via the carbon copy element.  Note the "data-importer" attribute.
+Xtal-sip also provides support for lazily loading custom elements defined and imported via the carbon copy element.  Note the "data-importer" attribute, and the value of the "as" attribute.
 
 ```html
 <link 
-    rel="preload" as="document" 
+    rel="preload" as="fetch" 
     data-tag="my-component" type="text/html" 
     data-importer="c-c" href="include.html#myTemplate">
     ...
 ```
+
+**Here again we see yet another bug in Chrome, which Firefox doesn't share**.  Even though the carbon copy element fetches include.html via the fetch api, Chrome ends up downloading the file twice.  Firefox does this correctly.
+
+Until Chrome fixes this bug, you can use as="document", which is buggy in the opposite direction, and which won't be quite as performant, but at least the person's bandwidth won't be wasted.
 
 ## Bundling
 
@@ -340,6 +344,8 @@ followed immediately by:
   <link class="billboard bb"     rel="preload" as="script" href="https://naver.github.io/billboard.js/release/latest/dist/billboard.min.js">
   <link class="billboard css"    rel="preload" as="style"  href="https://naver.github.io/billboard.js/release/latest/dist/billboard.min.css">
 ```
+
+Unfortunately, in testing out this example, **another Chrome bug appears**.  Not sure why it's so hard for Chrome to keep track of what url's it has requested -- If you use link preload="billboard.css" and then include a reference to that same file within a shadow DOM template, Chrome ends up downloading the same file twice.
 
 ## TODO:  Mixin Mischief
 
