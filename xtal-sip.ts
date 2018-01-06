@@ -1,62 +1,38 @@
-export interface IReference {
-    // path?: string;
-    // async?: boolean;
-    // //isJS?: boolean;
-    // //isCC?: boolean;
-    // //useESM?: boolean;
-    // type?: string;
-    // preemptive?: boolean;
-    el: HTMLLinkElement;
-}
-
 (function () {
     const xtal_sip = 'xtal-sip';
-    if(customElements.get(xtal_sip)) return;
+    if (customElements.get(xtal_sip)) return;
     const originalDefine = customElements.define;
     const boundDefine = originalDefine.bind(customElements);
-    customElements.define = function(name: string, cls: any){
+    customElements.define = function (name: string, cls: any) {
         const lookup = XtalSip.get(name);
-        if(lookup){
+        if (lookup) {
             Object.assign(cls, lookup.dataset);
         }
         boundDefine(name, cls);
     }
-    /**
-    * `xtal-sip`
-    * Dynamically load custom elements from central config file. 
-    *
-    * @customElement
-    * @polymer
-    * @demo demo/index.html
-    */
     class XtalSip extends HTMLElement {
-        //static _lM: { [key: string]: IReference};
         static _added: { [key: string]: boolean } = {};
-        //static useJITLoading = false;
-
-        static _tB: (tagName: string, candidates: HTMLLinkElement[]) => IReference; //tie breaker
-        static _sub: (link: HTMLLinkElement) => void;
-        
-        static replace(str, find, replace) {
-            return str.replace(new RegExp(find, 'g'), replace);
+        static _notFound: {[key: string]: boolean} = {};
+        static get(tagName): HTMLLinkElement {
+            return document.head.querySelector(`link[data-tag="${tagName}"]`);
         }
-        static get(tagName) : HTMLLinkElement {
-            return document.head.querySelector(`link[rel="preload"][data-tag="${tagName}"]`);
-        }
-        static loadDeps(tagNames: string[]) {
-            tagNames.forEach(tagName => XtalSip.loadDep(tagName))
+        static load(...args: string[]) {
+            args.forEach(tagName => XtalSip.loadDep(tagName))
         }
         static loadDep(tagName: string) {
-            XtalSip._added[tagName] = true;
             const lookup = this.get(tagName);
-            if (!lookup) return;
-            const el = lookup, d=el.dataset;
+            if (!lookup) {
+                XtalSip._notFound[tagName] = true;
+                return;
+            }
+            XtalSip._added[tagName] = true;
+            const d = lookup.dataset;
             if (customElements.get(tagName)) return;
-            let nodeName, pathName;
-            switch(el.getAttribute('as')){
+            let nodeName, pathName = 'href';
+            switch (lookup.getAttribute('as')) {
                 case 'document':
                     nodeName = 'link';
-                    pathName = 'href';
+                    //pathName = 'href';
                     break;
                 case 'script':
                     nodeName = 'script';
@@ -64,125 +40,33 @@ export interface IReference {
                     break;
                 case 'fetch':
                     nodeName = 'c-c';
-                    pathName = 'href'
+                    //pathName = 'href'
                     break;
             }
             let target = d['importer'] ? document.body : document.head as HTMLElement;
 
             const newTag = document.createElement(nodeName);
-            newTag.setAttribute(pathName, el.getAttribute('href'));
+            newTag.setAttribute(pathName, lookup.getAttribute('href'));
             newTag.setAttribute('rel', 'import');  // no harm done for other types
-            if (el['async']) newTag.setAttribute('async', '');
+            if (lookup['async']) newTag.setAttribute('async', '');
             setTimeout(() => {
                 target.appendChild(newTag);
-            }, 50);
+            }, 1);
         }
-        static qsa(css, from: HTMLElement | Document): HTMLElement[] {
-            return [].slice.call(from.querySelectorAll(css));
-        }
-
-        static init(){
-            //if (!XtalSip._lM) {
-                //XtalSip._lM = {};
-                const tagToFakeLink = {}; // accumulate links with same custom element tag
-                // so can provide to tie breaker.
-                this.qsa('link[rel-ish="preload"]', document.head).forEach(el => {
-                    if(XtalSip._sub) XtalSip._sub(el as HTMLLinkElement); //substitution
-                    el.dataset.tags.split(',').forEach(tag => {
-                        if(!tagToFakeLink[tag]) tagToFakeLink[tag] = [];
-                        tagToFakeLink[tag].push(el);
-                    })
-                });
-                const goodFakeLinkEls = [];
-                //tie breaker
-                for(var key in tagToFakeLink){
-                    const els = tagToFakeLink[key];
-                    let elToAdd;
-                    if(els.length === 1) {
-                        elToAdd = els[0];
-                    }else{
-                        if(XtalSip._tB){
-                            elToAdd = XtalSip._tB(key, els);
-                        }
-                    }
-                    if(elToAdd){
-                        if(elToAdd['_a']) continue; //already added
-                        elToAdd['_a'] = true;
-                        goodFakeLinkEls.push(elToAdd);
-                    }
-                }
-                //Now clone fake els to real preload links to allow browser to preload link
-                goodFakeLinkEls.forEach(el =>{
-                    const href = el.getAttribute('href');
-                    el.dataset.tags.split(',').forEach(tag => {
-                        let modifiedHref = href;
-                        let counter = 0;
-                        tag.split('-').forEach(token => {
-                            modifiedHref = this.replace(modifiedHref, '\\{' + counter + '\\}', token);
-                            counter++;
-                        });
-                        const d = el.dataset;
-                        let base = d.base || (d.baseRef ? document.querySelector(d.baseRef).dataset.base : '');
-                        modifiedHref = base + modifiedHref;
-                        //from https://developer.mozilla.org/en-US/docs/Web/HTML/Preloading_content
-
-                        // const preloadLink = document.createElement("link") as HTMLLinkElement;
-                        // preloadLink.href = modifiedHref;
-                        // preloadLink.rel = 'preload';
-                        // preloadLink.setAttribute('as', el.getAttribute('as'));
-                        // preloadLink.dataset.tag = tag;
-                        // Object.assign(preloadLink.dataset, el.dataset);
-                        const preloadLink = el.cloneNode();
-                        preloadLink.href = modifiedHref;
-                        preloadLink.dataset.tag = tag;
-                        preloadLink.rel = 'preload'; //el.getAttribute('rel-ish') if support prefetch
-                        document.head.appendChild(preloadLink);
-                    });
-
-                });
-                //}
-                // this.qsa('link[rel="preload"][data-tag]', document.head).forEach(el => {
-                //     const tag = el.dataset.tag;
-                //     const newRef = {
-                //         el: el
-                //     } as IReference;
-                //     //XtalSip._lM[tag] = newRef;
-                // });
-
-            //}
-        }
-
         connectedCallback() {
-
+            if (document.readyState !== "loading") {
+                this.do();
+            } else {
+                document.addEventListener("DOMContentLoaded", e => {
+                    this.do();
+                });
+            }
+        }
+        do(){
             this.getAttribute('load').split(',').forEach(tag => {
                 XtalSip.loadDep(tag);
             })
-
         }
-
-
     }
-    const detail = {};
-    document.head.dispatchEvent(new CustomEvent(xtal_sip + '-init', {
-        detail: detail,
-    } as CustomEventInit));
-    XtalSip._tB = detail['tieBreaker'];
-    XtalSip._sub = detail['substitutor'];
-    
-
-    function init(){
-        XtalSip.init();
-        customElements.define(xtal_sip, XtalSip);
-    }
-
-    if (document.readyState  !== "loading") {
-        init();
-    }else{
-        document.addEventListener("DOMContentLoaded", e => { 
-            init();
-        });
-    }
-
-
-
+    customElements.define(xtal_sip, XtalSip);
 })();

@@ -76,7 +76,7 @@ Generally you will not want to list all tags in a single \<xtal-sip\> tag.  Rath
 If the sight of \<xtal-sip\>'s is unpleasant to see in the markup, or is an inconvenient way to resolve dependencies, an alternative way of explicitly declaring which tags should become active is to call the static method:
 
 ```JavaScript
-customElements.get('xtal-sip').loadDependencies('paper-input,iron-ajax');
+customElements.get('xtal-sip').load('paper-input,iron-ajax');
 ```
 
 

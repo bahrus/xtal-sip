@@ -3,6 +3,7 @@
   "fragments": [],
   "sources": [
     "xtal-sip.js",
+    "xtal-sip-plus.js",
     "xtal-sip-loader.js",
     "ES5Compat.js",
     "index.html"

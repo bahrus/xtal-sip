@@ -8,7 +8,9 @@
   <title>xtal-sip demo</title>
 
   <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
-  
+  <script async src="../xtal-sip.js"></script>
+  <link rel="preload" async as="script" data-tag="xtal-sip-plus" href="../xtal-sip-plus.js">
+
   <link rel="import" href="../../iron-demo-helpers/demo-pages-shared-styles.html">
   
   <link rel="preload" async as="script" data-tag="xtal-link-preview" href="https://cdn.jsdelivr.net/npm/xtal-link-preview/build/ES6/xtal-link-preview.js">
@@ -17,8 +19,8 @@
   <link rel-ish="preload" as="document" data-tags="dom-bind,dom-if" href="../../polymer/lib/elements/dom-{1}.html">
   <link rel="preload" as="document" data-tag="demo-snippet" href="../../iron-demo-helpers/demo-snippet.html">
   <link rel-ish="preload" as="document" data-tags="wired-input,wired-radio-group,wired-radio,wired-card" href="../../wired-{1}/wired-{1}.html"
-    data-async>
-  <script async src="../xtal-sip.js"></script>
+    async>
+  
   <link rel="preload" as="fetch" data-tag="my-component" type="text/html" data-importer="c-c" href="include.html#myTemplate">
   <custom-style>
     <style is="custom-style" include="demo-pages-shared-styles">
@@ -34,7 +36,7 @@
 <body>
   <div class="vertical-section-container centered">
     <h3>Basic xtal-sip demo</h3>
-    <xtal-sip load="demo-snippet,dom-bind,c-c,wired-card,wired-input,wired-radio-group,wired-radio,xtal-link-preview,my-component"></xtal-sip>
+    <xtal-sip load="xtal-sip-plus,demo-snippet,dom-bind,c-c,wired-card,wired-input,wired-radio-group,wired-radio,xtal-link-preview,my-component"></xtal-sip>
     <demo-snippet>
       <template>
         <dom-bind>
