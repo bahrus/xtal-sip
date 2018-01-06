@@ -2,15 +2,6 @@
     const xtal_sip = 'xtal-sip';
     if (customElements.get(xtal_sip))
         return;
-    const originalDefine = customElements.define;
-    const boundDefine = originalDefine.bind(customElements);
-    customElements.define = function (name, cls) {
-        const lookup = XtalSip.get(name);
-        if (lookup) {
-            Object.assign(cls, lookup.dataset);
-        }
-        boundDefine(name, cls);
-    };
     class XtalSip extends HTMLElement {
         static get(tagName) {
             return document.head.querySelector(`link[data-tag="${tagName}"]`);

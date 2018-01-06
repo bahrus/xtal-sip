@@ -1,15 +1,7 @@
 (function () {
     const xtal_sip = 'xtal-sip';
     if (customElements.get(xtal_sip)) return;
-    const originalDefine = customElements.define;
-    const boundDefine = originalDefine.bind(customElements);
-    customElements.define = function (name: string, cls: any) {
-        const lookup = XtalSip.get(name);
-        if (lookup) {
-            Object.assign(cls, lookup.dataset);
-        }
-        boundDefine(name, cls);
-    }
+
     class XtalSip extends HTMLElement {
         static _added: { [key: string]: boolean } = {};
         static _notFound: {[key: string]: boolean} = {};
