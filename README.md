@@ -119,9 +119,8 @@ Classic script references are handled much the same way.  The biggest difference
 ```html
 <link rel="preload" 
     async as="script" 
-    data-base-ref="#hasBaseCdnUrl"
     href="xtal-json-editor/build/ES6/xtal-json-editor.js" 
-    data-tags="xtal-json-editor">
+    data-tag="xtal-json-editor">
 ```
 
 ## c-c reference
