@@ -117,7 +117,7 @@ Simply add the following markup inside head tag of the web page:
 Classic script references are handled much the same way.  The biggest difference is now the "as" attribute should be set to "script":
 
 ```html
-<link rel-ish="preload" 
+<link rel="preload" 
     async as="script" 
     data-base-ref="#hasBaseCdnUrl"
     href="xtal-json-editor/build/ES6/xtal-json-editor.js" 
