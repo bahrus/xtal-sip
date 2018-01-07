@@ -1,5 +1,9 @@
 (function () {
-
+    /*
+    * @customElement
+    * @polymer
+    * @demo demo/index.html
+    */
     class XtalSip extends HTMLElement {
         static _added: { [key: string]: boolean } = {};
         static _notFound: {[key: string]: boolean} = {};
