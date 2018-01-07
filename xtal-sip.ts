@@ -1,5 +1,11 @@
 (function () {
     /*
+    * `xtal-sip`
+    *
+    * Dependency free web component that helps manage and load web component dependency mappings 
+    * on an as-needed basis.
+    * 
+    *
     * @customElement
     * @polymer
     * @demo demo/index.html
