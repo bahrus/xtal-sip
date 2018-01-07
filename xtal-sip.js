@@ -1,7 +1,4 @@
 (function () {
-    const xtal_sip = 'xtal-sip';
-    if (customElements.get(xtal_sip))
-        return;
     class XtalSip extends HTMLElement {
         static get(tagName) {
             return document.head.querySelector(`link[data-tag="${tagName}"]`);
@@ -62,6 +59,6 @@
     }
     XtalSip._added = {};
     XtalSip._notFound = {};
-    customElements.define(xtal_sip, XtalSip);
+    customElements.define('xtal-sip', XtalSip);
 })();
 //# sourceMappingURL=xtal-sip.js.map

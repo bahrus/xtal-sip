@@ -1,6 +1,4 @@
 (function () {
-    const xtal_sip = 'xtal-sip';
-    if (customElements.get(xtal_sip)) return;
 
     class XtalSip extends HTMLElement {
         static _added: { [key: string]: boolean } = {};
@@ -60,5 +58,5 @@
             })
         }
     }
-    customElements.define(xtal_sip, XtalSip);
+    customElements.define('xtal-sip', XtalSip);
 })();
