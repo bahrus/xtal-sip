@@ -175,7 +175,9 @@ One of those files is the 730B gzipped and minified file xtal-sip-plus.js.
 
 To reference it, use the preload tag in document.head:
 
+```html
 <link rel="preload" async as="script" data-tag="xtal-sip-plus" href="path/to/xtal-sip-plus.js">
+```
 
 and add the fake tag name 'xtal-sip-plus' to the first xtal-sip load statement:
 
