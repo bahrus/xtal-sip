@@ -1,5 +1,5 @@
 (function () {
-    /*
+    /** 
     * `xtal-sip`
     *
     * Dependency free web component that helps manage and load web component dependency mappings 
