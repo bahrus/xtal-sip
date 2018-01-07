@@ -2,50 +2,76 @@
 
 # \<xtal-sip\>
 
-<a href="https://www.webcomponents.org/element/bahrus/xtal-sip/demo/index.html">Demo</a>
+NB:  This component suffers currently in terms of IDE and build support, especially compared to the Polymer supported [lazy-imports](https://github.com/Polymer/lazy-imports).
 
 \<xtal-sip\> is a dependency free, 620B minified and gzipped custom element that dynamically "waters" other custom element tags with the necessary dependencies to sprout the tag from an inert seedling to a thing of beauty. 
 
-## Long soapboxing diatribe. Skip to "Core Functionality" to see what \<xtal-sip\>actually does.
 
-The \<xtal-sip\> element takes the philosophical stance that web components are more than just some mundane JavaScript libraries.  They enhance the DOM vocabulary.  They create a mapping between a tag and something that, yes, is a JavaScript class, but typically no code needs to interact directly with that class -- only the browser.
-
-NB:  This component suffers currently in terms of IDE and build support, especially compared to the Polymer supported [lazy-imports](https://github.com/Polymer/lazy-imports).
-
-The goal of this web component is to allow for easier maintenance of references, and reducing redundancy.  For example, this component allows the same index.html page to serve both IE11 and modern browsers fairly seamlessly.
+## Long soapboxing diatribe. Skip to "Core Functionality" to see what \<xtal-sip\> actually does.
 
 Importing the files needed for web components seems likely to become a lot more complicated.  Some references will come from bower_components, some from node_modules.  Some will be references to html files, others js files.  And the references are likely to be in a state of flux, as the [whims of elite developers](https://codeburst.io/the-javascript-modules-limbo-585eedbb182e) change.  Components will first migrate to node_modules (how will we explain to our grandkids that web components are node modules?).   As support for HTML Imports wanes, many  *.html files will be converted to *.js files, then to *.mjs files, then back to *.mhtml files, once the W3C Ents show some HTML love.  That will shortly be followed by converting them to *.wasm, followed by the universal binary format that includes HTML, JS, CSS, WASM: *.xap.
 
 This component, \<xtal-sip\>, is intended to "centralize the pain."  Keep the mappings between custom element tags and where to load the references for them all in one place.
 
-The annoying thing about HTMLImports (and ES6 Modules for that matter) is that creating references for each referenced web component inside an HTML or JS file feels like tedius busy work -- for HTML files, one must go towards the top of the page (outside any templates) to add the reference, and typically the reference is just a trite formulaic derivative of the tag name itself.  E.g. \<paper-input\> => \<link rel="import" href="../paper-input/paper-input.html"\>, \<paper-checkbox\> => \<link rel="import" href="../paper-checkbox/paper-checkbox.html"\>.   And all these references add to the footprint of the application.
+The \<xtal-sip\> element takes the philosophical stance that web components are more than just some mundane JavaScript libraries.  They enhance the DOM vocabulary.  They create a mapping between a tag and something that, yes, is a JavaScript class, but typically no code needs to interact directly with that class -- only the browser.
+
+Typically, the simplest, naive way to centralize that mapping would be to front load all the references in the head tag of index.html (the opening page for the entire application):
+
+```html
+<head>
+    <link rel="import" href="../bower_components/paper-checkbox/paper-checkbox">
+    <script type="module" href="https://gitcdn.xyz/cdn/goessner/canvas-area/master/canvas-area.js">
+    <etc/>
+    <etc/>
+    <etc/>
+</head>
+```
+
+The problem with this approach is 1)  Without adding the async or defer attribute to these tags, the whole page will be blocked until all these references are a)  downloaded and b)  loaded into memory.  That's a horrible experience for users.  And 2)  Even with those attributes, loading all that content into memory, well before it is needed will only partially reduce the horribleness of the experience.
+
+The goal of this web component is to allow us to fine tune this naive approach, while still allowing  easier maintenance of references, and reducing redundancy.  For example, this component allows the same index.html page to serve both IE11 and modern browsers fairly seamlessly.
+
+The approach will be to build on the \<link rel="preload"\> (and possibly prefetch) tag.
+
+The alternative to maintaining all the top level references centrally, is to break down the entire application into client-side components, either custom elements, or some framework-based component abstraction like that provided by Vue, (P)React, Angular, etc, and making each component handle its own import logic.  While I don't question the desirability of tightly coupled ES6 (or HTML Import) modules, I think as one moves from highly reusable and structured "micro web components" to content heavy, highly dynamic "macro web compositions", the benefits of the decentralized module system begins to diminish, and the benefits of the solution proposed here become more apparent.
+
+A rule of thumb of current front end development is "properties flow down, events flow up", and for deeply nested components, use a global state management system like Redux.  
+
+Perhaps an equivalent rule of thumb would be "references to resources in your folder, or subfolder are fine.  But if your references start with '../../../' or "https://..." perhaps it is time to think about centrally managing those dependencies. 
+
+What are some of the benefits of centrally managing dependencies?
+
+The annoying thing about HTMLImports (and ES6 Modules for that matter) is that creating references for each referenced web component inside an HTML or JS file feels like tedius busy work -- for HTML files, one must go towards the top of the page (outside any templates) to add the reference, and typically the reference is just a trite formulaic derivative of the tag name itself.  E.g. \<paper-input\> => \<link rel="import" href="../../../bower_components/paper-input/paper-input.html"\>, \<paper-checkbox\> => \<link rel="import" href="../../../bower_components/paper-checkbox/paper-checkbox.html"\>.   And all these references add to the footprint of the application.
 
 On top of that, leveraging a CDN when deploying [some of the] files to production could also be simplified by managing dependencies centrally.  Or maybe some components should only be activated in debug mode on the developer's workstation, but not deployed to production.
 
-Another use case for CDN's is when developing and publishing web components to npm or whatever.  What if you want the demo folder of the web component to showcase how the web component can integrate with other web components?  We don't want to mark those components as dependencies, because the web component really doesn't depend on them.  We just want to dynamically reference the other web components for demo purposes.  A CDN fits the bill nicely.
+Another use case for CDN's (which strenghens the need for central management of dependencies) is when developing and publishing web components to npm or bower or wherever.  What if you want the demo folder of the web component to showcase how the web component can integrate with other web components?  We don't want to mark those components as dependencies, because the web component really doesn't depend on them.  We just want to dynamically reference the other web components for demo purposes.  A CDN fits the bill nicely.
 
-Another case for centrally managing web component dependencies is when rendering a forest of  HTML "leaf nodes," including web components, inside a code-centric framework, like (P)react.  Not having a good solution to this scenario may partly explain why so many are "throwing in the towel," pushing web components that might be 99% static markup, 1% JavaScript, to be packaged / coded entirely in JavaScript. Sad!  
+Another case for centrally managing web component dependencies is when rendering a forest of  HTML "leaf nodes" including web components, inside a code-centric framework, like (P)react.  Not having a good solution to this scenario may partly explain why so many are "throwing in the towel," pushing web components that might be 99% static markup, 1% JavaScript, to be packaged / coded entirely in JavaScript. (Of course the dithering of the web component working group hasn't helped).  Sad!  
 
-What if the markup is generated by a server-side framework like asp.mvc or Java EE MVC, or PhP (or, yes, node, which currently falls in the "other" category of [popular web frameworks](https://trends.builtwith.com/framework))?  And suppose that server-side rendering is using web components to supplement the server-side generated HTML?  Although we are not supposed to use the PWA Hacker News site to ["compare the performance of one PWA to another"](https://hnpwa.com/), one can't help noticing that the fastest performing implementation is the one that uses [no JavaScript, other than the service worker](https://github.com/davideast/hnpwa-firebase). Clearly, this is an architecture we can't dismiss.  But accommodating the scenario of creating the web component references in a different location from the custom element tags when using a server-side solution can be quite awkward.   
+What if the markup is generated by a server-side framework like asp.mvc or Java EE MVC, or PhP (or, yes, node, which currently falls in the "other" category of [popular web frameworks](https://trends.builtwith.com/framework))?  And suppose that server-side rendering is using web components to supplement the server-side generated HTML?  Although we are not supposed to use the PWA Hacker News site to ["compare the performance of one PWA to another"](https://hnpwa.com/), one can't help noticing that the fastest performing implementation is the one that uses [no JavaScript, other than the service worker](https://github.com/davideast/hnpwa-firebase). Clearly, this is an architecture we can't dismiss.  But accommodating the scenario of dynamically creating the web component references,  in a different location from the custom element tags, when using a server-side solution can be quite awkward.   
 
 The bottom line is that the need for centralizing management of references is likely to increase significantly. 
 
 That's where \<xtal-sip\> fits in.
 
-Whether using HTML Imports, or classic JavaScript references, or ES6 Modules, there's a pretty good principle that we can assume regarding web components:  *Each web component will depend on only one top-level reference*.  (One small exception to that rule, at least in spirit, appears to be with components that depend on icon libraries, like paper-icon-button).  Of course, that reference file itself will likely specify multiple other references recursively, following standardized module conventions, which is all fine and good.  \<xtal-sip\> is meant for content-heavy, non reusable web compositions, as opposed to highly reusable web components. 
+Whether using HTML Imports, or classic JavaScript references, or ES6 Modules, there's a pretty good principle that we can assume regarding web components:  *Each web component will depend on only one top-level reference*.  (One small exception to that rule, at least in spirit, appears to be with components that depend on icon libraries, like paper-icon-button).  Of course, that reference file itself will likely specify multiple other references recursively, following standardized module conventions, which is all fine and good. As I indicated earlier, \<xtal-sip\> is meant for content-heavy, non reusable web compositions, as opposed to highly reusable web components. 
 
-xtal-sip assumes that web sites will want to take advantage of the recent web standard that allows  [content to be preloaded](https://developer.mozilla.org/en-US/docs/Web/HTML/Preloading_content).  
+xtal-sip assumes that web sites will want to take advantage of the recent web standard that allows  [content to be preloaded](https://developer.mozilla.org/en-US/docs/Web/HTML/Preloading_content):  
 
 ```html
 <link rel="preload" href="..."> 
 ```
 
-For performance reasons, it is beneficial to use these to preload all these references ahead of time.  Might as well build on this support to provide the mappings we need, and not repeat ourselves.
+For performance reasons, it is beneficial to use these to pre-download all these references ahead of time, without processing them until needed.  Might as well build on this support to provide the mappings we need, and not repeat ourselves.
 
 ### What about prefetch?
 
-An older alternative to \<link rel="preload"\> is \<link rel="prefetch"\>.  However, from my experiments, this directive seems quite messed up, at least in Chrome, always resulting in duplicate downloads.  Not sure why such a simple thing would be so difficult to implement.  If I run across a good explanation of how to use prefetch properly in Chrome, this component will support it as well.
+An older alternative to \<link rel="preload"\> is \<link rel="prefetch"\>.  Preload would appear to be for use cases where the resources won't be needed until the user chooses to navigate to a different view, so the downloading is done with a lower priority, which sounds good in theory.  However, it appears that this tag suffers from some ambiguity -- if everything has higher priority, should it ever really be downloaded.
 
+In contrast, to that concern, I see a different issue. From my experiments, this directive seems quite messed up, at least in Chrome, always resulting in duplicate downloads.  Not sure why such a simple thing would be so difficult to implement.  If I run across a good explanation of how to use prefetch properly in Chrome, this component will support it as well.
+
+As a result of sticking with \<link rel="preload"\>, Chrome, at least, will issue some warnings in the console ("Hey, you said you would use this really soon, what gives?", which can be safely ignored)
 
 So what does xtal-sip add to the \<link rel="preload"\> functionality?
 
@@ -64,9 +90,9 @@ Place your link preload tags inside the head tag of your index.html (or equivale
 >
 ```
 
-When \<xtal-sip\> is told to load the \<paper-checkbox\> tag, it will perform a hash lookup for link preload tags with attribute 'data-tag="paper-checkbox"', and it will formally load the reference. 
+When \<xtal-sip\> is told to load the \<paper-checkbox\> tag, it will perform a css query on document.head, for link preload tag with attribute 'data-tag="paper-checkbox"', and it will formally load the reference into memory and execute the code. 
 
-NB:  Currently, Chrome does not preload assets when as="document."  This seems like another  bug to me, but [what do I know](https://bugs.chromium.org/p/chromium/issues/detail?id=593267)?  Attempting to work around this unexpected behavior by setting as="script" causes duplicate requests, which is probably worse. 
+NB:  Currently, Chrome does not preload assets when as="document" as shown in the example above.  This seems like another  bug to me, but [what do I know](https://bugs.chromium.org/p/chromium/issues/detail?id=593267)?  Attempting to work around this unexpected behavior by setting as="script" causes duplicate requests, which is probably worse. The story is much better for as="script" (of course!).
 
 ## Declaring custom elements that need watering
 
@@ -106,7 +132,7 @@ https://cdn.jsdelivr.net/npm/xtal-sip/build/ES6/xtal-sip.js
 
 ## Referencing xtal-sip
 
-Simply add the following markup inside head tag of the web page:
+Simply add the following markup inside the head tag of the opening web page (like index.html):
 
 ```html
 <script async src="path/To/xtal-sip.js"></script>
@@ -114,7 +140,7 @@ Simply add the following markup inside head tag of the web page:
 
 ## Script references
 
-Classic script references are handled much the same way.  The biggest difference is now the "as" attribute should be set to "script":
+Classic script references are handled much the same way as HTML Imports shown in the example above.  The biggest difference is now the "as" attribute should be set to "script":
 
 ```html
 <link rel="preload" 
@@ -141,14 +167,13 @@ Xtal-sip also provides support for lazily loading custom elements defined and im
 
 Until Chrome fixes this bug, you can use as="document", which is buggy in the opposite direction, and which won't be quite as performant, but at least the person's bandwidth won't be wasted.
 
-
 # Extended Functionality
 
 Xtal-sip also supports two files for additional functionality, that might be useful for larger projects, or projects that must target a wider variety of browser types, with more distributed dependencies.
 
 One of those files is the 730B gzipped and minified file xtal-sip-plus.js.  
 
-To reference it, use the preload tag:
+To reference it, use the preload tag in document.head:
 
 <link rel="preload" async as="script" data-tag="xtal-sip-plus" href="path/to/xtal-sip-plus.js">
 
@@ -162,7 +187,7 @@ Let's walk through the extra feaatures xtal-sip-plus provides:
 
 ## Compact dependency preloading
 
-It was mentioned above that listing all the elements with the same prefix can be boring and add to the footprint.
+It was mentioned many paragraphs ago that listing all the elements with the same prefix can be boring and add to the footprint.
 
 The markup below allows for more compact dependency mappings.
 
@@ -181,7 +206,7 @@ For each tag name found in the data-tags attribute, that name is split using the
 
 xtal-sip-plus "autoexpands" this, by cloning the tag, and dynamically creating multiple genuine preload tags in the header where each file is listed explictly. The autogenerated preload tags include the single data-tag attribute. 
 
-One could always use these fake "rel-ish" preload tags, even for single mappings, to be consistent.  But using the non standard preload tag causes a delay, because the xtal-sip  web component, and xtal-sip-plus extension need to load first before generating the real preload tags, meaning the preloading download will start a little later.
+One could always use these fake "rel-ish" preload tags, even for single mappings, to be consistent.  But using the non standard preload tag causes a delay, because the xtal-sip web component, and the xtal-sip-plus extension need to load first before generating the real preload tags, meaning the preloading download will start a little later.
 
 If this is a concern, the expansion could be done by a service worker instead of by xtal-sip-plus, with no sacrifice to the bandwidth footprint (and likely gaining back the performance degration discussed in the previous paragraph).
 
@@ -254,11 +279,6 @@ Now add the following code in the original critical path (i.e. top of the header
 ```
 
 This will circumvent the generation of individual real rel="preload" tags.  Instead, it will create multiple rel-ish tags with individual data-tag attributes, allowing for fast lookup between tagname and the url.
-
-## Async loading
-
-If the preload tag has attribute data-async, then live references will use async capabilities (async import, async script reference).
-
 
 ## Bundling
 
@@ -379,7 +399,7 @@ One can provide xtal-sip a preprocessing function that will subsitute (say) ES6 
 
 Often the size of the web component itself will be dwarfed by the size of the dependencies the web component relies on.  For example, web component wrappers around complex d3-based charting libraries will be tiny compared to d3.js, the d3 charting code, and the associated css file(s).  We would really like to preload those resources too.  Nothing is preventing us from doing that of course.  But once again we have a scenario where the preload tag specifies a url which may duplicate, or worse, conflict with the path the component itself expects.  While ES6 modules, due to their ability to avoid polluting the global namespace, and Shadow DOM, with its style encapsulation, could help avoid conflicts, it is hard to see how inadvertent downloading of the same resource (including version) from different places could be avoided, if we rely on native ES6 module loading of resources.  The only other way I can see to prevent this, is to command that, as a web development community, we all must permanently "marry" our local node_modules folder as our source of files, forevermore.  Anyone publishing a library *must* publish it to npm, which must be installed locally.  No partial or competing CDN deployments.  No competing package manager to npm dare enter. Deviants will be sentenced to 10 years of IE6 development. That's quite a committment!  Maybe I'm missing something.
 
-A nice way to provide a lot more flexibility is to allow the web component to do some IoC dependency inversion -- allow the "container" to tell the web component where the references are.  In order to achieve this, **\<xtal-sip\> with he plus extension provides a way of passing valuable configuration information from the main link preload tag associated with the custom element tag, to static properties of the web component class**.  This is done before customElements.define is called on the element.  In particular, the value(s) of the data- (dataset) attribute is passed into the Class definition.  Again, keeping all these url's centrally managed would help identify shared resources -- for example, two components that may rely on the same version of a library.
+A nice way to provide a lot more flexibility is to allow the web component to do some IoC dependency inversion -- allow the "container" to tell the web component where the references are.  In order to achieve this, **\<xtal-sip\> with the plus extension provides a way of passing valuable configuration information from the main link preload tag associated with the custom element tag, to static properties of the web component class**.  This is done before customElements.define is called on the element.  In particular, the value(s) of the data- (dataset) attribute is passed into the Class definition.  Again, keeping all these url's centrally managed would help identify shared resources -- for example, two components that may rely on the same version of a library.
 
 So for example, the preload link for billboard.js custom element could look as follows:
 
@@ -410,14 +430,9 @@ This is a use case where I've not seen much activity, yet, but conceivably could
 - [x] Compact dependency loading.
 - [ ] Optional preemptive loading.
 - [x] Common base href's
-- [x] Explicit tag dependency listing for optimal performance.
-- [x] Support async loading.
 - [x] Tie breaking
 - [x] Substitution
 - [ ] Just-in-time loading static property
-- [x]  Explicit declaration
-- [ ] For non async, specify whether to add a setTimeout before adding import tag (defaults to true)
-- [ ] Support specific settings of how to import (async, etc)
 - [x] Autogenerate .html references.
 - [x] Autogenerate .js classic script references.
 - [x] Autogenerate c-c references.
