@@ -1,6 +1,6 @@
 {
   "name": "xtal-sip",
-  "main": "xtal-sip.html",
+  "main": "xtal-sip.js",
   "dependencies": {
     "polymer": "Polymer/polymer#^2.0.0",
     "wired-card": "wiredjs/wired-card#^0.1.1",

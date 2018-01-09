@@ -2,10 +2,12 @@
 
 # \<xtal-sip\>
 
+
 NB:  This component suffers currently in terms of IDE and build support, especially compared to the Polymer supported [lazy-imports](https://github.com/Polymer/lazy-imports).
 
 \<xtal-sip\> is a dependency free, 620B minified and gzipped custom element that dynamically "waters" other custom element tags with the necessary dependencies to sprout the tag from an inert seedling to a thing of beauty. 
 
+<a href="https://www.webcomponents.org/element/bahrus/xtal-sip/demo/index.html">Demo</a>
 
 ## Long soapboxing diatribe. Skip to "Core Functionality" to see what \<xtal-sip\> actually does.
 
@@ -45,7 +47,9 @@ The annoying thing about HTMLImports (and ES6 Modules for that matter) is that c
 
 On top of that, leveraging a CDN when deploying [some of the] files to production could also be simplified by managing dependencies centrally.  Or maybe some components should only be activated in debug mode on the developer's workstation, but not deployed to production.
 
-Another use case for CDN's (which strenghens the need for central management of dependencies) is when developing and publishing web components to npm or bower or wherever.  What if you want the demo folder of the web component to showcase how the web component can integrate with other web components?  We don't want to mark those components as dependencies, because the web component really doesn't depend on them.  We just want to dynamically reference the other web components for demo purposes.  A CDN fits the bill nicely.  A service worker could be used to "install" these example-based references so the developer can work offline in a bomb shelter.
+Potentially, widely used web components shared by multiple sites would benefit from the use of the same CDN.
+
+Another use case for CDN's (which strengthens the need for central management of dependencies) is when developing and publishing web components to npm or bower or wherever.  What if you want the demo folder of the web component to showcase how the web component can integrate with other web components?  We don't want to mark those components as dependencies, because the web component really doesn't depend on them.  We just want to dynamically reference the other web components for demo purposes.  A CDN fits the bill nicely.  A service worker could be used to "install" these example-based references so the developer can work offline in a bomb shelter.
 
 Another case for centrally managing web component dependencies is when rendering a forest of  HTML "leaf nodes" including web components, inside a code-centric framework, like (P)react.  Not having a good solution to this scenario may partly explain why so many are "throwing in the towel," pushing web components that might be 99% static markup, 1% JavaScript, to be packaged / coded entirely in JavaScript. (Of course the dithering of the web component working group hasn't helped).  Sad!  
 
@@ -92,7 +96,7 @@ Place your link preload tags inside the head tag of your index.html (or equivale
 
 When \<xtal-sip\> is told to load the \<paper-checkbox\> tag, it will perform a css query on document.head, for link preload tag with attribute 'data-tag="paper-checkbox"', and it will formally load the reference into memory and execute the code. 
 
-NB:  Currently, Chrome does not preload assets when as="document" as shown in the example above.  This seems like another  bug to me, but [what do I know](https://bugs.chromium.org/p/chromium/issues/detail?id=593267)?  Attempting to work around this unexpected behavior by setting as="script" causes duplicate requests, which is probably worse. The story is much better for as="script" (of course!).
+NB:  Currently, Chrome does not preload assets when as="document" as shown in the example above.  This seems like another  bug to me, but [what do I know](https://bugs.chromium.org/p/chromium/issues/detail?id=593267)?  Attempting to work around this unexpected behavior by setting as="script" causes duplicate requests, which is probably worse. The story is much better for actual script referencing, using as="script" (of course!).
 
 ## Declaring custom elements that need watering
 
@@ -132,7 +136,7 @@ https://cdn.jsdelivr.net/npm/xtal-sip/build/ES6/xtal-sip.js
 
 ## Referencing xtal-sip
 
-Simply add the following markup inside the head tag of the opening web page (like index.html):
+Simply add the following markup inside the head tag of the opening web page (like index.html or index.ejs):
 
 ```html
 <script async src="path/To/xtal-sip.js"></script>
