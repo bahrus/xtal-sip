@@ -33,25 +33,47 @@ The problem with this approach is 1)  Without adding the async or defer attribut
 
 The goal of this web component is to allow us to fine tune this naive approach, while still allowing  easier maintenance of references, and reducing redundancy.  For example, this component (combined with some extended features mentioned below) allows the same index.html page to serve both IE11 and modern browsers fairly seamlessly.
 
-The approach will be to build on the \<link rel="preload"\> (and possibly prefetch) tag.
+The approach will be to build on the \<link rel="preload"\> tag (and prefetch tag, but watch for duplicate requests).
 
 The alternative to maintaining all the top level references centrally, is to break down the entire application into client-side components, either custom elements, or some framework-based component abstraction like that provided by Vue, (P)React, Angular, etc, and making each component handle its own import logic.  While I don't question the desirability of tightly coupled ES6 (or HTML Import) modules, I think as one moves from highly reusable and structured "micro web components" to content heavy, highly dynamic "macro web compositions", the benefits of the decentralized module system begin to diminish, and the benefits of the solution proposed here become more apparent.
 
-A rule of thumb of current front end development is "properties flow down, events flow up", and for complex applications that require deeply nested components, use a global state management system like Redux.  
-
-Perhaps an equivalent rule of thumb would be "references to resources in your folder, or subfolder are fine.  But if your references start with '../../../' or "https://..." perhaps it is time to think about centrally managing those dependencies. 
 
 What are some of the benefits of centrally managing dependencies?
 
-The annoying thing about HTMLImports (and ES6 Modules for that matter) is that creating references for each referenced web component inside an HTML or JS file feels like tedius busy work -- for HTML files, one must go towards the top of the page (outside any templates) to add the reference, and typically the reference is just a trite formulaic derivative of the tag name itself.  E.g. \<paper-input\> => \<link rel="import" href="../../../bower_components/paper-input/paper-input.html"\>, \<paper-checkbox\> => \<link rel="import" href="../../../bower_components/paper-checkbox/paper-checkbox.html"\>.   And all these references add to the footprint of the application.
+A rule of thumb of current front end development is "properties flow down, events flow up", and for complex applications that require deeply nested components, use a global state management system like Redux.  
 
-On top of that, leveraging a CDN when deploying [some of the] files to production could also be simplified by managing dependencies centrally.  Or maybe some components should only be activated in debug mode on the developer's workstation, but not deployed to production.
+Perhaps an equivalent rule of thumb would be "references to resources in your folder, or subfolder are fine.  But if your references are littered with repetitive references to something like '../../../node_modules/
+my-amazing-suite-of-components/foo/bar/baz/qux/quux/corge/grault/garply/waldo/fred/plugh/xyzzy/thud.js' or 'http://silkroadonlinepharmacy.com/product/ecstasy-mdma-100mg-pills/my-first-web-component.js' perhaps it is time to think about centrally managing those dependencies. 
+
+In the former case, it is likely you are counting on an extremely precise and permanent folder structure, which seems iffy if it spawns multiple library authors.  If multiple components depend on this great thud.js library, and the author decides to slowly evolve to the lorem ipsum naming convention, it is likely that a great number of library versions would become incompatible with each other.  I'm sure this can managed, as every modern language relies on a local package manager which could have edge cases like this.  But why not look for an easier route if one is available? 
+
+The latter case:
+
+```JavaScript
+import * from 'http://silkroadonlinepharmacy.com/product/ecstasy-mdma-100mg-pills/my-first-web-component.js'
+```
+
+suffers from the fact that static imports don't support a global constant that could be used to share with
+
+```JavaScript
+import {frizzleFry} from 'http://silkroadonlinepharmacy.com/product/lsd-lysergic-acid-diethylamide-150mcg-tablets/OnnghYanngh.mjs'
+```
+
+and URL's tend to change over time.
+
+Dynamic imports could derive from global constants, but we are talking about everyone agreeing to some sort of common naming convention for these constants, aren't we?  What are the chances of that hapenning? 
+
+Why not take advantage of the great, simplifying fact that there's a strong, informal agreement that everyone  adopt a globally unique tag name for their component?
+
+The annoying thing about HTMLImports (and ES6 Modules for that matter) is that creating references for each referenced web component inside an HTML or JS file feels like tedius busy work -- for HTML files, one must go towards the top of the page (outside any templates) to add the reference, and typically the reference is just a trite formulaic derivative of that globally unique tag name itself.  E.g. \<paper-input\> => \<link rel="import" href="../../../bower_components/paper-input/paper-input.html"\>, \<paper-checkbox\> => \<link rel="import" href="../../../bower_components/paper-checkbox/paper-checkbox.html"\>.   And all these references add to the footprint of the application.
+
+On top of that, leveraging a CDN when deploying [some of the] files to production could also be simplified by managing top-level dependencies centrally.  
 
 Potentially, widely used web components shared by multiple sites would benefit from the use of the same CDN.
 
 Another use case for CDN's (which strengthens the need for central management of dependencies) is when developing and publishing web components to npm or bower or wherever.  What if you want the demo folder of the web component to showcase how the web component can integrate with other web components?  We don't want to mark those components as dependencies, because the web component really doesn't depend on them.  We just want to dynamically reference the other web components for demo purposes.  A CDN fits the bill nicely.  A service worker could be used to "install" these example-based references so the developer can work offline in a bomb shelter.
 
-Another case for centrally managing web component dependencies is when rendering a forest of  HTML "leaf nodes" including web components, inside a code-centric framework, like (P)react.  Not having a good solution to this scenario may partly explain why so many are "throwing in the towel," pushing web components that might be 99% static markup, 1% JavaScript, to be packaged / coded entirely in JavaScript. (Of course the dithering of the web component working group hasn't helped).  Sad!  
+Considr the case of rendering a forest of  HTML "leaf nodes" including web components, inside a code-centric framework, like (P)react.  Not having a good solution to this scenario may partly explain why so many are "throwing in the towel," pushing web components that might be 99% static markup, 1% JavaScript, to be packaged / coded entirely in JavaScript. (Of course the dithering of the web component working group hasn't helped).  Sad!  
 
 What if the markup is generated by a server-side framework like asp.mvc or Java EE MVC, or PhP (or, yes, node, which currently falls in the "other" category of [popular web frameworks](https://trends.builtwith.com/framework))?  And suppose that server-side rendering is using web components to supplement the server-side generated HTML?  Although we are not supposed to use the PWA Hacker News site to ["compare the performance of one PWA to another"](https://hnpwa.com/), one can't help noticing that the fastest performing implementation is the one that uses [no JavaScript, other than the service worker](https://github.com/davideast/hnpwa-firebase). Clearly, this is an architecture we can't dismiss.  But accommodating the scenario of dynamically creating the web component references,  in a different location from the custom element tags, when using a server-side solution can be quite awkward.   
 
@@ -67,15 +89,17 @@ xtal-sip assumes that web sites will want to take advantage of the recent web st
 <link rel="preload" href="..."> 
 ```
 
-For performance reasons, it is beneficial to use these to pre-download all these references ahead of time, without processing them until needed.  Might as well build on this support to provide the mappings we need, and not repeat ourselves.
+For performance reasons, it is beneficial to use these to pre-download all these references ahead of time, without processing them until needed.  Might as well build on this promising performance booster, support to provide the mappings we need, and not repeat ourselves.
 
 ### What about prefetch?
 
-An older alternative to \<link rel="preload"\> is \<link rel="prefetch"\>.  Preload would appear to be for use cases where the resources won't be needed until the user chooses to navigate to a different view, so the downloading is done with a lower priority, which sounds good in theory.  However, it appears that this tag suffers from some ambiguity -- if everything has higher priority, should it ever really be downloaded?
+An older alternative to \<link rel="preload"\> is \<link rel="prefetch"\>.  Prefetch would appear to be for use cases where the resources won't be needed until the user chooses to navigate to a different view, so the downloading is done with a lower priority, which sounds good in theory.  However, it appears that this tag suffers from some ambiguity -- if everything has higher priority, should it ever really be downloaded?
 
-In contrast to that concern, I see a different issue. From my experiments, this directive seems quite messed up, at least in Chrome, always resulting in duplicate downloads.  Not sure why such a simple thing would be so difficult to implement.  If I run across a good explanation of how to use prefetch properly in Chrome, this component will support it as well.
+In contrast to that concern, I see a different issue. From my experiments, in both Chrome and Firefox, if the script is activated by programmatically adding a real script tag to the header, it results in duplicate downloads of the same script file, with different .  Perhaps th
 
-As a result of sticking with \<link rel="preload"\>, Chrome, at least, will issue some warnings in the console ("Hey, you said you would use this really soon, what gives?", which can be safely ignored).
+Anyway, the xtal-sip code treats rel="prefetch" the same as "preload," so web components will load if you use prefetch, while apparently incurring a toll on the network.  Use at your own risk.
+
+If you do stick with the shiny new \<link rel="preload"\> toy, Chrome, at least, will issue some warnings in the console ("Hey, you said you would use this really soon, what gives?", which can be safely ignored).
 
 So what does xtal-sip add to the \<link rel="preload"\> functionality?
 
