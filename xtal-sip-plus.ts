@@ -1,4 +1,5 @@
 (function () {
+    const XtalSip = customElements.get('xtal-sip');
     const originalDefine = customElements.define;
     const boundDefine = originalDefine.bind(customElements);
     customElements.define = function (name: string, cls: any) {
@@ -67,7 +68,7 @@
         });
 
     });
-    const XtalSip = customElements.get('xtal-sip');
+    
     const notFound = [];
     for(var key in XtalSip._notFound){
         notFound.push(key);
