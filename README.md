@@ -22,7 +22,7 @@ The simplest, naive way to centralize that mapping would be to front load all th
 ```html
 <head>
     <link rel="import" href="../bower_components/paper-checkbox/paper-checkbox">
-    <script type="module" href="https://cdn.jsdelivr.net/npm/xtal-json-merge/build/ES6/json-merge.js">
+    <script type="module" href="https://cdn.jsdelivr.net/npm/xtal-json-merge/build/ES6/json-merge.js"></script>
     <etc/>
     <etc/>
     <etc/>
