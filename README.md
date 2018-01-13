@@ -62,6 +62,12 @@ or
 
 perhaps it is time to think about centrally managing those dependencies? 
 
+True, dynamic imports would allow the url's to be built off of some common constants. The problems with that solution are many:
+
+1) It would defeat the purpose of this web component.
+2) Kind of boring, don't you think?  You bore me.
+3) It would't start quietely preloading the files ahead of time, unless you utilize ES9's magic preloading constants (Stage 2).
+
 The most common use case for absolute paths like this would be referencing web components from a CDN.
 
 ### Why would we want our web components to be hosted by a CDN?
@@ -74,8 +80,11 @@ Consider the case of rendering a forest of  HTML "leaf nodes" including web comp
 
 ### Oh, and another thing!
 
-The annoying thing about HTMLImports (and ES6 Modules for that matter) is that creating references for each referenced web component inside an HTML or JS file feels like tedius busy work -- for HTML files, one must go towards the top of the page (outside any templates) to add the reference, and typically the reference is just a trite formulaic derivative of that globally unique tag name itself.  E.g. \<paper-input\> => \<link rel="import" href="../../../bower_components/paper-input/paper-input.html"\>, \<paper-checkbox\> => \<link rel="import" href="../../../bower_components/paper-checkbox/paper-checkbox.html"\>.   And all these references add to the footprint of the application.
+Why not take advantage of the great, simplifying fact that no two web components can have the same name (at least on the same page)?  *That* should be the primary identifier, not the particular location it came from.
 
+That's where \<xtal-sip\> fits in.
+
+The annoying thing about HTMLImports (and ES6 Modules for that matter) is that creating references for each referenced web component inside an HTML or JS file feels like tedius busy work -- for HTML files, one must go towards the top of the page (outside any templates) to add the reference, and typically the reference is just a trite formulaic derivative of that globally unique tag name itself.  E.g. \<paper-input\> => \<link rel="import" href="../../../bower_components/paper-input/paper-input.html"\>, \<paper-checkbox\> => \<link rel="import" href="../../../bower_components/paper-checkbox/paper-checkbox.html"\>.   And all these references add to the footprint of the application.
 
 
 ### Severe Server Burn
@@ -119,14 +128,11 @@ import '../../../../../node_modules/
 
 Enough said.
 
-### Almost done
+### Ok, almost.
 
 
 The bottom line is that the need for centralizing management of references is likely to increase significantly. 
 
-Why not take advantage of the great, simplifying fact that no two web components can have the same name (at least on the same page)?  *That* should be the primary identifier, not the particular location it came from.
-
-That's where \<xtal-sip\> fits in.
 
 Whether using HTML Imports, or classic JavaScript references, or ES6 Modules, there's a pretty good principle that we can assume regarding web components:  *Each web component will depend on only one top-level reference*.  (One small exception to that rule, at least in spirit, appears to be with components that depend on icon libraries, like paper-icon-button).  Of course, that reference file itself will likely specify multiple other references recursively, following standardized module conventions, which is all fine and good. As I indicated earlier, \<xtal-sip\> is meant for content-heavy, macro, largely non reusable web compositions, as opposed to highly reusable micro web components. 
 
@@ -187,6 +193,8 @@ If the sight of \<xtal-sip\>'s is unpleasant to see in the markup, or is an inco
 customElements.get('xtal-sip').load('paper-input,iron-ajax');
 ```
 
+
+
 ## Installing xtal-sip
 
 If you wish to install xtal-sip locally, you can use:
@@ -199,11 +207,29 @@ or
 
 or
 
->yarn add xtal-sip
+> yarn add xtal-sip
+
+Or you can install it via the Google Play store
+
+Or nuget
+
+Or iTunes
+
+Or as a vs code extension, transmitted via Alexa in Morse code encrypted via enigma.
 
 Or you can use a cdn that proxies npm or github.  For example:
 
 https://cdn.jsdelivr.net/npm/xtal-sip/build/ES6/xtal-sip.js
+
+Or
+
+https://cdn.jsdelivr.net/gh/bahrus/xtal-sip/build/ES6/xtal-sip.js
+
+Or 
+
+https://unpkg.com/xtal-sip/build/ES6/xtal-sip.js
+
+
 
 ## Referencing xtal-sip
 
