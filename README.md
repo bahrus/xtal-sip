@@ -126,8 +126,7 @@ I'm sure more sophisticated approaches could be found, but this is the most dire
 Suppose you need to reference a path that look like this over and over again:
 
 ```JavaScript
-import '../../../../../node_modules/
-@my-vague-suite-of-components/foo/bar/baz/qux/quux/corge/grault/garply/waldo/fred/plugh/xyzzy-thud.js'
+import '../../../../../node_modules/my-vague-suite-of-components/foo/bar/baz/qux/quux/corge/grault/garply/waldo/fred/plugh/xyzzy-thud.js'
 ``` 
 
 Enough said.
