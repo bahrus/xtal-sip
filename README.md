@@ -70,7 +70,7 @@ True, dynamic imports would allow the url's to be built off of some common const
 
 1) It would defeat the purpose of this web component.
 2) Kind of boring, don't you think?  You bore me.
-3) It's unclear if IDE or build support will be able to work with common constant references (I'm sure with enough grunt work it could (or has already).
+3) It's unclear if IDE or build support will be able to work with common constant references (I'm sure with enough grunt work it could (or has already?))
 4) It wouldn't start quietly preloading the files ahead of time, unless you utilize ES9's magic preloading constants (Stage 2).
 
 The most common use case for absolute paths like this would be referencing web components from a CDN.
