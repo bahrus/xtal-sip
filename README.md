@@ -250,23 +250,28 @@ Classic script references are handled much the same way as HTML Imports shown in
     data-tag="xtal-json-editor">
 ```
 
-## c-c reference
+## HTML based custom element importers
 
 [The carbon copy element](https://www.webcomponents.org/element/bahrus/carbon-copy), c-c for short, provides a 1.9 kb alternative to HTML Imports, that can also be used to define HTML-based custom elements.  Unlike HTML Imports, it also supports direct client-side include functionality, including dynamic url references, similar to Polymer's iron-pages.
 
-A lighter-weight alternative to c-c, specializing in providing an HTML-based web component definition without HTML Imports, is in the works. 
+[xtal-pattern](https://www.webcomponents.org/element/bahrus/xtal-pattern)  is a lighter-weight alternative to c-c, specializing in providing an HTML-based web component definition without HTML Imports. 
 
-Xtal-sip also provides support for lazily loading custom elements defined and imported via the carbon copy element.  Note the "data-importer" attribute, and the value of the "as" attribute.
+What these two "web component creator" components have in common is that they use "href" to specify the location of the file containing the web component.
+
+Xtal-sip also provides support for lazily loading custom elements defined and imported via such importing custom elements. Note the "data-importer" attribute, and the value of the "as" attribute.  It can be "c-c" or "xtal-pattern" or any other name of a web component that takes href as its resource locator.
+
+You will need to also create the reference to the importer web component itself, either via xtal-sip, or via more traditional ways. 
 
 ```html
 <link 
     rel="preload" as="fetch" 
     data-tag="my-component" type="text/html" 
-    data-importer="c-c" href="include.html#myTemplate">
+    data-importer="xtal-pattern" href="include.html#myTemplate">
     ...
 ```
 
-**Here again we see yet another bug in Chrome, which Firefox doesn't share**.  Even though the carbon copy element fetches include.html via the fetch api, Chrome ends up downloading the file twice.  Firefox does this correctly.
+The correct attritube for "as," as shown above, ought to be, in my opinion "fetch." But
+**here again we see yet another bug in Chrome, which Firefox doesn't share**.  Even though the two importing  elements mentioned above fetch include.html via the fetch api, Chrome ends up downloading the file twice.  Firefox does this correctly.
 
 Until Chrome fixes this bug, you can use as="document", which is buggy in the opposite direction, and which won't be quite as performant, but at least the person's bandwidth won't be wasted.
 
