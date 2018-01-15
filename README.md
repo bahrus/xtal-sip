@@ -21,7 +21,7 @@ The simplest, naive way to centralize that mapping would be to front load all th
 
 ```html
 <head>
-    <link rel="import" href="../bower_components/paper-checkbox/paper-checkbox">
+    <link rel="import" href="../bower_components/paper-checkbox/paper-checkbox.html">
     <script type="module" href="https://cdn.jsdelivr.net/npm/xtal-json-merge/build/ES6/json-merge.js"></script>
     <etc/>
     <etc/>
@@ -45,7 +45,7 @@ Perhaps an equivalent rule of thumb would be "references to web components in yo
 
 
 ```Javascript
-import 'http://silkroadonlinepharmacy.com/product/ecstasy-mdma-100mg-pills/my-first-web-component.js'
+import 'http://silkroadonlinepharmacy.com/product/ecstasy-mdma-100mg-pills/my-first-web-component.js';
 import('http://silkroadonlinepharmacy.com/product/lsd-lysergic-acid-diethylamide-150mcg-tablets/onngh-yanngh/onngh-yanngh.esm').then((module) =>{
     console.log('No need for this block of code, just saying hi')
 })
@@ -57,7 +57,11 @@ or
 <script 
     type="module"
     src="//myIoTServerRunningFromMyMicrowaveOven.com/npm/poparazzi-gourmet-popcorn-monitor/poparazzi-gourmet-popcorn-monitor.js">
-<script type="module" src="//myIoTServerRunningFromMyMicrowaveOven.com/github/fire-extinguisher/fire-extinguisher.axd">
+</script>
+<script 
+    type="module" 
+    src="//myIoTServerRunningFromMyMicrowaveOven.com/github/fire-extinguisher/fire-extinguisher.axd">
+</script>
 ```
 
 perhaps it is time to think about centrally managing those dependencies? 
@@ -66,7 +70,8 @@ True, dynamic imports would allow the url's to be built off of some common const
 
 1) It would defeat the purpose of this web component.
 2) Kind of boring, don't you think?  You bore me.
-3) It would't start quietly preloading the files ahead of time, unless you utilize ES9's magic preloading constants (Stage 2).
+3) It's unclear if IDE or build support will be able to work with common constant references (I'm sure with enough grunt work, it could but will any step up to the plate?)
+4) It wouldn't start quietly preloading the files ahead of time, unless you utilize ES9's magic preloading constants (Stage 2).
 
 The most common use case for absolute paths like this would be referencing web components from a CDN.
 
@@ -76,16 +81,13 @@ Potentially, widely used web components shared by multiple sites would benefit f
 
 What about when you are developing and publishing web components to npm or bower or gitpubhub?  What if you want the demo folder of the web component to showcase how it can integrate with lots of other web components?  We don't want to mark those components as dependencies, because the web component really doesn't depend on them.  We just want to dynamically reference the other web components for demo purposes.  A CDN fits the bill nicely.  A service worker could be used to "install" these example-based references so the developer can work offline in a bomb shelter.
 
-Consider the case of rendering a forest of  HTML "leaf nodes" including web components, inside a code-centric framework, like (P)react.  Not having a good solution to this scenario may partly explain why so many are "throwing in the towel," pushing web components that might be 99% static markup, 1% JavaScript, to be packaged / coded entirely in JavaScript. (Of course the dithering of the web component working group hasn't helped).  Sad! 
-
 ### Oh, and another thing!
 
-Why not take advantage of the great, simplifying fact that no two web components can have the same name (at least on the same page)?  *That* should be the primary identifier, not the particular location it came from.
+Consider the case of rendering a forest of  HTML "leaf nodes" including web components, inside a code-centric framework, like (P)react.  Not having a good solution to this scenario may partly explain why so many are "throwing in the towel," pushing web components that might be 99% static markup, 1% JavaScript, to be packaged / coded entirely in JavaScript. (Of course the dithering of the web component working group hasn't helped).  Sad! 
 
-That's where \<xtal-sip\> fits in.
+### More kvetching
 
 The annoying thing about HTMLImports (and ES6 Modules for that matter) is that creating references for each referenced web component inside an HTML or JS file feels like tedius busy work -- for HTML files, one must go towards the top of the page (outside any templates) to add the reference, and typically the reference is just a trite formulaic derivative of that globally unique tag name itself.  E.g. \<paper-input\> => \<link rel="import" href="../../../bower_components/paper-input/paper-input.html"\>, \<paper-checkbox\> => \<link rel="import" href="../../../bower_components/paper-checkbox/paper-checkbox.html"\>.   And all these references add to the footprint of the application.
-
 
 ### Severe Server Burn
 
@@ -117,6 +119,8 @@ Wouldn't this be loverly to inspect?
     </template>
 ```
 
+I'm sure more sophisticated approaches could be found, but this is the most direct one I can think of.
+
 ### Pathological Vertiginousness
 
 Suppose you need to reference a path that look like this over and over again:
@@ -128,15 +132,17 @@ import '../../../../../node_modules/
 
 Enough said.
 
-### Ok, almost.
+No wait, there's more!
 
+The bottom line is that the need for centralizing management of top level references is likely to increase significantly. 
 
-The bottom line is that the need for centralizing management of references is likely to increase significantly. 
+Why not take advantage of the great, simplifying fact that no two web components can have the same name (at least on the same page)?  *That* should be the primary identifier for repeated import statements, not the particular location it came from.
 
+That's where \<xtal-sip\> fits in.
 
 Whether using HTML Imports, or classic JavaScript references, or ES6 Modules, there's a pretty good principle that we can assume regarding web components:  *Each web component will depend on only one top-level reference*.  (One small exception to that rule, at least in spirit, appears to be with components that depend on icon libraries, like paper-icon-button).  Of course, that reference file itself will likely specify multiple other references recursively, following standardized module conventions, which is all fine and good. As I indicated earlier, \<xtal-sip\> is meant for content-heavy, macro, largely non reusable web compositions, as opposed to highly reusable micro web components. 
 
-xtal-sip assumes that web sites will want to take advantage of the recent web standard that allows  [content to be preloaded](https://developer.mozilla.org/en-US/docs/Web/HTML/Preloading_content):  
+As mentioned earlier, xtal-sip assumes that web sites will want to take advantage of the recent web standard that allows  [content to be preloaded](https://developer.mozilla.org/en-US/docs/Web/HTML/Preloading_content):  
 
 ```html
 <link rel="preload" href="..."> 
@@ -254,7 +260,7 @@ Classic script references are handled much the same way as HTML Imports shown in
 
 [The carbon copy element](https://www.webcomponents.org/element/bahrus/carbon-copy), c-c for short, provides a 1.9 kb alternative to HTML Imports, that can also be used to define HTML-based custom elements.  Unlike HTML Imports, it also supports direct client-side include functionality, including dynamic url references, similar to Polymer's iron-pages.
 
-[xtal-pattern](https://www.webcomponents.org/element/bahrus/xtal-pattern)  is a lighter-weight alternative to c-c, specializing in providing an HTML-based web component definition without HTML Imports. 
+[xtal-pattern](https://www.webcomponents.org/element/bahrus/xtal-pattern)  is a lighter-weight (~920B) alternative  to c-c, specializing in providing an HTML-based web component definition without HTML Imports. 
 
 What these two "web component creator" components have in common is that they use "href" to specify the location of the file containing the web component.
 
