@@ -1,4 +1,15 @@
 (function () {
+    /**
+    * `xtal-sip`
+    *
+    * Dependency free web component that helps manage and load web component dependency mappings
+    * on an as-needed basis.
+    *
+    *
+    * @customElement
+    * @polymer
+    * @demo demo/index.html
+    */
     class XtalSip extends HTMLElement {
         static get(tagName) {
             return document.head.querySelector(`link[data-tag="${tagName}"]`);
@@ -27,7 +38,7 @@
                     pathName = 'src';
                     break;
                 case 'fetch':
-                    nodeName = 'c-c';
+                    nodeName = lookup.dataset.importer;
                     //pathName = 'href'
                     break;
             }

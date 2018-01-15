@@ -14,14 +14,14 @@
   <link rel="import" href="../../iron-demo-helpers/demo-pages-shared-styles.html">
   
   <link rel="preload" async as="script" data-tag="xtal-link-preview" href="https://cdn.jsdelivr.net/npm/xtal-link-preview/build/ES6/xtal-link-preview.js">
-  <link rel="preload" as="script" data-tag="c-c" href="https://cdn.jsdelivr.net/npm/carbon-copy@0.1.7/build/ES6/carbon-copy.js">
-  
+  <!-- <link rel="preload" as="script" data-tag="c-c" href="https://cdn.jsdelivr.net/npm/carbon-copy@0.1.7/build/ES6/carbon-copy.js"> -->
+  <link rel="preload" as="script" data-tag="xtal-pattern" href="https://cdn.jsdelivr.net/npm/xtal-pattern/build/ES6/xtal-pattern.js">
   <link rel-ish="preload" as="document" data-tags="dom-bind,dom-if" href="../../polymer/lib/elements/dom-{1}.html">
   <link rel="preload" as="document" data-tag="demo-snippet" href="../../iron-demo-helpers/demo-snippet.html">
   <link rel-ish="preload" as="document" data-tags="wired-input,wired-radio-group,wired-radio,wired-card" href="../../wired-{1}/wired-{1}.html"
     async>
   
-  <link rel="preload" as="fetch" data-tag="my-component" type="text/html" data-importer="c-c" href="include.html#myTemplate">
+  <link rel="preload" as="fetch" data-tag="my-component" type="text/html" data-importer="xtal-pattern" href="my-component.html">
   <custom-style>
     <style is="custom-style" include="demo-pages-shared-styles">
     </style>
@@ -36,13 +36,12 @@
 <body>
   <div class="vertical-section-container centered">
     <h3>Basic xtal-sip demo</h3>
-    <xtal-sip load="xtal-sip-plus,demo-snippet,dom-bind,c-c,wired-card,wired-input,wired-radio-group,wired-radio,xtal-link-preview,my-component"></xtal-sip>
+    <xtal-sip load="xtal-sip-plus,demo-snippet,dom-bind,xtal-pattern,wired-card,wired-input,wired-radio-group,wired-radio,xtal-link-preview,my-component"></xtal-sip>
     <demo-snippet>
       <template>
         <dom-bind>
           <template>
             <div style="height:400px">
-              <!-- <c-c href="include.html#myTemplate"></c-c> -->
               <my-component></my-component>
               <wired-card class="form">
                 <h3>Form Title</h3>

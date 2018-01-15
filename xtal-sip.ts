@@ -39,7 +39,7 @@
                     pathName = 'src';
                     break;
                 case 'fetch':
-                    nodeName = 'c-c';
+                    nodeName = lookup.dataset.importer;
                     //pathName = 'href'
                     break;
             }
