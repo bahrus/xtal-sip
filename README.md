@@ -338,13 +338,18 @@ Here's an even more aggressive example, that uses {0} and {1}:
 
 ### Common base href
 
-It's likely that numerous link tags will want to share the same base url.  This is accomplished using a data-base attribute to set a common path, and then other link tags can refer to it via a selector to the first tag:
+It's likely that numerous link tags will want to share the same base url. 
+
+Here we build on another link rel value -- [preconnect](https://css-tricks.com/prefetching-preloading-prebrowsing/#article-header-id-1). 
+
 
 ```html
-<link id="hasBaseCdnUrl" rel-ish="preload" async as="script" data-base="https://cdn.jsdelivr.net/npm/"
+
+<link id="baseCdnUrl" rel="preconnect" href="https://cdn.jsdelivr.net/npm/">
+<link id="hasBaseCdnUrl" rel-ish="preload" async as="script" data-base-ref="#baseCdnUrl"
     href="xtal-json-merge/build/ES6/json-merge.js" data-tags="json-merge">
 
-<link rel-ish="preload" async as="script" data-base-ref="#hasBaseCdnUrl"
+<link rel-ish="preload" async as="script" data-base-ref="#baseCdnUrl"
     href="xtal-json-editor/build/ES6/xtal-json-editor.js" data-tags="xtal-json-editor">    
 ```
 

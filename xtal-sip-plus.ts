@@ -55,7 +55,7 @@
                 counter++;
             });
             const d = el.dataset;
-            let base = d.base || (d.baseRef ? document.querySelector(d.baseRef).dataset.base : '');
+            const base = d.baseRef ? document.querySelector(d.baseRef).href : '';
             modifiedHref = base + modifiedHref;
             //from https://developer.mozilla.org/en-US/docs/Web/HTML/Preloading_content
             const preloadLink = el.cloneNode();
