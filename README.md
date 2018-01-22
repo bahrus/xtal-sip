@@ -73,6 +73,53 @@ True, dynamic imports would allow the url's to be built off of some common const
 3) It's unclear if IDE or build support will be able to work with common constant references (I'm sure with enough grunt work it could (or has already?))
 4) It wouldn't start quietly preloading the files ahead of time, unless you utilize ES9's magic preloading constants (Stage 2).
 
+However, if you are using dynamic imports, there is a way to address point 4 above.
+
+If you define a tag with an id, it may perhaps be a [surprise](https://dev.to/buntine/dom-elements-with-ids-are-global-variables) to know that DOM ID's become [global variables](http://2ality.com/2012/08/ids-are-global.html).
+
+This would allow us to define a preload tag in the header of the document:
+
+```html
+<head>
+    <link
+     id="my_first_web_component"
+     rel="preload" href="http://silkroadonlinepharmacy.com/product/ecstasy-mdma-100mg-pills/my-first-web-component.js">
+</head>
+```
+
+and then activate the web component thusly:
+
+```JavaScript
+import(my_first_web_component);
+```
+
+If this is used by a non reusable web application, where the developer maintains their own index.html, thus having confidence that the link will be present in the header, then this solution would seem sufficient.  It does require "require.js" or some other library that helps polyfill dynamic imports after transpiling to downlevel browsers.  \<xtal-sip\> allows you to circumvent require.js, which is ~7kb gzip, minified.
+
+But what if you want to use this solution for your own reusable components, that you hope will get widespread use?
+
+If you want to extend this solution, then you can hedge your bets by falling back to your local node_modules folder if no preload instructions exist in index.html:
+
+```JavaScript
+//declare const my_fist_web_component (for Typescript)
+import(my_first_web_component || '../../ecstasy-mdma-100mg-pills/my-first-web-component')
+```
+
+The link above assumes you are either developing your components from a folder within node_modules (unlikely), or you are using a tool like Polymer Serve, which uses some alias mapping so it emulates the real runtime environment.
+
+In the second, more iffy scenario described above (assuming the presence of a preload link in the document.head even for highly reusable components), the solution would reap more benefits if everyone adopted the same naming convention for the link id.  As you can see, I chose to replace dashes with underscores.  This appears to me to be the simples solution that satisfies these criteria:
+
+1)  You can reference the constant without typing window["..."]
+2)  It is easy to switch betweent the id and the name of the web component:  
+
+```JavaScript
+    console.log('my_first_web_component'.split('_').join('-'));
+    // my-first-web-component
+```
+
+
+\<xtal-sip\>
+This, though, may not be very satisfying to the developer who worries that their 
+
 The most common use case for absolute paths like this would be referencing web components from a CDN.
 
 ### Why would we want our web components to be hosted by a CDN?
@@ -168,7 +215,8 @@ So what does xtal-sip add to the \<link rel="preload"\> functionality?
 Place your link preload tags inside the head tag of your index.html (or equivalent), with the data-tag attribute indicating which tag uses this reference:
 
 ```html
-<link 
+<link
+    id="paper_checkbox"
     rel="preload" 
     as="document" 
     href="//myCDN.com/@bower_components/polymer/paper-checkbox/paper-checkbox.html" 
