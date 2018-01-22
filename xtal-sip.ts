@@ -14,7 +14,7 @@
         static _added: { [key: string]: boolean } = {};
         static _notFound: {[key: string]: boolean} = {};
         static get(tagName): HTMLLinkElement {
-            return document.head.querySelector(`link[data-tag="${tagName}"]`);
+            return window[tagName.split('-').join('_')];
         }
         static load(...args: string[]) {
             args.forEach(tagName => XtalSip.loadDep(tagName))
@@ -50,6 +50,8 @@
             newTag.setAttribute('rel', 'import');  // no harm done for other types
             if (lookup['async']) newTag.setAttribute('async', '');
             setTimeout(() => {
+                console.log('appending');
+                console.log(newTag);
                 target.appendChild(newTag);
             }, 1);
         }

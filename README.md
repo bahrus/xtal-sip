@@ -11,7 +11,7 @@ NB:  This component suffers currently in terms of IDE and build support, especia
 
 ## Long soapboxing diatribe. Skip to "Core Functionality" to see what \<xtal-sip\> actually does.
 
-Importing the files needed for web components seems likely to become a lot more complicated.  Some references will come from bower_components, some from node_modules.  Some will be references to html files, others js files.  And the references are likely to be in a state of flux, as the [whims of elite developers](https://codeburst.io/the-javascript-modules-limbo-585eedbb182e) change.  Components will first migrate to node_modules (how will we explain to our grandkids that web components are node modules?).   As support for HTML Imports wanes, many  *.html files will be converted to *.js files, then to *.mjs files, then back to *.mhtml files, once the W3C Ents show some HTML love.  That will shortly be followed by converting them to *.wasm, followed by the universal binary format that includes HTML, JS, CSS, WASM: *.xap.
+Importing the files needed for web components seems likely to become a lot more complicated.  Some references will come from bower_components, some from node_modules.  Some will be references to html files, others js files.  And the references are likely to be in a state of flux, as the [whims of elite developers](https://codeburst.io/the-javascript-modules-limbo-585eedbb182e) change.  Components will first migrate to node_modules (how will we explain to our grandkids that [web components are node modules](https://www.polymer-project.org/blog/2017-08-23-hands-on-30-preview.html)?).   As support for HTML Imports wanes, many  *.html files will be converted to *.js files, then to *.mjs files, then back to *.mhtml files, once the W3C Ents show some HTML love.  That will shortly be followed by converting them to *.wasm, followed by the universal binary format that includes HTML, JS, CSS, WASM: *.xap.
 
 This component, \<xtal-sip\>, is intended to "centralize the pain."  Keep the top level mappings between custom element tags and where to load the references for them all in one place.
 
@@ -90,7 +90,7 @@ This would allow us to define a preload tag in the header of the document:
 and then activate the web component thusly:
 
 ```JavaScript
-import(my_first_web_component);
+import(my_first_web_component.href);
 ```
 
 If this is used by a non reusable web application, where the developer maintains their own index.html, thus having confidence that the link will be present in the header, then this solution would seem sufficient.  It does require "require.js" or some other library that helps polyfill dynamic imports after transpiling to downlevel browsers.  \<xtal-sip\> allows you to circumvent require.js, which is ~7kb gzip, minified.
@@ -100,25 +100,21 @@ But what if you want to use this solution for your own reusable components, that
 If you want to extend this solution, then you can hedge your bets by falling back to your local node_modules folder if no preload instructions exist in index.html:
 
 ```JavaScript
-//declare const my_fist_web_component (for Typescript)
-import(my_first_web_component || '../../ecstasy-mdma-100mg-pills/my-first-web-component')
+declare const my_fist_web_component : HTMLLinkElement //(only needed for Typescript)
+import(my_first_web_component ? my_first_web_component.href : '../../ecstasy-mdma-100mg-pills/my-first-web-component.js');
 ```
 
-The link above assumes you are either developing your components from a folder within node_modules (unlikely), or you are using a tool like Polymer Serve, which uses some alias mapping so it emulates the real runtime environment.
+The relative url above ('../../ecstasy-mdma-100mg-pills/my-first-web-component.js') assumes you are either developing your components from a folder within node_modules (unlikely), or you are using a tool like Polymer Serve, which uses some alias mapping so it emulates the real runtime environment.
 
-In the second, more iffy scenario described above (assuming the presence of a preload link in the document.head even for highly reusable components), the solution would reap more benefits if everyone adopted the same naming convention for the link id.  As you can see, I chose to replace dashes with underscores.  This appears to me to be the simples solution that satisfies these criteria:
+In the second, more iffy scenario described above (assuming the presence of a preload link in the document.head even for highly reusable components), the solution would pay more dividents if large numbers of other apps / web components adopted the same naming convention for how they name id ofany link preloading tags.  Being that I'm just a pip squeak developer with no ability to sway anyone else to adopt this convention, I put some effort into the chose of replace dashes with underscores as the convention, hoping that other players with more clout may crash upon the same conclusion.  This appears to me to be the simplest solution that satisfies these criteria:
 
-1)  You can reference the constant without typing window["..."]
-2)  It is easy to switch betweent the id and the name of the web component:  
+1)  You can reference the DOM element without typing window["..."]
+2)  It is easy to switch between the id and the name of the web component:  
 
 ```JavaScript
     console.log('my_first_web_component'.split('_').join('-'));
     // my-first-web-component
 ```
-
-
-\<xtal-sip\>
-This, though, may not be very satisfying to the developer who worries that their 
 
 The most common use case for absolute paths like this would be referencing web components from a CDN.
 
@@ -220,11 +216,10 @@ Place your link preload tags inside the head tag of your index.html (or equivale
     rel="preload" 
     as="document" 
     href="//myCDN.com/@bower_components/polymer/paper-checkbox/paper-checkbox.html" 
-    data-tag="paper-checkbox"
 >
 ```
 
-When \<xtal-sip\> is told to load the \<paper-checkbox\> tag, it will perform a css query on document.head, for link preload tag with attribute 'data-tag="paper-checkbox"', and it will formally load the reference into memory and execute the code. 
+When \<xtal-sip\> is told to load the \<paper-checkbox\> tag, it looks for the global constant paper_checkbox, and reads the href property.  It then formally loads the reference into memory and executes the code. It does this by programmatically generating a script tag or HTML import tag (depending on the value of "as", and adding the tag to the header. 
 
 NB:  Currently, Chrome does not preload assets when as="document" as shown in the example above.  This seems like another  bug to me, but [what do I know](https://bugs.chromium.org/p/chromium/issues/detail?id=593267)?  Attempting to work around this unexpected behavior by setting as="script" causes duplicate requests, which is probably worse. The story is much better for actual script referencing, using as="script" (of course!).
 
@@ -245,8 +240,6 @@ If the sight of \<xtal-sip\>'s is unpleasant to see in the markup, or is an inco
 ```JavaScript
 customElements.get('xtal-sip').load('paper-input,iron-ajax');
 ```
-
-
 
 ## Installing xtal-sip
 
@@ -297,10 +290,11 @@ Simply add the following markup inside the head tag of the opening web page (lik
 Classic script references are handled much the same way as HTML Imports shown in the example above.  The biggest difference is now the "as" attribute should be set to "script":
 
 ```html
-<link rel="preload" 
+<link id="xtal_json_editor"
+    rel="preload" 
     async as="script" 
     href="xtal-json-editor/build/ES6/xtal-json-editor.js" 
-    data-tag="xtal-json-editor">
+>
 ```
 
 ## HTML based custom element importers
@@ -316,10 +310,12 @@ Xtal-sip also provides support for lazily loading custom elements defined and im
 You will need to also create the reference to the importer web component itself, either via xtal-sip, or via more traditional ways. 
 
 ```html
-<link 
-    rel="preload" as="fetch" 
-    data-tag="my-component" type="text/html" 
-    data-importer="xtal-pattern" href="include.html#myTemplate">
+<link id="my-component"
+    rel="preload" 
+    as="fetch" 
+    type="text/html" 
+    data-importer="xtal-pattern" 
+    href="include.html#myTemplate">
     ...
 ```
 
@@ -337,7 +333,7 @@ One of those files is the 730B gzipped and minified file xtal-sip-plus.js.
 To reference it, use the preload tag in document.head:
 
 ```html
-<link rel="preload" async as="script" data-tag="xtal-sip-plus" href="path/to/xtal-sip-plus.js">
+<link id="xtal_sip_plus" rel="preload" async as="script" href="path/to/xtal-sip-plus.js">
 ```
 
 and add the fake tag name 'xtal-sip-plus' to the first xtal-sip load statement:

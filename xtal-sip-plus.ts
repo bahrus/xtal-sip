@@ -62,7 +62,7 @@
             preloadLink.removeAttribute('rel-ish');
             preloadLink.removeAttribute('data-tags');
             preloadLink.href = modifiedHref;
-            preloadLink.dataset.tag = tag;
+            preloadLink.id = tag.split('-').join('_');
             preloadLink.rel = 'preload'; //el.getAttribute('rel-ish') if support prefetch
             document.head.appendChild(preloadLink);
         });

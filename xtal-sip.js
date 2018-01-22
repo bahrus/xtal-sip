@@ -12,7 +12,7 @@
     */
     class XtalSip extends HTMLElement {
         static get(tagName) {
-            return document.head.querySelector(`link[data-tag="${tagName}"]`);
+            return window[tagName.split('-').join('_')];
         }
         static load(...args) {
             args.forEach(tagName => XtalSip.loadDep(tagName));
@@ -49,6 +49,8 @@
             if (lookup['async'])
                 newTag.setAttribute('async', '');
             setTimeout(() => {
+                console.log('appending');
+                console.log(newTag);
                 target.appendChild(newTag);
             }, 1);
         }

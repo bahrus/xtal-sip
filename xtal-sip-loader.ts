@@ -1,7 +1,8 @@
+declare var xtal_sip;
 (function () {
     var ESX = 'ES' + ( (navigator.userAgent.indexOf('Trident') > -1) ? '5' : '6');
     let cs_src = '';
-    let script = document.head.querySelector('script[data-tag="xtal-sip"]');
+    let script = xtal_sip;
     if(script){
         cs_src = script['src'];
     }else{
