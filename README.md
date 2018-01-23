@@ -64,57 +64,7 @@ or
 </script>
 ```
 
-perhaps it is time to think about centrally managing those dependencies? 
-
-True, dynamic imports would allow the url's to be built off of some common constants. The problems with that solution are many:
-
-1) It would defeat the purpose of this web component.
-2) Kind of boring, don't you think?  You bore me.
-3) It's unclear if IDE or build support will be able to work with common constant references (I'm sure with enough grunt work it could (or has already?))
-4) It wouldn't start quietly preloading the files ahead of time, unless you utilize ES9's magic preloading constants (Stage 2).
-
-However, if you are using dynamic imports, there is a way to address point 4 above.
-
-If you define a tag with an id, it may perhaps be a [surprise](https://dev.to/buntine/dom-elements-with-ids-are-global-variables) to know that DOM ID's become [global variables](http://2ality.com/2012/08/ids-are-global.html).
-
-This would allow us to define a preload tag in the header of the document:
-
-```html
-<head>
-    <link
-     id="my_first_web_component"
-     rel="preload" href="http://silkroadonlinepharmacy.com/product/ecstasy-mdma-100mg-pills/my-first-web-component.js">
-</head>
-```
-
-and then activate the web component thusly:
-
-```JavaScript
-import(my_first_web_component.href);
-```
-
-If this is used by a non reusable web application, where the developer maintains their own index.html, thus having confidence that the link will be present in the header, then this solution would seem sufficient.  It does require "require.js" or some other library that helps polyfill dynamic imports after transpiling to downlevel browsers.  \<xtal-sip\> allows you to circumvent require.js, which is ~7kb gzip, minified.
-
-But what if you want to use this solution for your own reusable components, that you hope will get widespread use?
-
-If you want to extend this solution, then you can hedge your bets by falling back to your local node_modules folder if no preload instructions exist in index.html:
-
-```JavaScript
-declare const my_fist_web_component : HTMLLinkElement //(only needed for Typescript)
-import(my_first_web_component ? my_first_web_component.href : '../../ecstasy-mdma-100mg-pills/my-first-web-component.js');
-```
-
-The relative url above ('../../ecstasy-mdma-100mg-pills/my-first-web-component.js') assumes you are either developing your components from a folder within node_modules (unlikely), or you are using a tool like Polymer Serve, which uses some alias mapping so it emulates the real runtime environment.
-
-In the second, more iffy scenario described above (assuming the presence of a preload link in the document.head even for highly reusable components), the solution would pay more dividents if large numbers of other apps / web components adopted the same naming convention for how they name id ofany link preloading tags.  Being that I'm just a pip squeak developer with no ability to sway anyone else to adopt this convention, I put some effort into the chose of replace dashes with underscores as the convention, hoping that other players with more clout may crash upon the same conclusion.  This appears to me to be the simplest solution that satisfies these criteria:
-
-1)  You can reference the DOM element without typing window["..."]
-2)  It is easy to switch between the id and the name of the web component:  
-
-```JavaScript
-    console.log('my_first_web_component'.split('_').join('-'));
-    // my-first-web-component
-```
+perhaps it is time to think about centrally managing those dependencies?
 
 The most common use case for absolute paths like this would be referencing web components from a CDN.
 
@@ -124,9 +74,62 @@ Potentially, widely used web components shared by multiple sites would benefit f
 
 What about when you are developing and publishing web components to npm or bower or gitpubhub?  What if you want the demo folder of the web component to showcase how it can integrate with lots of other web components?  We don't want to mark those components as dependencies, because the web component really doesn't depend on them.  We just want to dynamically reference the other web components for demo purposes.  A CDN fits the bill nicely.  A service worker could be used to "install" these example-based references so the developer can work offline in a bomb shelter.
 
-### Oh, and another thing!
+True, dynamic imports would allow the url's to be built off of some common constants. The problems with that solution are many:
 
-Consider the case of rendering a forest of  HTML "leaf nodes" including web components, inside a code-centric framework, like (P)react.  Not having a good solution to this scenario may partly explain why so many are "throwing in the towel," pushing web components that might be 99% static markup, 1% JavaScript, to be packaged / coded entirely in JavaScript. (Of course the dithering of the web component working group hasn't helped).  Sad! 
+1) It would defeat the purpose of this web component.
+2) Kind of boring, don't you think?  You bore me.
+3) It's unclear if IDE or build support will be able to work with common constant references (I'm sure with enough grunt work it could (or has already?))
+4) It wouldn't start quietly preloading the files ahead of time, unless you utilize ES9's magic preloading constants (Stage 2).
+
+However, there is a way to address point 4 above, seriously.
+
+If you define a tag with an id, it may perhaps be a [surprise](https://dev.to/buntine/dom-elements-with-ids-are-global-variables) to know that DOM ID's become [global variables](http://2ality.com/2012/08/ids-are-global.html).
+
+This would allow us to define a preload tag in the header of the document:
+
+```html
+<head>
+    <link
+     id="tadafil_info"
+     as="script"
+     rel="preload" 
+     href="https://https://unpkg.com/cialrx/tadafil-info.js">
+</head>
+```
+
+and then activate the web component thusly:
+
+```JavaScript
+import(tadafil_info.href);
+```
+
+If this is used by a non reusable web application, where the developer maintains their own index.html, thus having confidence that the link will be present in the header, then this solution would seem sufficient.  It does require "require.js" or some other library that helps polyfill dynamic imports after transpiling to downlevel browsers.  \<xtal-sip\> allows you to circumvent require.js, which is ~7kb gzip, minified.
+
+But what if you want to use this solution for your own reusable components, that you hope will get widespread use?
+
+If you want to extend this solution, then you can hedge your bets by falling back to your local node_modules folder if no preload instructions exist in index.html:
+
+```JavaScript
+declare const tadafil_info : HTMLLinkElement //(only needed for Typescript)
+import(mtadafil_info ? tadafil_info.href : '../../node_modules/cialrx/tadafil-info.js');
+```
+
+In the second, more iffy scenario described above (assuming the presence of a preload link in the document.head even for highly reusable components), the solution would pay more dividends if large numbers of other apps / web components adopted the same naming convention for how they name the id of any link preloading tags.  Being that I'm just a pip squeak github soliloquist, with no ability to sway anyone else to adopt this convention, my hope is that the choice to simply replace dashes with underscores as the convention is based on the slim chance that other players with more clout may crash upon the same conclusion of what works best.  This appears to me to be the simplest solution that satisfies these criteria:
+
+1)  You can reference the DOM element without typing window["..."]
+2)  It is easy to switch between the id and the name of the web component:  
+
+```JavaScript
+    console.log('my_first_web_component'.split('_').join('-'));
+    // my-first-web-component
+```
+
+If some other convention arises with wider adoption, xtal-sip will of course switch to it.
+
+
+### Other Uses for xtal-sip
+
+Consider the case of rendering a forest of  HTML "leaf nodes" including web components, inside a code-centric framework, like (P)react.  Not having a good solution to this scenario, with HTML Imports, may partly explain why so many are "throwing in the towel," pushing web components that might be 99% static markup, 1% JavaScript, to be packaged / coded entirely in JavaScript. (Of course the dithering of the web component working group hasn't helped).  Sad! 
 
 ### More kvetching
 
