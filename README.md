@@ -93,7 +93,7 @@ This would allow us to define a preload tag in the header of the document:
      id="tadafil_info"
      as="script"
      rel="preload" 
-     href="https://https://unpkg.com/cialrx/tadafil-info.js">
+     href="https://unpkg.com/cialrx/tadafil-info.js">
 </head>
 ```
 
@@ -103,7 +103,7 @@ and then activate the web component thusly:
 import(tadafil_info.href);
 ```
 
-If this is used by a non reusable web application, where the developer maintains their own index.html, thus having confidence that the link will be present in the header, then this solution would seem sufficient.  It does require "require.js" or some other library that helps polyfill dynamic imports after transpiling to downlevel browsers.  \<xtal-sip\> allows you to circumvent require.js, which is ~7kb gzip, minified.
+If this is used for top level web component references, within a non reusable web application, where the developer maintains their own index.html, we can have confidence that the link will be present in the header. This solution, then, would seem sufficient.  It does require "require.js" or some other library that helps polyfill dynamic imports after transpiling to downlevel browsers.  \<xtal-sip\> allows you to circumvent require.js, which is ~7kb gzip, minified.
 
 But what if you want to use this solution for your own reusable components, that you hope will get widespread use?
 
