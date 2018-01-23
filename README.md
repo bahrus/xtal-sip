@@ -313,7 +313,7 @@ Xtal-sip also provides support for lazily loading custom elements defined and im
 You will need to also create the reference to the importer web component itself, either via xtal-sip, or via more traditional ways. 
 
 ```html
-<link id="my-component"
+<link id="my_component"
     rel="preload" 
     as="fetch" 
     type="text/html" 
