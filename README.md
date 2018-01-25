@@ -395,11 +395,11 @@ Here we build on another link rel value -- [preconnect](https://css-tricks.com/p
 <link id="baseCdnUrl" 
     rel="preconnect" 
     href="https://cdn.jsdelivr.net/npm/">
-<link rel-ish="preload" async as="script"
-    href="${baseCdnUrl}xtal-json-merge/build/ES6/json-merge.js" data-tags="json-merge">
+<link id="json_merge" rel-ish="preload" async as="script"
+    href="${baseCdnUrl.href}xtal-json-merge/build/ES6/json-merge.js">
 
-<link rel-ish="preload" async as="script"
-    href="${baseCdnUrl}xtal-json-editor/build/ES6/xtal-json-editor.js" data-tags="xtal-json-editor">    
+<link id="xtal_json_editor" rel-ish="preload" async as="script"
+    href="${baseCdnUrl.href}xtal-json-editor/build/ES6/xtal-json-editor.js">    
 ```
 
 ## Preemptive loading
