@@ -11,7 +11,7 @@
     * @demo demo/index.html
     */
     class XtalSip extends HTMLElement {
-        static _added: { [key: string]: boolean } = {};
+        static _a: { [key: string]: boolean } = {}; //added
         static _notFound: {[key: string]: boolean} = {};
         static get(tagName): HTMLLinkElement {
             return window[tagName.split('-').join('_')];
@@ -25,7 +25,8 @@
                 XtalSip._notFound[tagName] = true;
                 return;
             }
-            XtalSip._added[tagName] = true;
+            if(XtalSip._a[tagName]) return; //already added
+            XtalSip._a[tagName] = true;
             const d = lookup.dataset;
             if (customElements.get(tagName)) return;
             let nodeName, pathName = 'href';

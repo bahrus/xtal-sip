@@ -1,4 +1,4 @@
-(function () {
+do {
     const XtalSip = customElements.get('xtal-sip');
     const originalDefine = customElements.define;
     const boundDefine = originalDefine.bind(customElements);
@@ -75,5 +75,5 @@
     }
     XtalSip._notFound = {};
     XtalSip.load(...notFound);
-})();    
+}while('');    
 

@@ -23,7 +23,9 @@
                 XtalSip._notFound[tagName] = true;
                 return;
             }
-            XtalSip._added[tagName] = true;
+            if (XtalSip._a[tagName])
+                return;
+            XtalSip._a[tagName] = true;
             const d = lookup.dataset;
             if (customElements.get(tagName))
                 return;
@@ -70,7 +72,7 @@
             });
         }
     }
-    XtalSip._added = {};
+    XtalSip._a = {}; //added
     XtalSip._notFound = {};
     customElements.define('xtal-sip', XtalSip);
 })();
