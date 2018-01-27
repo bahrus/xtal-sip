@@ -395,11 +395,11 @@ Here we build on another link rel value -- [preconnect](https://css-tricks.com/p
 <link id="baseCdnUrl" 
     rel="preconnect" 
     href="https://cdn.jsdelivr.net/npm/">
-<link id="json_merge" rel-ish="preload" async as="script"
-    href="${baseCdnUrl.href}xtal-json-merge/build/ES6/json-merge.js">
+<link id="json_merge" rel-ish="preload" async as="script" data-base="baseCdnUrl"
+    href="xtal-json-merge/build/ES6/json-merge.js">
 
-<link id="xtal_json_editor" rel-ish="preload" async as="script"
-    href="${baseCdnUrl.href}xtal-json-editor/build/ES6/xtal-json-editor.js">    
+<link id="xtal_json_editor" rel-ish="preload" async as="script" data-base="baseCdnUrl"
+    href="xtal-json-editor/build/ES6/xtal-json-editor.js">    
 ```
 
 ## Preemptive loading
@@ -532,11 +532,11 @@ More on this topic below.
 Using the tie breaking approach described above to differentiate between ES5 and ES6 references can get redundant, particularly if there's symmetry between how bundling is done for ES5 vs ES6.  For example, suppose we do no bundling.  We would be apt to end up with lots of "double references":
 
 ```html
-  <link rel-ish="preload" async as="script" data-es="6"
-    href="${baseCdnUrl}xtal-json-editor/build/ES6/xtal-json-editor.js" data-tags="xtal-json-editor">
+  <link rel-ish="preload" async as="script" data-es="6" data-base="cdnBaseUrl"
+    href="xtal-json-editor/build/ES6/xtal-json-editor.js" data-tags="xtal-json-editor">
 
-    <link rel-ish="preload" async as="script" data-es="5" 
-    href="${baseCdnUrl}xtal-json-editor/build/ES5/xtal-json-editor.js" data-tags="xtal-json-editor">
+    <link rel-ish="preload" async as="script" data-es="5" data-base="cdnBaseUrl"
+    href="xtal-json-editor/build/ES5/xtal-json-editor.js" data-tags="xtal-json-editor">
 ```
 
 That's a nuisance to maintain, and won't help reducing the bandwidth of the application.

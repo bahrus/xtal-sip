@@ -45,7 +45,7 @@ do {
         }
     }
     //Now clone fake els to real preload links to allow browser to preload link
-    goodFakeLinkEls.forEach(el => {
+    goodFakeLinkEls.forEach((el : HTMLElement) => {
         const href = el.getAttribute('href');
         el.dataset.tags.split(',').forEach(tag => {
             let modifiedHref = href;
@@ -55,15 +55,15 @@ do {
                 counter++;
             });
             const d = el.dataset;
-            const base = d.baseRef ? document.querySelector(d.baseRef).href : '';
+            const base = d.baseRef ? window[d.baseRef].href : '';
             modifiedHref = base + modifiedHref;
             //from https://developer.mozilla.org/en-US/docs/Web/HTML/Preloading_content
-            const preloadLink = el.cloneNode();
+            const preloadLink = el.cloneNode() as HTMLLinkElement;
             preloadLink.removeAttribute('rel-ish');
             preloadLink.removeAttribute('data-tags');
             preloadLink.href = modifiedHref;
             preloadLink.id = tag.split('-').join('_');
-            preloadLink.rel = 'preload'; //el.getAttribute('rel-ish') if support prefetch
+            preloadLink.rel = el.getAttribute('rel-ish'); //el.getAttribute('rel-ish') if support prefetch
             document.head.appendChild(preloadLink);
         });
 

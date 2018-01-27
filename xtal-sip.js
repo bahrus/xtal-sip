@@ -23,9 +23,10 @@
                 XtalSip._notFound[tagName] = true;
                 return;
             }
-            if (XtalSip._a[tagName])
-                return;
-            XtalSip._a[tagName] = true;
+            const href = lookup.getAttribute('href');
+            if (XtalSip._a[href])
+                return; //already added
+            XtalSip._a[href] = true;
             const d = lookup.dataset;
             if (customElements.get(tagName))
                 return;
@@ -46,7 +47,7 @@
             }
             let target = d['importer'] ? document.body : document.head;
             const newTag = document.createElement(nodeName);
-            newTag.setAttribute(pathName, lookup.getAttribute('href'));
+            newTag.setAttribute(pathName, href);
             newTag.setAttribute('rel', 'import'); // no harm done for other types
             if (lookup['async'])
                 newTag.setAttribute('async', '');
