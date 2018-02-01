@@ -1,35 +1,31 @@
-declare var xtal_sip;
+declare var xtal_sip : HTMLScriptElement;
 (function () {
     var ESX = 'ES' + ( (navigator.userAgent.indexOf('Trident') > -1) ? '5' : '6');
-    let cs_src = '';
-    let script = xtal_sip;
-    if(script){
-        cs_src = script['src'];
-    }else{
-        let cs = document.currentScript;
-        if(cs) {
-            cs_src = cs['src'];
-        }else{
-            cs_src = '/bower_components/xtal-sip/stal-sip-loader.js';
-        }
-    }
+    const cs_src = self['xtal_sip'] ? xtal_sip.src : (document.currentScript as HTMLScriptElement).src;
+    const base = cs_src.split('/').slice(0, -1).join('/');
     if(ESX === 'ES5'){
-        var es5Compat = document.createElement('script');
-        es5Compat.src = cs_src.replace('xtal-sip-loader.js', 'ES5Compat.js');
-        es5Compat.async = false;
-        es5Compat.onload = function(){
-            loadSip();
-        }
-        document.head.appendChild(es5Compat);
+        loadScript(base + '/ES5Compat.js', loadSip);
     }else{
         loadSip();
     }
     
+    function loadScript(src: string, callBack?: any){
+        var scr = document.createElement('script');
+        scr.src = src;
+        scr.async = false;
+        if(callBack){
+            scr.onload = function(){
+                callBack();
+            }
+        }
+        document.head.appendChild(scr);        
+    }
 
     function loadSip(){
-        var cs = cs_src.replace('xtal-sip-loader.js', 'build/' + ESX + '/xtal-sip.js'); //TODO
-        var sc = document.createElement('script');
-        sc.src = cs;
-        document.head.appendChild(sc);
+        loadScript(base + '/build/' + ESX + '/xtal-sip.js', loadSipPlus); 
+    }
+
+    function loadSipPlus(){
+        loadScript(base + '/build/' + ESX + '/xtal-sip-plus.js');
     }
 })();

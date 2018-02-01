@@ -1,14 +1,5 @@
 do {
     const XtalSip = customElements.get('xtal-sip');
-    const originalDefine = customElements.define;
-    const boundDefine = originalDefine.bind(customElements);
-    customElements.define = function (name: string, cls: any) {
-        const lookup = XtalSip.get(name);
-        if (lookup) {
-            Object.assign(cls, lookup.dataset);
-        }
-        boundDefine(name, cls);
-    }
     function replace(str, find, replace) {
         return str.replace(new RegExp(find, 'g'), replace);
     }

@@ -52,8 +52,6 @@
             if (lookup['async'])
                 newTag.setAttribute('async', '');
             setTimeout(() => {
-                console.log('appending');
-                console.log(newTag);
                 target.appendChild(newTag);
             }, 1);
         }

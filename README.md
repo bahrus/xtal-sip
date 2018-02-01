@@ -513,17 +513,7 @@ If 1) you are creating a custom element wrapper around a third-party api, which 
 As mentioned above, document.currentScript is extremely buggy in IE11.  I suggest using the following approach to find the location of the script associated with the custom element tag name you are working with:
 
 ```JavaScript
-    let cs_src = '';
-    if(my_tag_name){ //replace dashes with underscores.
-        cs_src = my_tag_name.getAttribute('href');
-    }else{
-        let cs = document.currentScript;
-        if(cs) {
-            cs_src = cs['src'];
-        }else{
-            cs_src = '/bower_components/my-tag-name/my-tag-name.js'; //or node_modules soon
-        }
-    }
+    const cs_src = my_tag_name ? my_tag_name.href : document.currentScript.src; //IE11 compatible if link tag is present
 ```
 More on this topic below.
 
@@ -586,6 +576,23 @@ followed immediately by:
 
 Unfortunately, in testing out this example, **another Chrome bug appears**.  Not sure why it's so hard for Chrome to keep track of what url's it has requested -- If you use link preload="billboard.css" and then include a reference to that same file within a shadow DOM template, Chrome ends up downloading the same file twice.
 
+## Preloading dependencies, Take II
+
+```html
+<link id="my_tag_name" rel="preload" as="script" href="../../wherever/my-tag-name.js" data-has-config>
+```
+
+config file located in same directory as my-tag-name.js, called my-tag-name.config.json
+
+structure:
+
+```JSON
+{
+    "JS_Scripts":[],
+    "ES_Modules":[],
+    
+}
+```
 ## TODO:  Mixin Mischief
 
 Unfortunately, the solution above for managing third party dependencies for a component, doesn't work for common, loosely coupled mixins that we might want to manage centrally.  Something else is required for that scenario.  

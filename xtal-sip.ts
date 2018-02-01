@@ -53,8 +53,6 @@
             newTag.setAttribute('rel', 'import');  // no harm done for other types
             if (lookup['async']) newTag.setAttribute('async', '');
             setTimeout(() => {
-                console.log('appending');
-                console.log(newTag);
                 target.appendChild(newTag);
             }, 1);
         }
