@@ -5,7 +5,7 @@
 
 NB:  This component suffers currently in terms of IDE and build support, especially compared to the Polymer supported [lazy-imports](https://github.com/Polymer/lazy-imports).
 
-\<xtal-sip\> is a dependency free, 620B minified and gzipped custom element that dynamically "waters" other custom element tags with the necessary dependencies to sprout the tag from an inert seedling to a thing of beauty. 
+\<xtal-sip\> is a dependency free, 550B minified and gzipped custom element that dynamically "waters" other custom element tags with the necessary dependencies to sprout the tag from an inert seedling to a thing of beauty. 
 
 <a href="https://www.webcomponents.org/element/bahrus/xtal-sip/demo/index.html">Demo</a>
 
@@ -110,13 +110,12 @@ But what if you want to use this solution for your own reusable components, that
 If you want to extend this solution, then you can hedge your bets by falling back to your local node_modules folder if no preload instructions exist in index.html:
 
 ```JavaScript
-declare const tadafil_info : HTMLLinkElement //(only needed for Typescript)
-import(tadafil_info ? tadafil_info.href : '../../node_modules/cialrx/tadafil-info.js');
+import(self.tadafil_info ? tadafil_info.href : '../../node_modules/cialrx/tadafil-info.js');
 ```
 
-In the second, more iffy scenario described above (assuming the presence of a preload link in the document.head even for highly reusable components), the solution would pay more dividends if large numbers of other apps / web components adopted the same naming convention for how they name the id of any link preloading tags.  Being that I'm just a pip squeak github soliloquist, with no ability to sway anyone else to adopt this convention, my hope is that the choice to simply replace dashes with underscores as the convention is based on the slim chance that other players with more clout may crash upon the same conclusion of what works best.  This appears to me to be the simplest solution that satisfies these criteria:
+In the second, more iffy scenario described above (assuming the presence of a preload link in the document.head even for highly reusable components), the solution would pay more dividends if large numbers of other apps / web components adopted the same naming convention for how they name the id of any link preloading tags.  Being that I'm just a pip squeak github soliloquist, with no ability to sway anyone else to adopt this convention, my hope is that the choice to simply replace dashes with underscores as the convention will match what others adopt, based on similar considerations.  This appears to me to be the simplest solution that satisfies these criteria:
 
-1)  You can reference the DOM element without typing window["..."]
+1)  You can reference the DOM element without typing self["..."]
 2)  It is easy to switch between the id and the name of the web component:  
 
 ```JavaScript
@@ -331,21 +330,15 @@ Until Chrome fixes this bug, you can use as="document", which is buggy in the op
 
 Xtal-sip also supports two files for additional functionality, that might be useful for larger projects, or projects that must target a wider variety of browser types, with more distributed dependencies.
 
-One of those files, where the exciting stuff happens, is the 730B gzipped and minified file xtal-sip-plus.js. As will become clear, much (but not quite all) of this additional functionality could instead be done by a server-side filter, or during the build, in the interest of eliminating that 730B overhead.  Writing such a filter or build step would be fairly straightforward due to xtal-sip-plus all being based on declarative HTML tags.  In some cases, though, the benefits of performing the processing during the build or on the server could be outweighed by the cost of a larger download size.
+One of those files, where the exciting stuff happens, is the 600B gzipped and minified file xtal-sip-plus.js. As will become clear, much (but not quite all) of this additional functionality could instead be done by a server-side filter, or during the build, in the interest of eliminating that 600B overhead.  Writing such a filter or build step would be fairly straightforward due to xtal-sip-plus all being based on declarative HTML tags.  In some cases, though, the benefits of performing the processing during the build or on the server could be outweighed by the cost of a larger download size.
 
-To reference xtal-sip-plus, use the preload tag in document.head:
-
-```html
-<link id="xtal_sip_plus" rel="preload" async as="script" href="path/to/xtal-sip-plus.js">
-```
-
-and add the fake tag name 'xtal-sip-plus' to the first xtal-sip load statement:
+To reference xtal-sip-plus, replace the script tag reference mentioned above with this one in document.head:
 
 ```html
-<xtal-sip load="xtal-sip-plus,..."></xtal-sip>
+<script id="xtal_sip" src="path/to/xtal-sip-loader.js"></script>
 ```
 
-Let's walk through the extra feaatures xtal-sip-plus provides:
+xtal-sip-loader first loads the core file, xtal-sip, described above, which can immediately take action on the preload/prefetch tags.  Then xtal-sip-plus is loaded, whose functionaltiy is described below:
 
 ## Compact dependency preloading
 
@@ -402,7 +395,7 @@ Here we build on another link rel value -- [preconnect](https://css-tricks.com/p
     href="xtal-json-editor/build/ES6/xtal-json-editor.js">    
 ```
 
-## Preemptive loading
+## Preemptive loading [TODO]
 
 By default, xtal-sip doesn't add the live script or link import tag to the header until it is explicitly told to do so. Until then, we are preparing for the moment it is, by adding such references to the link rel="preload".  This allows us to stay on the conservative side and only load into memory what's really needed.
 
@@ -420,7 +413,7 @@ However, if preemptive loading is desired, add the data-preemptive attribute:
 
 This preemptive loading could also be (temporarily?) useful to use for the common (for now?) scenario that 1)  The component follows the Polymer <3 approach of importing via HTML Imports, and 2)  Chrome (and possibly other browsers using polyfills) doesn't recognize as="document" or the polyfill for HTML Imports isn't recognized by the browser as type "document".
 
-## JIT preloading
+## JIT preloading [TODO]
 
 On the other side of the spectrum, perhaps there are certain locales one is targeting, where we know they pay a high price for downloading unnecessary stuff.
 
@@ -513,9 +506,9 @@ If 1) you are creating a custom element wrapper around a third-party api, which 
 As mentioned above, document.currentScript is extremely buggy in IE11.  I suggest using the following approach to find the location of the script associated with the custom element tag name you are working with:
 
 ```JavaScript
-    const cs_src = my_tag_name ? my_tag_name.href : document.currentScript.src; //IE11 compatible if link tag is present
+    const jsFilePath = self.my_tag_name ? my_tag_name.href : document.currentScript.src;
 ```
-More on this topic below.
+
 
 ### Substitution
 
@@ -552,52 +545,6 @@ One can provide xtal-sip a preprocessing function that will subsitute (say) ES6 
 </script>
 
 ```
-
-## Preloading third party dependencies, and configuring global settings for web component definitions
-
-Often the size of the web component itself will be dwarfed by the size of the dependencies the web component relies on.  For example, web component wrappers around complex d3-based charting libraries will be tiny compared to d3.js, the d3 charting code, and the associated css file(s).  We would really like to preload those resources too.  Nothing is preventing us from doing that of course.  But once again we have a scenario where the preload tag specifies a url which may duplicate, or worse, conflict with the path the component itself expects.  While ES6 modules, due to their ability to avoid polluting the global namespace, and Shadow DOM, with its style encapsulation, could help avoid conflicts, it is hard to see how inadvertent downloading of the same resource (including version) from different places could be avoided, if we rely on native ES6 module loading of resources.  The only other way I can see to prevent this, is to command that, as a web development community, we all must permanently "marry" our local node_modules folder as our source of files, forevermore.  Anyone publishing a library *must* publish it to npm, which must be installed locally.  No partial or competing CDN deployments.  No competing package manager to npm dare enter. Deviants will be sentenced to 10 years of IE6 development. That's quite a committment!  Maybe I'm missing something.
-
-A nice way to provide a lot more flexibility is to allow the web component to do some IoC dependency inversion -- allow the "container" to tell the web component where the references are.  In order to achieve this, **\<xtal-sip\> with the plus extension provides a way of passing valuable configuration information from the main link preload tag associated with the custom element tag, to static properties of the web component class**.  This is done before customElements.define is called on the element.  In particular, the value(s) of the data- (dataset) attribute is passed into the Class definition.  Again, keeping all these url's centrally managed would help identify shared resources -- for example, two components that may rely on the same version of a library.
-
-So for example, the preload link for billboard.js custom element could look as follows:
-
-```html
- <link id="billboard_charts" rel="preload" as="script" href="../billboard-charts.js" 
-      data-d3-selector=".billboard.d3" data-billboard-js-selector=".billboard.bb" data-bb-css-selector=".billboard.css">
-```
-
-followed immediately by:
-
-```html
-  <link class="billboard d3" rel="preload" as="script" href="https://d3js.org/d3.v4.min.js"> 
-  <link class="billboard bb"     rel="preload" as="script" href="https://naver.github.io/billboard.js/release/latest/dist/billboard.min.js">
-  <link class="billboard css"    rel="preload" as="style"  href="https://naver.github.io/billboard.js/release/latest/dist/billboard.min.css">
-```
-
-Unfortunately, in testing out this example, **another Chrome bug appears**.  Not sure why it's so hard for Chrome to keep track of what url's it has requested -- If you use link preload="billboard.css" and then include a reference to that same file within a shadow DOM template, Chrome ends up downloading the same file twice.
-
-## Preloading dependencies, Take II
-
-```html
-<link id="my_tag_name" rel="preload" as="script" href="../../wherever/my-tag-name.js" data-has-config>
-```
-
-config file located in same directory as my-tag-name.js, called my-tag-name.config.json
-
-structure:
-
-```JSON
-{
-    "JS_Scripts":[],
-    "ES_Modules":[],
-    
-}
-```
-## TODO:  Mixin Mischief
-
-Unfortunately, the solution above for managing third party dependencies for a component, doesn't work for common, loosely coupled mixins that we might want to manage centrally.  Something else is required for that scenario.  
-
-This is a use case where I've not seen much activity, yet, but conceivably could become more of an issue.  Examples I'm thinking of are common "cross cutting concern" mixins, things that do logging / usage tracking, instrumentation, etc, that we may want to layer on top of existing web components without modifying the original code.  More on this topic if and when such mixins appear. 
 
 ## List of features:
 
