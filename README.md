@@ -5,7 +5,7 @@
 
 NB:  This component suffers currently in terms of IDE and build support, especially compared to the Polymer supported [lazy-imports](https://github.com/Polymer/lazy-imports).
 
-\<xtal-sip\> is a dependency free, 550B minified and gzipped custom element that dynamically "waters" other custom element tags with the necessary dependencies to sprout the tag from an inert seedling to a thing of beauty. 
+\<xtal-sip\> is a dependency free, 750B minified and gzipped custom element that dynamically "waters" other custom element tags with the necessary dependencies to sprout the tag from an inert seedling to a thing of beauty. 
 
 <a href="https://www.webcomponents.org/element/bahrus/xtal-sip/demo/index.html">Demo</a>
 
