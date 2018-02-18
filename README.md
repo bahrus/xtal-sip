@@ -243,6 +243,18 @@ If the sight of \<xtal-sip\>'s is unpleasant to see in the markup, or is an inco
 customElements.get('xtal-sip').load('paper-input,iron-ajax');
 ```
 
+### Notification when loading is complete
+
+Ideally, [binding frameworks](https://custom-elements-everywhere.com/) such as Vue, Angular and (P)react would be able to distinguish between attributes and properties, and bind properly with custom elements even before they have loaded all their dependencies.  Alas, (p)react is [not](https://github.com/developit/preact/issues/678) such a [framework](https://github.com/facebook/react/issues/11347). In the case of preact, the simple solution is to wait for the custom elements to load before employing binding.
+
+To help in this effort, xtal-sip events a custom event when it has finished loading:  'loaded-changed'.  \
+
+This would allow Preact users to activate a component after all the web components have loaded:
+
+```JSX
+    <MyPreactChildComponent onLoaded-changed={this.activateMe} />
+```
+
 ## Installing xtal-sip
 
 If you wish to install xtal-sip locally, you can use:

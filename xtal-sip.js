@@ -66,8 +66,24 @@
             }
         }
         do() {
-            this.getAttribute('load').split(',').forEach(tag => {
+            const tags = this.getAttribute('load').split(',');
+            tags.forEach(tag => {
                 XtalSip.loadDep(tag);
+            });
+            let tagsNotLoadedYet = tags.slice(0);
+            tags.forEach(tag => {
+                customElements.whenDefined(tag).then(() => {
+                    tagsNotLoadedYet = tagsNotLoadedYet.filter(t => t !== tag);
+                    if (tagsNotLoadedYet.length === 0) {
+                        this.dispatchEvent(new CustomEvent('loaded-changed', {
+                            detail: {
+                                value: true,
+                            },
+                            bubbles: true,
+                            composed: true
+                        }));
+                    }
+                });
             });
         }
     }
