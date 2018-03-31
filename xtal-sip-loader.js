@@ -2,11 +2,20 @@
     var ESX = 'ES' + ((navigator.userAgent.indexOf('Trident') > -1) ? '5' : '6');
     const cs_src = self['xtal_sip'] ? xtal_sip.src : document.currentScript.src;
     const base = cs_src.split('/').slice(0, -1).join('/');
-    if (ESX === 'ES5') {
-        loadScript(base + '/ES5Compat.js', loadSip);
-    }
-    else {
-        loadSip();
+    checkCE();
+    function checkCE() {
+        if (typeof customElements === 'undefined') {
+            setTimeout(() => {
+                checkCE();
+            }, 100);
+            return;
+        }
+        if (ESX === 'ES5') {
+            loadScript(base + '/ES5Compat.js', loadSip);
+        }
+        else {
+            loadSip();
+        }
     }
     function loadScript(src, callBack) {
         var scr = document.createElement('script');
