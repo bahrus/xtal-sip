@@ -1,72 +1,37 @@
 <!doctype html>
 <html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1, user-scalable=yes">
 
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1, user-scalable=yes">
+    <title>xtal-sip demo</title>
 
-  <title>xtal-sip demo</title>
+    <script src="../node_modules/@webcomponents/webcomponentsjs/webcomponents-bundle.js"></script>
+    <script async src="../xtal-sip.js"></script>
+    <link id="xtal_sip_plus" rel="preload" async as="script" href="../xtal-sip-plus.js">
+    <link id="xtal_link_preview" rel="preload" async as="script" href="https://cdn.jsdelivr.net/npm/xtal-link-preview/build/ES6/xtal-link-preview.js">
+    <script type="module">
+      import '@polymer/iron-demo-helpers/demo-pages-shared-styles';
+      import '@polymer/iron-demo-helpers/demo-snippet';
+    </script>
 
-  <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
-  <script async src="../xtal-sip.js"></script>
-  <link id="xtal_sip_plus" rel="preload" async as="script" href="../xtal-sip-plus.js">
+    <script type="module" src="../xtal-sip.js"></script>
 
-  <link rel="import" href="../../iron-demo-helpers/demo-pages-shared-styles.html">
-  
-  <link rel="preconnect" href="//example.com">
-  <link id="xtal_link_preview" rel="preload" async as="script" href="https://cdn.jsdelivr.net/npm/xtal-link-preview/build/ES6/xtal-link-preview.js">
-  <!-- <link rel="preload" as="script" data-tag="c-c" href="https://cdn.jsdelivr.net/npm/carbon-copy@0.1.7/build/ES6/carbon-copy.js"> -->
-  
-  <link rel="preload" as="script" data-tag="xtal-pattern" href="https://cdn.jsdelivr.net/npm/xtal-pattern@0.0.2/build/ES6/xtal-pattern.js">
-  <link rel-ish="preload" as="document" data-tags="dom-bind,dom-if" href="../../polymer/lib/elements/dom-{1}.html">
-  <link id="demo_snippet" rel="preload" as="document" href="../../iron-demo-helpers/demo-snippet.html">
-  <link rel-ish="preload" as="document" data-tags="wired-input,wired-radio-group,wired-radio,wired-card" href="../../wired-{1}/wired-{1}.html"
-    async>
-  
-  <link id="my_component" rel="preload" as="fetch" type="text/html" data-importer="xtal-pattern" href="my-component.html">
-  <custom-style>
-    <style is="custom-style" include="demo-pages-shared-styles">
-    </style>
-  </custom-style>
-  <script>
-    document.head.addEventListener('xtal-sip-init', e =>{
-      //debugger;
-    });
-  </script>
-</head>
-
-<body>
-  <div class="vertical-section-container centered">
-    <h3>Basic xtal-sip demo</h3>
-    <xtal-sip load="xtal-sip-plus,demo-snippet,dom-bind,xtal-pattern,wired-card,wired-input,wired-radio-group,wired-radio,xtal-link-preview,my-component"></xtal-sip>
-    <demo-snippet>
-      <template>
-        <dom-bind>
-          <template>
-            <div style="height:400px">
-              <my-component></my-component>
-              <wired-card class="form">
-                <h3>Form Title</h3>
-                <div>
-                  <wired-input placeholder="full name"></wired-input>
-                </div>
-                <div>
-                  <wired-input placeholder="location"></wired-input>
-                </div>
-                <wired-radio-group>
-                  <wired-radio name="male" text="male"></wired-radio>
-                  <wired-radio name="female" text="female"></wired-radio>
-                </wired-radio-group>
-              </wired-card>
-              <xtal-link-preview preview href="https://onsen.io"></xtal-link-preview>
-            </div>
-          </template>
-
-        </dom-bind>
-
-      </template>
-    </demo-snippet>
-  </div>
-</body>
-
+    <custom-style>
+      <style is="custom-style" include="demo-pages-shared-styles">
+      </style>
+    </custom-style>
+  </head>
+  <body>
+    <div class="vertical-section-container centered">
+      <h3>Basic xtal-sip demo</h3>
+      <demo-snippet>
+        <template>
+          <xtal-sip load="xtal-link-preview"></xtal-sip>
+          <xtal-link-preview preview href="https://onsen.io"></xtal-link-preview>
+          <div style="height:200px"></div>
+        </template>
+      </demo-snippet>
+    </div>
+  </body>
 </html>

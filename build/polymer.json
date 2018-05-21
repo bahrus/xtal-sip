@@ -9,7 +9,7 @@
     "index.html"
   ],
   "extraDependencies": [
-    "bower_components\\webcomponentsjs\\*.js"
+    "bower_components/webcomponentsjs/*.js"
   ],
   "builds": [
     {
@@ -29,7 +29,8 @@
   ],
   "lint": {
     "rules": [
-      "polymer-2"
+      "polymer-3"
     ]
-  }
+  },
+  "moduleResolution": "node"
 }

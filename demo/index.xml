@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="hello.xsl"?>
+<refs>   
+    <wc_patterns>
+        <pattern prefix="paper-" context="@polymer">
+            <tag suffix="input" ext="js"/>
+        </pattern>
+    </wc_patterns>
+</refs>
