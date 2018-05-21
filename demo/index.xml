@@ -1,9 +1,10 @@
 <?xml version="1.0"?>
-<?xml-stylesheet type="text/xsl" href="hello.xsl"?>
+<?xml-stylesheet type="text/xsl" href="input.xsl"?>
 <refs>   
     <wc_patterns>
-        <pattern prefix="paper-" context="@polymer">
-            <tag suffix="input" ext="js"/>
+        <pattern prefix="paper-" context="@polymer" as="script" ext="js" root="https://unpkg.com/" version="3.0.0-pre.19">
+            <input />
+            <button/>
         </pattern>
     </wc_patterns>
 </refs>
