@@ -4,7 +4,9 @@ Dynamically &#34;water&#34; a custom element tag with the necessary dependencies
 
 This custom element was introduced prior to learning about the [bare import specifier / package name maps proposal](https://github.com/domenic/package-name-maps).  Assuming that proposal is ratified by all the browser vendors, the usefulness of this component will signifanctly diminish, as that proposal allows for central management of references, something this component also supports.  The usefulness will also diminish once dynamic imports are shipping in all browsers, other than those with insignificant marketshare.
 
-But that day is not here.  In the meantime, \<xtal-sip\>takes the philosophical stance that web components are more than just some mundane JavaScript libraries.  They enhance the DOM vocabulary.  They create a mapping between a tag and something that, yes, today must be a JavaScript class, but typically no code needs to interact directly with that class -- only the browser. The way this component loads web component definitions uses syntax that is not tied to JavaScript. The usefulness of this web component, then, would increase if browsers supported any way other than JS imports / classes as a way of importing a web component definition.  E.g. defining a custom element with WASM, or as part of an HTML import document.  xtal-sip assumes that whatever the file type used to generate a custom element, browsers will ship with a link preload/prefetch/other tag/attribute that allows retrieving the web component definition ahead of time.
+But that day is not here.  And as will see, this component still does make managing large numbers of web components easier, even when that day arrives. 
+
+\<xtal-sip\>takes the philosophical stance that web components are more than just some mundane JavaScript libraries.  They enhance the DOM vocabulary.  They create a mapping between a tag and something that, yes, today must be a JavaScript class, but typically no code needs to interact directly with that class -- only the browser. The way this component loads web component definitions uses syntax that is not tied to JavaScript. The usefulness of this web component, then, would increase if browsers supported any way other than JS imports / classes as a way of importing a web component definition.  E.g. defining a custom element with WASM, or as part of an HTML import document.  xtal-sip assumes that whatever the file type used to generate a custom element, browsers will ship with a link preload/prefetch/other tag/attribute that allows retrieving the web component definition ahead of time.
 
 One of the drivers behind this component is the desire to avoid repeating ourselves.  It seems even with the bare import specifier proposal, some degree of repeating will still be needed, if you want to not only specify import specifiers as well as preload/preload tags.  
 
@@ -35,6 +37,7 @@ and index.xsl as follows:
 <?xml version="1.0"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
   <xsl:template match="/refs">
+  
     <html>
       <head>
         <title>xtal-sip demo</title>
@@ -72,6 +75,10 @@ This will generate link tags in the head tag:
 <link rel="preload" as="script" href="https://unpkg.com/@polymer/paper-input@3.0.0-pre.19/paper-input.js">
 <link rel="preload" as="script" href="https://unpkg.com/@polymer/paper-button@3.0.0-pre.19/paper-button.js">
 ```
+
+The same xml tags could also be used to define part of the bare import specifier configuration, as well as link preconnect tags.
+
+
 
 
 ## Install the Polymer-CLI
