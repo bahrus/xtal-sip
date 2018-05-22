@@ -29,11 +29,12 @@ But xtal-sip sees the benefits of loading content progressively, and the benefit
 
 One of the drivers behind this component is the desire to avoid repeating ourselves.  It seems even with the bare import specifier proposal, some degree of repeating will still be needed, if you want to not only specify import specifiers but also preload/prefetch/preconnect tags. 
 
+
+There is a clear pattern with web components, that the prefix of the name tends to come from the same vendor / author.  Predicting the path to the JavaScript based only the name of the custom element, therefore, becomes almost formulaic.  This provides opportunites to look for additional ways of eliminating redundancies and the download footprint (at the risk of increasing client-side processing).
+
 This package contains a core web component, xtal-sip, that simply loads link preload tags on demand.  
 
 But it also has a supplementary file, xtal-sip-plus, that programatically (via JavaScript) auto generates multiple link preload tags based on wildcard rules, and that can also cater those link refererences based on the device type (ES6 supporting browser vs IE11, for example.)  
-
-There is a clear pattern with web components, that the prefix of the name tends to come from the same vendor / author.  Predicting the path to the JavaScript based only the name of the custom element, therefore, becomes almost formulaic.  This provides opportunites to look for additional ways of eliminating redundancies and the download footprint (at the risk of increasing client-side processing).
 
 ## Reasons not to use xtal-sip-plus
 
@@ -41,7 +42,7 @@ But is this really the best approach, especially outside of development?  Dynami
 
 That auto generation of preload tags could instead be done by the server, or during the build, but that would hurt the bandwidth savings achieved by listing the references programmatically.  In the abstract, maybe a service worker could do the trick, but the problem is the service worker can only be invoked *after* index.html (say) has loaded. 
 
-After contemplating this dilemma, I remembered about an old, but never fully appreciated technology -- xslt.  The idea between xslt is not that dissimilar to functional renderers like react.  The same transform can be performed on the server or on the client.
+After contemplating this dilemma, I remembered about an old, but never fully appreciated technology -- xslt.  The idea between xslt is not that dissimilar to functional renderers like react.  The same transform can be performed on the server or on the client.  So let's use the **whole** platform, not just the fashionable recent bits.
 
 If we define index.xml as follows:
 
@@ -82,7 +83,7 @@ and index.xsl as follows:
 </xsl:stylesheet>
 ```
 
-Note the file include.xsl.  This file is shown below:
+Note the file include.xsl.  This can be a shared file (across multiple applications, but you can't use an externally hosted CDN for this), full of esoteric (to millennials) xslt.  The file is shown below:
 
 ```xml
 <?xml version="1.0"?>
