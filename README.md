@@ -2,7 +2,7 @@
 
 Dynamically &#34;water&#34; a custom element tag with the necessary dependencies to sprout the tag from an inert seedling to a thing of beauty.
 
-To skip this long-winded prelude, and see what xtal-sip does, jump to the core functionality section.
+To skip this long-winded prelude, and see what xtal-sip does, jump to the [core functionality section](#core-functionality).
 
 ## Reasons for not using this web component
 
@@ -35,11 +35,13 @@ But it also has a supplementary file, xtal-sip-plus, that programatically (via J
 
 There is a clear pattern with web components, that the prefix of the name tends to come from the same vendor / author.  Predicting the path to the JavaScript based only the name of the custom element, therefore, becomes almost formulaic.  This provides opportunites to look for additional ways of eliminating redundancies and the download footprint (at the risk of increasing client-side processing).
 
+## Reasons not to use xtal-sip-plus
+
 But is this really the best approach, especially outside of development?  Dynamically generating the list of preload tags with client-side JavaScript will of course delay the browser's ability to begin downloading the resources right away.  
 
-That auto generation of preload could instead be done by the server, or during the build, but that would hurt the bandwidth savings achieved by listing the references programmatically.  In the abstract, maybe a service worker could do the trick, but the problem is the service worker can only be invoked *after* index.html (say) has loaded. 
+That auto generation of preload tags could instead be done by the server, or during the build, but that would hurt the bandwidth savings achieved by listing the references programmatically.  In the abstract, maybe a service worker could do the trick, but the problem is the service worker can only be invoked *after* index.html (say) has loaded. 
 
-After contemplating this dillemma, I remembered about an old, but never fully appreciated technology -- xslt.  The idea between xslt is not that dissimilar to functional renderers like react.  The same transform can be performed on the server or on the client.
+After contemplating this dilemma, I remembered about an old, but never fully appreciated technology -- xslt.  The idea between xslt is not that dissimilar to functional renderers like react.  The same transform can be performed on the server or on the client.
 
 If we define index.xml as follows:
 
@@ -92,6 +94,9 @@ Note the file include.xsl.  This file is shown below:
       <xsl:variable name="ext" select="@ext"/>
       <xsl:variable name="root" select="@root"/>
       <xsl:variable name="version" select="@version"/>
+      <xsl:if test="system-property('xsl:vendor') = 'Microsoft'">
+        <script src="../node_modules/@webcomponents/webcomponentsjs/webcomponents-bundle.js"></script>
+      </xsl:if>
       <xsl:for-each select="*">
         <link rel="preload" as="script">
           <xsl:attribute name="href">
@@ -110,6 +115,8 @@ This will generate link tags in the head tag:
 <link rel="preload" as="script" href="https://unpkg.com/@polymer/paper-input@3.0.0-pre.19/paper-input.js">
 <link rel="preload" as="script" href="https://unpkg.com/@polymer/paper-button@3.0.0-pre.19/paper-button.js">
 ```
+
+Note that now we can synchronously load the web component polyfills with zero impact on browsers which support web components.
 
 The same xml tags could also be used to define part of the bare import specifier configuration, as well as link preconnect tags.
 

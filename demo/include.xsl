@@ -1,6 +1,11 @@
 <?xml version="1.0"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
   <xsl:template match="wc_patterns">
+  
+    <xsl:if test="system-property('xsl:vendor') = 'Microsoft'">
+      <script src="../node_modules/@webcomponents/webcomponentsjs/webcomponents-bundle.js"></script>
+    </xsl:if>
+
    <xsl:for-each select="pattern">
       <xsl:variable name="prefix" select="@prefix"/>
       <xsl:variable name="context" select="@context"/>
