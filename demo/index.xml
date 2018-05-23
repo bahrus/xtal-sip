@@ -2,11 +2,11 @@
 <?xml-stylesheet type="text/xsl" href="index.xsl"?>
 <refs>   
     <wc_patterns>
-        <pattern prefix="paper-" context="@polymer/" as="script" ext="js" root="https://unpkg.com/" version="3.0.0-pre.19">
+        <pattern prefix="paper-" rel="modulepreload" context="@polymer/" as="script" ext="?module" root="https://unpkg.com/" version="3.0.0-pre.19">
             <input />
             <button/>
         </pattern>
-        <pattern prefix="xtal-" as="script"  ext="js" root="https://cdn.jsdelivr.net/npm/">
+        <pattern prefix="xtal-" as="script"  ext=".js" root="https://cdn.jsdelivr.net/npm/">
             <link-preview version="0.0.14"/>
         </pattern>
     </wc_patterns>

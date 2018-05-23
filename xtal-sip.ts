@@ -30,28 +30,32 @@
             XtalSip._a[href] = true;
             const d = lookup.dataset;
             if (customElements.get(tagName)) return;
-            let nodeName, pathName = 'href';
+            //let nodeName, pathName = 'href';
             
-            switch (lookup.getAttribute('as')) {
-                case 'document':
-                    nodeName = 'link';
-                    //pathName = 'href';
-                    break;
-                case 'script':
-                    nodeName = 'script';
-                    pathName = 'src';
-                    break;
-                case 'fetch':
-                    nodeName = lookup.dataset.importer;
-                    //pathName = 'href'
-                    break;
-            }
-            let target = d['importer'] ? document.body : document.head as HTMLElement;
+            // switch (lookup.getAttribute('as')) {
+            //     case 'document':
+            //         nodeName = 'link';
+            //         //pathName = 'href';
+            //         break;
+            //     case 'script':
+            //         nodeName = 'script';
+            //         pathName = 'src';
+            //         break;
+            //     case 'fetch':
+            //         nodeName = lookup.dataset.importer;
+            //         //pathName = 'href'
+            //         break;
+            // }
+            //let target = d['importer'] ? document.body : document.head as HTMLElement;
+            let target = document.head;
 
-            const newTag = document.createElement(nodeName);
-            newTag.setAttribute(pathName, href);
-            newTag.setAttribute('rel', 'import');  // no harm done for other types
+            const newTag = document.createElement('script');
+            newTag.setAttribute('src', href);
+            //newTag.setAttribute('rel', 'import');  // no harm done for other types
             if (lookup['async']) newTag.setAttribute('async', '');
+            if(lookup['rel'] === 'modulepreload'){
+                newTag.setAttribute('type', 'module');
+            }
             setTimeout(() => {
                 target.appendChild(newTag);
             }, 1);

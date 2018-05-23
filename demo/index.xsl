@@ -10,11 +10,19 @@
       <head>
         <title>xtal-sip demo</title>
         <xsl:apply-templates select="*"/>
+            <script type="module">
+      import '../node_modules/@polymer/iron-demo-helpers/demo-pages-shared-styles.js';
+      import '../node_modules/@polymer/iron-demo-helpers/demo-snippet.js';
+    </script>
+        <custom-style>
+          <style is="custom-style" include="demo-pages-shared-styles"></style>
+        </custom-style>
       </head>
       <body>
-        <h1>
-          Hello <xsl:value-of select="system-property('xsl:vendor')"/>
-        </h1>
+          <xtal-sip load="xtal-link-preview,paper-input,paper-button"></xtal-sip>
+          <xtal-link-preview preview="" href="https://onsen.io"></xtal-link-preview>
+          <paper-input hidden=""></paper-input>
+          <paper-button hidden="">I am a button</paper-button>
       </body>
     </html>
   </xsl:template>
