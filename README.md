@@ -6,7 +6,7 @@ To skip this long-winded prelude, and see what xtal-sip does, jump to the [core 
 
 ## Reasons for not using this web component
 
-If you are perfectly content just bundling all your web component resources into bundle.js, this component is not for you.  If you think performing some view-based bundle splitting is sufficient / appealing, this component is also not for you.  This component is for developers who want to load web components asynchronously, in parallel, and limit bundling to tightly coupled resources.
+If you are perfectly content just bundling all your web component resources into bundle.js, this component is not for you.  If you think performing some view-based bundle splitting is sufficient / appealing, this component is also not for you.  This component is for developers who want to hydrate web components asynchronously, in parallel, and limit bundling to tightly coupled resources (though this component is certainly compatible with more aggressive bundling).
 
 This custom element was conceived prior to learning about the [bare import specifier / package name maps proposal](https://github.com/domenic/package-name-maps).  Assuming that proposal is ratified by all the browser vendors, the usefulness of this component will significanctly diminish, as that proposal allows for central management of JS references, something this component also supports (at least for top level references).  The usefulness will also diminish once dynamic imports are shipping in all browsers, other than those with insignificant marketshare.
 
@@ -16,7 +16,7 @@ But that day is not here.  And as we will see, this component still does arguabl
 
 \<xtal-sip\> takes the philosophical stance that web components are more than just some mundane JavaScript libraries.  They enhance the DOM vocabulary.  They create a mapping between a tag and something that, yes, today must be a JavaScript class, but typically no code needs to interact directly with that class -- only the browser. The way this component loads web component definitions uses syntax that is not tied to JavaScript. The usefulness of this web component, then, would increase if browsers supported any way other than JS imports / classes as a way of importing a web component definition.  E.g. defining a custom element with WASM, or as part of an HTML imported document.  xtal-sip assumes that whatever the file type used to generate a custom element, browsers will (eventually) ship with a link preload/prefetch/other tag/attribute that allows retrieving the web component definition ahead of time.
 
-\<xtal-sip\> is also betting long on the usefulness of asynchronously loading web components with limited bundling.  xtal-sip's optimism took a hit when confronted with this [wailing tweet](https://twitter.com/paul_irish/status/979867890080915456?lang=en):
+\<xtal-sip\> is also betting long on the usefulness of asynchronously hydrating web components, with bundling limited to tightly coupled resources.  xtal-sip's spirits wilted a bit when confronted with this [wailing tweet](https://twitter.com/paul_irish/status/979867890080915456?lang=en):
 
 >Some of the brightest performance minds I know have tried to make loading unbundled ES modules fast. They have not yet succeeded. 
 Perhaps in two years, it'll be competitive—but until then keep on bundling y'all.
@@ -25,14 +25,13 @@ Out sprang the dental hygienist from Abu Ghraib, triumphantly telling us we must
 
 But xtal-sip sees the benefits of loading content progressively, and the benefits of sharing common components via a shared CDN.
 
-\<xtal-sip\> also caters to developers who dream of the day when it is at least *possible* to develop applications with no build step, and no specialized web server.  Saving a file should allow the browser to refresh with a minimum of fuss and no complex abstraction layers.  Being able to use the browser's editors capabilities would also be a benefit of keeping things as simple as possible during development.
+\<xtal-sip\> also caters to developers who dream of the day when it is at least *possible* to develop applications with no build step, and no specialized web server.  Saving a file should allow the browser to refresh with a minimum of fuss and no complex abstraction layers.  Being able to use the browser's editor's capabilities would also be a benefit of keeping things as simple as possible during development.
 
-One of the drivers behind this component is the desire to avoid repeating ourselves.  It seems even with the bare import specifier proposal, some degree of repeating will still be needed, if you want to not only specify import specifiers but also preload/prefetch/preconnect tags. 
+Another driver behind this component is the desire to avoid repeating ourselves.  It seems even with the bare import specifier proposal, some degree of repeating will still be needed, if we want to not only specify import specifiers but also preload/prefetch/preconnect tags. 
 
+There is a clear pattern with web components, that the prefix of the name tends to come from the same vendor / author.  Predicting the path to the JavaScript based only the name of the custom element, therefore, becomes almost formulaic.  This provides opportunites to look for additional ways of eliminating redundancies and reducing the size of the download (at the risk of increasing client-side processing).
 
-There is a clear pattern with web components, that the prefix of the name tends to come from the same vendor / author.  Predicting the path to the JavaScript based only the name of the custom element, therefore, becomes almost formulaic.  This provides opportunites to look for additional ways of eliminating redundancies and the download footprint (at the risk of increasing client-side processing).
-
-This package contains a core web component, xtal-sip, that simply loads link preload tags on demand.  
+This package contains a core web component, xtal-sip, that simply loads link preload / prefetch / * tags on demand.  
 
 But it also has a supplementary file, xtal-sip-plus, that programatically (via JavaScript) auto generates multiple link preload tags based on wildcard rules, and that can also cater those link refererences based on the device type (ES6 supporting browser vs IE11, for example.)  
 
@@ -40,9 +39,11 @@ But it also has a supplementary file, xtal-sip-plus, that programatically (via J
 
 But is this really the best approach, especially outside of development?  Dynamically generating the list of preload tags with client-side JavaScript will of course delay the browser's ability to begin downloading the resources right away.  
 
-That auto generation of preload tags could instead be done by the server, or during the build, but that would hurt the bandwidth savings achieved by listing the references programmatically.  In the abstract, maybe a service worker could do the trick, but the problem is the service worker can only be invoked *after* index.html (say) has loaded. 
+That auto generation of preload tags could instead be done by the server, or during the build, but that would hurt the bandwidth savings achieved by pgorammatically generating references from a compact representation of the references.  In the abstract, maybe a service worker could do the trick, but the problem is the service worker can only be invoked *after* index.html (say) has loaded. 
 
-After contemplating this dilemma, I remembered about an old, but never fully appreciated technology -- xslt.  The idea between xslt is not that dissimilar to functional renderers like react.  The same transform can be performed on the server or on the client.  So let's use the **whole** platform, not just the fashionable recent bits.
+After contemplating this dilemma, I remembered about an old, but never fully appreciated technology -- xslt.  The idea behind xslt is not that dissimilar to functional renderers like react or litHTML (the only difference being that xslt is xml based, react is JavaScript based).  The same transform can be performed on the server or on the client.  Yes, concepts of isomorphism were around back in 2000!
+
+So let's use the **whole** platform, not just the fashionable recent bits.
 
 If we define index.xml as follows:
 
@@ -121,6 +122,8 @@ Note that now we can synchronously load the web component polyfills with zero im
 
 The same xml tags could also be used to define part of the bare import specifier configuration, as well as link preconnect tags.
 
+We may want the xml file defining the blueprint of where all the references should come from, to depend on the browser type.  For this, one must rely on the servers capabilities.  For example nginx supports a module that can cause ["ancient browsers" to come from a different from than modern browsers](http://nginx.org/en/docs/http/ngx_http_browser_module.html).
+
 # Core functionality
 
 ## Location look up based on tag name
@@ -131,8 +134,8 @@ Place your link preload tags inside the head tag of your index.html (or equivale
 <link
     id="paper_checkbox"
     rel="preload" 
-    as="document" 
-    href="//myCDN.com/@bower_components/polymer/paper-checkbox/paper-checkbox.html" 
+    as="script" 
+    href="https://unpkg.com/@polymer/paper-checkbox@3.0.0-pre.19/paper-checkbox.js" 
 >
 ```
 
