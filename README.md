@@ -22,4 +22,14 @@ A significant pain point has to do with  listing all the dependencies used by th
 2.  Do so without introducing another listing of dependencies.
 
 
-
+```html
+<script type="import*">
+  {
+    "imports": {
+      ...
+      "xtal-frappe-chart/xtal-frappe-chart.js": "https://cdn.jsdelivr.net/npm/xtal-frappe-chart@0.0.22/xtal-frappe-chart.js#xtal-frappe-chart",
+      ...
+    }
+  }
+  </script>
+```

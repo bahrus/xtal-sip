@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1, user-scalable=yes">
+
+    <title>xtal-frappe-chart demo</title>
+    
+  </head>
+  <body>
+    <div>
+      <h3>Basic xtal-frappe-chart demo</h3>
+      <xtal-insert-json input="[]">
+        <script type="application/json">
+          [
+            {
+              "title": "My Awesome Chart",
+              "data": {
+                "labels": ["12am-3am", "3am-6am", "6am-9am", "9am-12pm",
+                  "12pm-3pm", "3pm-6pm", "6pm-9pm", "9pm-12am"],
+            
+                "datasets": [
+                  {
+                    "name": "Some Data", "color": "light-blue",
+                    "values": [25, 40, 30, 35, 8, 52, 17, -4]
+                  },
+                  {
+                    "name": "Another Set", "color": "violet",
+                    "values": [25, 50, -10, 15, 18, 32, 27, 14]
+                  },
+                  {
+                    "name": "Yet Another", "color": "blue",
+                    "values": [15, 20, -3, -15, 58, 12, -17, 37]
+                  }
+                ]
+              },
+              "type": "bar", 
+              "height": 250,
+              "isNavigable": true
+            }
+          ]
+        </script>
+      </xtal-insert-json>
+      <p-d on="merged-prop-changed" prop="data" val="target.value"></p-d>
+      <xtal-frappe-chart></xtal-frappe-chart>
+      <p-d on="selected-element-changed" prop="input" val="target.value"></p-d>
+      <xtal-json-editor options="{}"  height="300px"></xtal-json-editor>
+
+      <script src="https://unpkg.com/@webcomponents/webcomponentsjs/webcomponents-loader.js"></script>
+    
+        <!-- Use experimental import maps -->
+        <script defer src="https://cdn.jsdelivr.net/npm/es-module-shims@0.2.0/dist/es-module-shims.js"></script>
+        <script type="importmap-shim">
+          {
+            "imports": {
+              "xtal-element/": "https://cdn.jsdelivr.net/npm/xtal-element@0.0.43/",
+              "xtal-json-merge/": "https://cdn.jsdelivr.net/npm/xtal-json-merge@0.2.34/",
+              "xtal-json-editor/": "https://cdn.jsdelivr.net/npm/xtal-json-editor@0.0.33/",
+              "p-d.p-u/": "https://cdn.jsdelivr.net/npm/p-d.p-u@0.0.110/",
+              "xtal-frappe-chart/xtal-frappe-chart.js": "https://cdn.jsdelivr.net/npm/xtal-frappe-chart@0.0.22/xtal-frappe-chart.js#xtal-frappe-chart",
+              "frappe-charts/": "https://cdn.jsdelivr.net/npm/frappe-charts@1.1.0/"
+            }
+          }
+          </script>
+        <script  type="module-shim">
+          import 'xtal-frappe-chart/xtal-frappe-chart.js';
+          import 'xtal-json-merge/xtal-insert-json.js';
+          import 'xtal-json-editor/xtal-json-editor.js';
+          import 'p-d.p-u/p-d.js';
+        </script>
+    </div>
+  </body>
+</html>
