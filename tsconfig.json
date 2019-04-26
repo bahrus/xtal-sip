@@ -1,14 +1,13 @@
 {
 	"compilerOptions": {
-		"target": "ES6",
-		"module":"es6",
-		"sourceMap": true,
+		"target": "esnext",
+		"module":"esnext",
+		"sourceMap": false,
 		"experimentalDecorators": true,
-		"newLine": "LF"
+		"newLine": "LF",
+		"watch": true,
 	},
 	"exclude":[
-		"build",
-		"bower_components",
 		"node_modules"
 	]
 
