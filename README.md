@@ -18,4 +18,6 @@ xtal-sip argues that while it is certainly possible to build large applications 
 
 A significant pain point has to do with  listing all the dependencies used by thees macro components.  The goals of xtal-sip are:
 
-1.  
+1.  Provide a declarative way of progressively, dynamically loading web component dependencies into memory, only when needed.
+2.  Do so without introducing another listing of dependencies.
+
