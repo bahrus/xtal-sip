@@ -4,6 +4,8 @@ Dynamically &#34;water&#34; a custom element tag with the necessary dependencies
 
 Backdrop: Dynamic imports are shipping in every modern browser, and the import maps proposal is gelling and is well polyfilled. 
 
+**NB** If you are a bundle-phile, this component may not be right for you (depending on how the bundler treats dynamic parameters sent into dynamic imports).
+
 Most every web application can be recursivly broken down into logical regions, building blocks which are assembled together to form the whole site.
 
 xtal-sip takes the philosophical stance that at the most micro level, utilizing highly reusable, generic custom elements -- that can extend the HTML vocubulary; candidates to be incorporated into the browser, even -- forms a great fundamental "unit" to build on.
@@ -75,3 +77,5 @@ For this scenario, you can still benefit from xtal-sip's support for declarative
 
 
 ```
+
+Here we see the mapping passed in as an attribute, (in JSON-attribute format).  But the array can also be passed in to the element via the mapping property.
