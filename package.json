@@ -6,7 +6,10 @@
   "repository": "https://github.com/bahrus/xtal-sip",
   "author": "bahrus <anderson.bruce.b@gmail.com>",
   "license": "MIT",
-  "dependencies": {},
+  "dependencies": {
+    "trans-render": "0.0.110",
+    "xtal-element": "0.0.58"
+  },
   "devDependencies": {
     "@webcomponents/webcomponentsjs": "2.2.10"
   }

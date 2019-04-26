@@ -2,9 +2,11 @@
 
 Dynamically &#34;water&#34; a custom element tag with the necessary dependencies to sprout the tag from an inert seedling to a thing of beauty.
 
+Backdrop: Dynamic imports are shipping in every modern browser, and the import maps proposal is gelling and is well polyfilled. 
+
 Most every web application can be recursivly broken down into logical regions, building blocks which are assembled together to form the whole site.
 
-xtal-sip takes the philosophical stance that at the most micro level,utilizing highly reusable, generic custom elements -- that can extend the HTML vocubulary; candidates to be incorporated into the browser, even -- forms a great fundamental "unit" to build on.
+xtal-sip takes the philosophical stance that at the most micro level, utilizing highly reusable, generic custom elements -- that can extend the HTML vocubulary; candidates to be incorporated into the browser, even -- forms a great fundamental "unit" to build on.
 
 But as one zooms out from the micro to the macro, the nature of the components changes in signicant ways.  
 
@@ -14,13 +16,14 @@ ES6 Modules (and hopefully HTML and CSS Modules in the near future), combined wi
 
 xtal-sip argues that while it is certainly possible to build large applications with just modules and import maps, there are some pain points which will surface.
 
-"Macro" level components will tend to be heavy on business-domain specific data, heavy on gluing / orchestrating smaller components, light on difficult, esoteric JavaScript.  Web components (especially ES Module based) may or may not be the best fit for these components.  They may be  [Rails](https://goiabada.blog/rails-components-faedd412ce19) just to take an example.  
+"Macro" level components will tend to be heavy on business-domain specific data, heavy on gluing / orchestrating smaller components, light on difficult, esoteric JavaScript.  Web components (especially ES Module based) may or may not be the best fit for these application macro "modules".  A better fit might be a server-centric solution, like  [Rails](https://goiabada.blog/rails-components-faedd412ce19), just to take an example.  
 
-A significant pain point has to do with  listing all the dependencies used by thees macro components.  The goals of xtal-sip are:
+A significant pain point has to do with listing all the dependencies used by thees macro components, and loading them into memory only when needed.  The goals of xtal-sip are:
 
 1.  Provide a declarative way of progressively, dynamically loading web component dependencies into memory, only when needed.
 2.  Do so without introducing another listing of dependencies.
 
+## Solution 1.  Declarative application management
 
 ```html
 <html>
@@ -40,6 +43,30 @@ A significant pain point has to do with  listing all the dependencies used by th
   <body>
     ...
     <xtal-sip selector="[data-imp]">
+      ...
+    </xtal-sip>
+
+    <xtal-frappe-chart data-imp></xtal-frappe-chart> 
+  </body>
+
+
+```
+
+## I know what you're thinking
+
+The solution above doesn't make sense if it is part of a reusable web component that we might want to use in different applications.  Doing so would require consumers to have to not only reference your library, but also futz with their import map tag, which they might not even have.
+
+For this scenario, you can still benefit from xtal-sip's support for declarative loading-as-needed, but providing the xtal-sip instance with the mapping:
+
+```html
+<html>
+  <head>
+
+    ...
+  </head>
+  <body>
+    ...
+    <xtal-sip selector="[data-imp]" mapping='["xtal-frappe-chart":"xtal-frappe-chart/xtal-frappe-chart.js"]'>
       ...
     </xtal-sip>
 
