@@ -6,7 +6,6 @@
 
 <img src="https://badgen.net/bundlephobia/minzip/xtal-sip">
 
-**NB** If you are a bundle-phile, this component may not be right for you (depending on how the bundler treats dynamic parameters sent into dynamic imports).
 
 Dynamically &#34;water&#34; a custom element tag with the necessary dependencies to sprout the tag from an inert seedling to a thing of beauty.
 
@@ -91,3 +90,5 @@ For this scenario, you can still benefit from xtal-sip's support for declarative
 Here we see the mapping passed in as an attribute, (in JSON-attribute format).  But the array can also be passed in to the element via the mapping property.
 
 The code first checks for mappings in the global mapping import map, and uses the JSON attribute as a fallback.
+
+**NB** If you are a bundle-phile, this component may not be right for you (depending on how the bundler treats dynamic parameters sent into dynamic imports).
