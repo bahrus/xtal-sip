@@ -102,7 +102,7 @@ In maybe 90% of the cases, the name of the js file will match the tag name.  So 
 
 The solution above doesn't make sense if it is part of a reusable web component that we might want to use in different applications.  Doing so would require consumers to have to  futz with their import map tag, which they might not even have.
 
-##  Inline mapping
+##  Local mapping
 
 For this scenario, you can still benefit from xtal-sip's support for declarative loading-as-needed, by providing the xtal-sip instance with the mapping:
 
@@ -128,7 +128,7 @@ Here we see the mapping passed in as an attribute, (in JSON-attribute format).  
 
 The code first checks for mappings in the global mapping import map, and uses the JSON attribute as a fallback (this decision may be become configurable soon).
 
-## Shortcut for inline mapping
+## Shortcut for local mapping
 
 ```html
 <html>
@@ -148,7 +148,7 @@ The code first checks for mappings in the global mapping import map, and uses th
 
 ```
 
-## Extra shortcut
+## Extra shortcut for local mapping
 
 If the selector ("[data-imp]" in our example) matches a tag, but an explicit mapping is **not** found in either the global importmap script tag (via custom # notation) nor in the mapping attribute/property of the xtal-sip instance, then the shortcut "$0/$0.js" will be assumed, thus reducing boilerplate even more.
 
