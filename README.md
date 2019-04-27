@@ -138,9 +138,7 @@ The code first checks for mappings in the global mapping import map, and uses th
   </head>
   <body>
     ...
-    <xtal-sip selector="[data-imp]" mapping='[{"xtal-frappe-chart":"$0/$0.js"}]'>
-      ...
-    </xtal-sip>
+    <xtal-sip selector="[data-imp]" mapping='[{"xtal-frappe-chart":"$0/$0.js"}]'></xtal-sip>
 
     <xtal-frappe-chart data-imp></xtal-frappe-chart> 
   </body>
@@ -151,6 +149,18 @@ The code first checks for mappings in the global mapping import map, and uses th
 ## Extra shortcut for local mapping
 
 If the selector ("[data-imp]" in our example) matches a tag, but an explicit mapping is **not** found in either the global importmap script tag (via custom # notation) nor in the mapping attribute/property of the xtal-sip instance, then the shortcut "$0/$0.js" will be assumed, thus reducing boilerplate even more.
+
+## Wildcard shortcut for local mapping for packages [TODO].
+
+Another common pattern is that web components with a certain prefix will tend to come from a package:
+
+E.g. p-d => p-d.p-u/p-d.js, p-u => p-d.p-u/p-u.js
+
+To help with this scenario, use 
+
+```html
+<xtal-sip selector="[data-imp]" mapping='[{"p-*":"p-d.p-u/p-$0.js"}]'>
+```
 
 ## Scope
 
