@@ -94,8 +94,9 @@ export class XtalSip extends observeCssSelector(XtallatX(hydrate(HTMLElement))) 
                 const tagName = target.localName;
                 if (customElements.get(tagName) !== undefined)
                     return;
-                const lu = mappingLookup[tagName];
-                const importStatement = lu !== undefined ? lu : replaceAll(this._mapping[tagName], '$0', tagName);
+                const globalLookup = mappingLookup[tagName];
+                const localLookup = this._mapping[tagName];
+                const importStatement = globalLookup !== undefined ? globalLookup : replaceAll(localLookup ? localLookup : '$0/$0.js', '$0', tagName);
                 if (importStatement !== undefined) {
                     import(importStatement).then(() => {
                         this.de('loaded-' + tagName, {

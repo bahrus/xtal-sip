@@ -15,7 +15,7 @@ Most every web application can be recursivly broken down into logical regions, b
 
 xtal-sip takes the philosophical stance that at the most micro level, utilizing highly reusable, generic custom elements -- that can extend the HTML vocubulary; candidates to be incorporated into the browser, even -- forms a great fundamental "unit" to build on.
 
-But as one zooms out from the micro to the macro, the nature of the components changes in signicant ways.  
+But as one zooms out from the micro to the macro, the nature of the components changes in significant ways.  
 
 At the micro level, components will have few, if any, dependencies, and those dependencies will tend to be quite stable.  The dependencies will skew more towards tightly coupled utility libraries. 
 
@@ -32,7 +32,11 @@ The goals of xtal-sip are:
 1.  Provide a declarative way of progressively, dynamically loading web component dependencies into memory, only when needed.
 2.  Do so without introducing another listing of dependencies.
 
-## Sample syntax
+We provide two mechanisms to do this, and the two mechanisms can be used in combination -- Global Lookup, and Local (Shadow DOM realm) Lookup.
+
+## Global Lookup - Sample syntax
+
+Here we use the global importmap script tag.  Either the native browser-based one, or the polyfill linked above, which uses "type=importmap-shim."  (That's why we see the * in the type below, to represent that you can use one or the other):
 
 ```html
 <html>
@@ -42,22 +46,26 @@ The goals of xtal-sip are:
     {
       "imports": {
         ...
-        "xtal-frappe-chart/xtal-frappe-chart.js": "https://cdn.jsdelivr.net/npm/xtal-frappe-chart@0.0.22/xtal-frappe-chart.js#xtal-frappe-chart",
+        "xtal-frappe-chart/xtal-frappe-chart.js": 
+            "https://cdn.jsdelivr.net/npm/xtal-frappe-chart@0.0.22/xtal-frappe-chart.js#xtal-frappe-chart",
         ...
       }
     }
     </script>
     ...
+    
   </head>
   <body>
-    ...
     <xtal-sip selector="[data-imp]"></xtal-sip>
+    ... 
 
     <xtal-frappe-chart data-imp></xtal-frappe-chart> 
   </body>
 </html>
 
 ```
+
+Whereas native importmap script tags have to be in the head tag (I think) that is not the case for the polyfill.  In that case, placing the script tag in the header is optional, and xtal-sip should still be able to find it (as long as it is outside any ShadowDOM). 
 
 Note the hashmark in the import map resolution, followed by the custom element tag name.  This "metadata" forms the basis for mapping between the custom element name and the import statement.
 
@@ -83,7 +91,7 @@ In maybe 90% of the cases, the name of the js file will match the tag name.  So 
   <body>
     ...
     <xtal-sip selector="[data-imp]"></xtal-sip>
-
+    ...
     <xtal-frappe-chart data-imp></xtal-frappe-chart> 
   </body>
 </html>
@@ -92,7 +100,7 @@ In maybe 90% of the cases, the name of the js file will match the tag name.  So 
 
 ## I know what you're thinking
 
-The solution above doesn't make sense if it is part of a reusable web component that we might want to use in different applications.  Doing so would require consumers to have to not only reference your library, but also futz with their import map tag, which they might not even have.
+The solution above doesn't make sense if it is part of a reusable web component that we might want to use in different applications.  Doing so would require consumers to have to  futz with their import map tag, which they might not even have.
 
 ##  Inline mapping
 
@@ -140,10 +148,12 @@ The code first checks for mappings in the global mapping import map, and uses th
 
 ```
 
+## Extra shortcut
+
+If the selector ("[data-imp]" in our example) matches a tag, but an explicit mapping is **not** found in either the global importmap script tag (via custom # notation) nor in the mapping attribute/property of the xtal-sip instance, then the shortcut "$0/$0.js" will be assumed, thus reducing boilerplate even more.
+
 ## Scope
 
-<xtal-sip> only affects anythin within its shadow DOM realm (or outside any Shadow DOM if not inside any Shadow DOM).
-
-
+xtal-sip only affects anything within its shadow DOM realm (or outside any Shadow DOM if the tag is not inside any Shadow DOM).
 
 **NB** If you are a bundle-phile, this component may not be right for you (depending on how the bundler treats dynamic parameters sent into dynamic imports).
