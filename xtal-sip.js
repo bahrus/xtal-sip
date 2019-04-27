@@ -4,7 +4,7 @@ import { XtallatX } from "xtal-element/xtal-latx.js";
 import { observeCssSelector } from "xtal-element/observeCssSelector.js";
 const selector = "selector";
 const mapping = "mapping";
-const importmap = document.head.querySelector('script[type^="importmap"]');
+const importmap = document.querySelector('script[type^="importmap"]');
 const mappingLookup = {};
 if (importmap !== null) {
     const parsed = JSON.parse(importmap.innerHTML);

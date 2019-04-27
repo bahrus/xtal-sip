@@ -5,7 +5,7 @@ import { observeCssSelector } from "xtal-element/observeCssSelector.js";
 
 const selector = "selector";
 const mapping = "mapping";
-const importmap = document.head.querySelector('script[type^="importmap"]');
+const importmap = document.querySelector('script[type^="importmap"]');
 
 const mappingLookup : {[key: string] : string} = {};
 if(importmap !== null){
