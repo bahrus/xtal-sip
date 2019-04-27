@@ -17,11 +17,20 @@ if(importmap !== null){
     if(hashSplit.length === 2){
       const tags = hashSplit[1].split(',');
       tags.forEach(tag =>{
-        mappingLookup[tag] = key;
+        let tag2 = tag;
+        if(tag==='!'){
+          const last = key.split('/').pop();
+          tag2 = last.split('.')[0]; 
+        }
+        mappingLookup[tag2] = key;
       })
     }
   }
 }
+
+export function replaceAll(source: string, search: string, replacement: string) {
+  return source.replace(new RegExp(search, 'g'), replacement);
+};
 
 export class XtalSip extends observeCssSelector(
   XtallatX(hydrate(HTMLElement))
@@ -90,7 +99,7 @@ export class XtalSip extends observeCssSelector(
         const tagName = target.localName;
         if(customElements.get(tagName) !== undefined) return;
         const lu = mappingLookup[tagName];
-        const importStatement = lu !== undefined ? lu : this._mapping[tagName];
+        const importStatement = lu !== undefined ? lu : replaceAll(this._mapping[tagName], '$0', tagName);
         if(importStatement !== undefined){
           import(importStatement).then(() =>{
             this.de('loaded-' + tagName,{

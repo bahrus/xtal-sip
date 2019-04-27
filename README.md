@@ -51,21 +51,50 @@ The goals of xtal-sip are:
   </head>
   <body>
     ...
-    <xtal-sip selector="[data-imp]">
-      ...
-    </xtal-sip>
+    <xtal-sip selector="[data-imp]"></xtal-sip>
 
     <xtal-frappe-chart data-imp></xtal-frappe-chart> 
   </body>
-
+</html>
 
 ```
 
-Note the hashmark in the import map resolution, followed by the custom element tag name.  This "metadata" forms the basis for mapping between the custom element name and the import statement. 
+Note the hashmark in the import map resolution, followed by the custom element tag name.  This "metadata" forms the basis for mapping between the custom element name and the import statement.
+
+## Shortcut
+
+In maybe 90% of the cases, the name of the js file will match the tag name.  So in this case, use #! notation:
+
+```html
+<html>
+  <head>
+    ...
+    <script type="importmap*">
+    {
+      "imports": {
+        ...
+        "xtal-frappe-chart/xtal-frappe-chart.js": "https://cdn.jsdelivr.net/npm/xtal-frappe-chart@0.0.22/xtal-frappe-chart.js#!",
+        ...
+      }
+    }
+    </script>
+    ...
+  </head>
+  <body>
+    ...
+    <xtal-sip selector="[data-imp]"></xtal-sip>
+
+    <xtal-frappe-chart data-imp></xtal-frappe-chart> 
+  </body>
+</html>
+
+```
 
 ## I know what you're thinking
 
 The solution above doesn't make sense if it is part of a reusable web component that we might want to use in different applications.  Doing so would require consumers to have to not only reference your library, but also futz with their import map tag, which they might not even have.
+
+##  Inline mapping
 
 For this scenario, you can still benefit from xtal-sip's support for declarative loading-as-needed, by providing the xtal-sip instance with the mapping:
 
@@ -77,7 +106,7 @@ For this scenario, you can still benefit from xtal-sip's support for declarative
   </head>
   <body>
     ...
-    <xtal-sip selector="[data-imp]" mapping='["xtal-frappe-chart":"xtal-frappe-chart/xtal-frappe-chart.js"]'>
+    <xtal-sip selector="[data-imp]" mapping='[{"xtal-frappe-chart":"xtal-frappe-chart/xtal-frappe-chart.js"}]'>
       ...
     </xtal-sip>
 
@@ -89,6 +118,32 @@ For this scenario, you can still benefit from xtal-sip's support for declarative
 
 Here we see the mapping passed in as an attribute, (in JSON-attribute format).  But the array can also be passed in to the element via the mapping property.
 
-The code first checks for mappings in the global mapping import map, and uses the JSON attribute as a fallback.
+The code first checks for mappings in the global mapping import map, and uses the JSON attribute as a fallback (this decision may be become configurable soon).
+
+## Shortcut for inline mapping
+
+```html
+<html>
+  <head>
+
+    ...
+  </head>
+  <body>
+    ...
+    <xtal-sip selector="[data-imp]" mapping='[{"xtal-frappe-chart":"$0/$0.js"}]'>
+      ...
+    </xtal-sip>
+
+    <xtal-frappe-chart data-imp></xtal-frappe-chart> 
+  </body>
+
+
+```
+
+## Scope
+
+<xtal-sip> only affects anythin within its shadow DOM realm (or outside any Shadow DOM if not inside any Shadow DOM).
+
+
 
 **NB** If you are a bundle-phile, this component may not be right for you (depending on how the bundler treats dynamic parameters sent into dynamic imports).
