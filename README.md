@@ -2,7 +2,7 @@
 
 Dynamically &#34;water&#34; a custom element tag with the necessary dependencies to sprout the tag from an inert seedling to a thing of beauty.
 
-Backdrop: Dynamic imports are shipping in every modern browser, and the import maps proposal is gelling and is well polyfilled. 
+Backdrop: Dynamic imports are (almost) shipping in every modern browser, and the import maps proposal is gelling and is [well polyfilled](https://github.com/guybedford/es-module-shims). 
 
 **NB** If you are a bundle-phile, this component may not be right for you (depending on how the bundler treats dynamic parameters sent into dynamic imports).
 
@@ -25,7 +25,7 @@ A significant pain point has to do with listing all the dependencies used by the
 1.  Provide a declarative way of progressively, dynamically loading web component dependencies into memory, only when needed.
 2.  Do so without introducing another listing of dependencies.
 
-## Solution 1.  Declarative application management
+## Sample syntax
 
 ```html
 <html>
@@ -54,11 +54,13 @@ A significant pain point has to do with listing all the dependencies used by the
 
 ```
 
+Note the hashmark in the import map resolution, followed by the custom element tag name.  This "metadata" forms the basis for mapping between the custom element name and the import statement. 
+
 ## I know what you're thinking
 
 The solution above doesn't make sense if it is part of a reusable web component that we might want to use in different applications.  Doing so would require consumers to have to not only reference your library, but also futz with their import map tag, which they might not even have.
 
-For this scenario, you can still benefit from xtal-sip's support for declarative loading-as-needed, but providing the xtal-sip instance with the mapping:
+For this scenario, you can still benefit from xtal-sip's support for declarative loading-as-needed, by providing the xtal-sip instance with the mapping:
 
 ```html
 <html>
@@ -79,3 +81,5 @@ For this scenario, you can still benefit from xtal-sip's support for declarative
 ```
 
 Here we see the mapping passed in as an attribute, (in JSON-attribute format).  But the array can also be passed in to the element via the mapping property.
+
+The code first checks for mappings in the global mapping import map, and uses the JSON attribute as a fallback.
