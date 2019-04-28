@@ -95,15 +95,39 @@ export class XtalSip extends observeCssSelector(XtallatX(hydrate(HTMLElement))) 
                 if (customElements.get(tagName) !== undefined)
                     return;
                 const globalLookup = mappingLookup[tagName];
-                const localLookup = this._mapping[tagName];
-                const importStatement = globalLookup !== undefined ? globalLookup : replaceAll(localLookup ? localLookup : '$0/$0.js', '$0', tagName);
-                if (importStatement !== undefined) {
-                    import(importStatement).then(() => {
-                        this.de('loaded-' + tagName, {
-                            importStatement: importStatement
-                        }, true);
-                    });
+                let importStatement = globalLookup;
+                if (importStatement === undefined) {
+                    const localLookup = this._mapping[tagName];
+                    if (localLookup !== undefined) {
+                        importStatement = replaceAll(localLookup, '$0', tagName);
+                    }
+                    else {
+                        if (this._wildMap === undefined) {
+                            this._wildMap = [];
+                            for (const key in this._mapping) {
+                                if (key.endsWith('-'))
+                                    this._wildMap.push(key);
+                            }
+                        }
+                        const match = this._wildMap.find(s => tagName.startsWith(s));
+                        if (match !== undefined) {
+                            const wildCardLookup = this._mapping[match];
+                            const $1 = tagName.replace(match, '');
+                            importStatement = replaceAll(wildCardLookup, '$1', $1);
+                        }
+                    }
                 }
+                if (importStatement === undefined) {
+                    importStatement = `${tagName}/${tagName}.js`;
+                }
+                //const importStatement = globalLookup !== undefined ? globalLookup : replaceAll(localLookup ? localLookup : '$0/$0.js' , '$0', tagName);
+                //if(importStatement !== undefined){
+                import(importStatement).then(() => {
+                    this.de('loaded-' + tagName, {
+                        importStatement: importStatement
+                    }, true);
+                });
+                //}
             }, 0);
         }
     }
