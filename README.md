@@ -50,7 +50,7 @@ To customize what key to look for in the importmap JSON, you can subclass xtal-s
 
 xtal-sip checks if that key can be found in the global importmap.
 
-If it finds it, it tries to do a dynamic import of that key, and if that succeeds, and the tagName gets successfully registered, a custom event is fired: "load-sucess", which includes the tag name that was successfully loaded in the custom event detail.
+If it finds it, it tries to do a dynamic import of that key, and if that succeeds, and the tagName gets successfully registered, a custom event is fired: "load-success", which includes the tag name that was successfully loaded in the custom event detail.
 
 If no such key is found in the importmap JSON, or if the dependency fails to load, or doesn't succeed in registering the custom element, another custom event is fired, "load-failure" with the same detail information.
 
