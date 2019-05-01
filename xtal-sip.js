@@ -5,35 +5,14 @@ import { observeCssSelector } from "xtal-element/observeCssSelector.js";
 const selector = "selector";
 const mapping = "mapping";
 const importmap = document.querySelector('script[type^="importmap"]');
-// let mappingLookup : {[key: string] : string} = {};
-// if(importmap !== null){
-//   const parsed = JSON.parse(importmap.innerHTML);
-//   mappingLookup = parsed.imports;
-// }
-//   for(const key in imp){
-//     const val = imp[key];
-//     const hashSplit = val.split('#');
-//     if(hashSplit.length === 2){
-//       const tags = hashSplit[1].split(',');
-//       tags.forEach(tag =>{
-//         let tag2 = tag;
-//         if(tag==='!'){
-//           const last = key.split('/').pop();
-//           tag2 = last.split('.')[0]; 
-//         }
-//         mappingLookup[tag2] = key;
-//       })
-//     }
-//   }
-// }
-export function replaceAll(source, search, replacement) {
-    return source.replace(new RegExp(search, 'g'), replacement);
+let mappingLookup = {};
+if (importmap !== null) {
+    const parsed = JSON.parse(importmap.innerHTML);
+    mappingLookup = parsed.imports;
 }
-;
 export class XtalSip extends observeCssSelector(XtallatX(hydrate(HTMLElement))) {
     constructor() {
         super(...arguments);
-        this._mapping = {};
         this._conn = false;
         this._aL = false;
     }
@@ -49,22 +28,10 @@ export class XtalSip extends observeCssSelector(XtallatX(hydrate(HTMLElement))) 
     set selector(nv) {
         this.attr(selector, nv);
     }
-    get mapping() {
-        return this._mapping;
-    }
-    set mapping(nv) {
-        this._mapping = nv;
-        this.onPropsChange();
-    }
     attributeChangedCallback(name, oldVal, newVal) {
         let foundMatch = false;
         switch (name) {
-            case mapping:
-                this._mapping = JSON.parse(newVal);
-                foundMatch = true;
-                break;
             case selector:
-                //(<any>this)["_" + name] = newVal;
                 this._selector = newVal;
                 foundMatch = true;
                 break;
@@ -75,7 +42,6 @@ export class XtalSip extends observeCssSelector(XtallatX(hydrate(HTMLElement))) 
     }
     connectedCallback() {
         this[up]([selector]);
-        //super.connectedCallback();
         this._conn = true;
         this.onPropsChange();
     }
@@ -88,6 +54,9 @@ export class XtalSip extends observeCssSelector(XtallatX(hydrate(HTMLElement))) 
             this._aL = true;
         }
     }
+    getImportKey(tagName) {
+        return `${tagName}/${tagName}.js`;
+    }
     insertListener(e) {
         if (e.animationName === XtalSip.is) {
             const target = e.target;
@@ -95,35 +64,30 @@ export class XtalSip extends observeCssSelector(XtallatX(hydrate(HTMLElement))) 
                 const tagName = target.localName;
                 if (customElements.get(tagName) !== undefined)
                     return;
-                const localLookup = this._mapping[tagName];
-                let importStatement = null;
-                if (localLookup !== undefined) {
-                    importStatement = replaceAll(localLookup, '$0', tagName);
+                const key = this.getImportKey(tagName);
+                if (mappingLookup[key] !== undefined) {
+                    const detail = {
+                        tagName: tagName,
+                        importStatement: key
+                    };
+                    import(key)
+                        .then(() => {
+                        customElements
+                            .whenDefined(tagName)
+                            .then(() => {
+                            this.de("loaded-" + tagName, detail, true);
+                            this.de('load-success', detail, true);
+                        })
+                            .catch(() => {
+                            this.de("failed-to-load-" + tagName, detail, true);
+                            this.de('load-failure', detail);
+                        });
+                    })
+                        .catch(e => {
+                        this.de("failed-to-load-" + tagName, detail, true);
+                        this.de('load-failure', detail, true);
+                    });
                 }
-                else {
-                    if (this._wildMap === undefined) {
-                        this._wildMap = [];
-                        for (const key in this._mapping) {
-                            if (key.endsWith('-'))
-                                this._wildMap.push(key);
-                        }
-                    }
-                    const match = this._wildMap.find(s => tagName.startsWith(s));
-                    if (match !== undefined) {
-                        const wildCardLookup = this._mapping[match];
-                        const $1 = tagName.replace(match, '');
-                        importStatement = replaceAll(wildCardLookup, '$1', $1);
-                    }
-                }
-                if (importStatement === null) {
-                    importStatement = `${tagName}/${tagName}.js`;
-                }
-                import(importStatement).then(() => {
-                    this.de('loaded-' + tagName, {
-                        importStatement: importStatement
-                    }, true);
-                });
-                //}
             }, 0);
         }
     }

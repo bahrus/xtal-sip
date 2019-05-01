@@ -17,13 +17,15 @@ xtal-sip takes the philosophical stance that at the most micro level, utilizing 
 
 But as one zooms out from the micro to the macro, the nature of the components changes in significant ways.  
 
-At the micro level, components will have few, if any, dependencies, and those dependencies will tend to be quite stable.  The dependencies will skew more towards tightly coupled utility libraries. 
+At the micro level, components will have few, if any, dependencies, and those dependencies will tend to be quite stable, and likely asll used.  The dependencies will skew more towards tightly coupled utility libraries. 
 
 ES6 Modules (and hopefully HTML and CSS Modules in the near future), combined with import maps to (optionally) centralize management of these dependencies without bundling, works great at the micro level.  But does it scale to the big picture?
 
 xtal-sip argues that while it is certainly possible to build large applications with just modules and import maps, there are some pain points which will surface.
 
-"Macro" level components will tend to be heavy on business-domain specific data, heavy on gluing / orchestrating smaller components, light on difficult, esoteric JavaScript.  Web components (especially ES Module based) may or may not be the best fit for these application macro "modules".  A better fit might be a server-centric solution, like  [Rails](https://goiabada.blog/rails-components-faedd412ce19), just to take an example.  
+"Macro" level components will tend to be heavy on business-domain specific data, heavy on gluing / orchestrating smaller components, light on difficult, esoteric JavaScript.  They will also be heavy on conditional sections of the application only loading if requested by the user.
+
+Web components (especially ES Module based) may or may not be the best fit for these application macro "modules".  A better fit might be a server-centric solution, like  [Rails](https://goiabada.blog/rails-components-faedd412ce19), just to take an example.  
 
 A significant pain point has to do with listing all the dependencies used by these macro components / compositions, and loading them into memory only when needed.  
 
@@ -32,19 +34,35 @@ The goals of xtal-sip are:
 1.  Provide a declarative way of progressively, dynamically loading web component dependencies into memory, only when needed.
 2.  Do so without introducing another listing of dependencies.
 
-We provide two mechanisms to do this, and the two mechanisms can be used in combination -- Global Lookup, and Local (Shadow DOM realm) Lookup.
 
 
-## Global Lookup - Covention over configuration
+## Convention over Configuration
 
-Here we use the global importmap script tag.  Either the native browser-based one, or the polyfill linked above, which uses "type=importmap-shim."  (That's why we see the * in the type below, to represent that you can use one or the other):
+xtal-sip takes a cue from Ruby on Rails and adopts the Convention over Configuration philosophy.  Import maps are flexible enough that they should be able to map [name-of-element]/[name-of-element].js to whatever you need it to.  So xtal-sip always assumes that [name-of-element]/[name-of-element].js will be the key to a import map.  
+
+To customize what key to look for in the importmap JSON, you can subclass xtal-sip and override:
+
+```JavaScript
+  getImportKey(tagName: string) {
+    return `${tagName}/${tagName}.js`;
+  }
+```
+
+xtal-sip checks if that key can be found in the global importmap.
+
+If it finds it, it tries to do a dynamic import of that key, and if that succeeds, and the tagName gets successfully registered, a custom event is fired: "load-sucess", which includes the tag name that was successfully loaded in the custom event detail.
+
+If no such key is found in the importmap JSON, or if the dependency fails to load, or doesn't succeed in registering the custom element, another custom event is fired, "load-failure" with the same detail information.
+
+So here's some sample syntax.
 
 
 ```html
 <html>
   <head>
     ...
-    <script type="importmap*">
+    <!-- Polyfill: <script type="importmap-shim"> -->
+    <script type="importmap"> 
     {
       "imports": {
         ...
@@ -67,132 +85,22 @@ Here we use the global importmap script tag.  Either the native browser-based on
 
 ```
 
-When xtal-sip finds a tag with attribute "data-imp", it first checks if there's a entry in the import map with key $0/$0.js, where $0 is the name of the tag. 
-
-```html
-<html>
-  <head>
-    ...
-    <script type="importmap*">
-    {
-      "imports": {
-        ...
-        "xtal-frappe-chart/xtal-frappe-chart.js": 
-            "https://cdn.jsdelivr.net/npm/xtal-frappe-chart@0.0.22/xtal-frappe-chart.js#xtal-frappe-chart",
-        ...
-      }
-    }
-    </script>
-    ...
-    
-  </head>
-  <body>
-    <xtal-sip selector="[data-imp]"></xtal-sip>
-    ... 
-
-    <xtal-frappe-chart data-imp></xtal-frappe-chart> 
-  </body>
-</html>
-
-```
-
-Whereas native importmap script tags have to be in the head tag (I think) that is not the case for the polyfill.  In that case, placing the script tag in the header is optional, and xtal-sip should still be able to find it (as long as it is outside any ShadowDOM). 
-
-Note the hashmark in the import map resolution, followed by the custom element tag name.  This "metadata" forms the basis for mapping between the custom element name and the import statement.
-
-## Shortcut
-
-In maybe 90% of the cases, the name of the js file will match the tag name.  So in this case, use #! notation:
-
-```html
-<html>
-  <head>
-    ...
-    <script type="importmap*">
-    {
-      "imports": {
-        ...
-        "xtal-frappe-chart/xtal-frappe-chart.js": "https://cdn.jsdelivr.net/npm/xtal-frappe-chart@0.0.22/xtal-frappe-chart.js#!",
-        ...
-      }
-    }
-    </script>
-    ...
-  </head>
-  <body>
-    ...
-    <xtal-sip selector="[data-imp]"></xtal-sip>
-    ...
-    <xtal-frappe-chart data-imp></xtal-frappe-chart> 
-  </body>
-</html>
-
-```
-
 ## I know what you're thinking
 
-The solution above doesn't make sense if it is part of a reusable web component that we might want to use in different applications.  Doing so would require consumers to have to  futz with their import map tag, which they might not even have.
+The solution above is a bit dicey, if you are not on good terms with the people who configure the web sites usuing your web component.  You will need to convince them (via documentation or some other way) to a)  Add an importmap in index.html, and b)  add a bunch of entries for all your dynamically loaded web components.
 
-##  Local mapping
+There is no procedure that I'm aware of currently to manage the import map based off of package.json's.  
 
-For this scenario, you can still benefit from xtal-sip's support for declarative loading-as-needed, by providing the xtal-sip instance with the mapping:
+So what's the fallback if you want your web component to be reusable, until the ecosystem behind importmap's is more solid?
 
-```html
-<html>
-  <head>
+The only current failback xtal-sip provides is as follows:
 
-    ...
-  </head>
-  <body>
-    ...
-    <xtal-sip selector="[data-imp]" mapping='{"xtal-frappe-chart":"xtal-frappe-chart/xtal-frappe-chart.js"}'>
-      ...
-    </xtal-sip>
+1)  You should stll npm install all your dependencies.
+2)  You could create a separate js file that is simply a list of static imports of all your web-component dependencies that you want to lazy-load.
+3)  Subscribe to the event "load-failure" mentioned above, and the first time receiving such an event, dynamically load your separate file mentioned in step 2 using dynamic import().
 
-    <xtal-frappe-chart data-imp></xtal-frappe-chart> 
-  </body>
+This is the simplest fallback.  It means that all your web component dependencies will load into memory in one step, even if it isn't needed.  More sophisticated fallbacks could be developed, but this is probably a good starting point.  It's clearly not ideal.  Ideally, the person consuming your web component would have the patience to add what's needed to the importmap tag in index.html.
 
 
-```
+xtal-sip only affects anything within its shadow DOM realm (or outside any Shadow DOM if the tag is not inside any Shadow DOM).  
 
-Here we see the mapping passed in as an attribute, (in JSON-attribute format).  But the array can also be passed in to the element via the mapping property.
-
-The code first checks for mappings in the global mapping import map, and uses the JSON attribute as a fallback (this decision may be become configurable soon).
-
-## Shortcut for local mapping
-
-```html
-<html>
-  <head>
-
-    ...
-  </head>
-  <body>
-    ...
-    <xtal-sip selector="[data-imp]" mapping='{"xtal-frappe-chart":"$0/$0.js"}'></xtal-sip>
-
-    <xtal-frappe-chart data-imp></xtal-frappe-chart> 
-  </body>
-
-
-```
-
-## Extra shortcut for local mapping
-
-If the selector ("[data-imp]" in our example) matches a tag, but an explicit mapping is **not** found in either the global importmap script tag (via custom # notation) nor in the mapping attribute/property of the xtal-sip instance, nor any wildcard match described below, then the shortcut "$0/$0.js" will be assumed, thus reducing boilerplate even more.
-
-## Wildcard shortcut for local mapping for packages.
-
-Another common pattern is that web components with a certain prefix will tend to come from a package:
-
-E.g. p-d => p-d.p-u/p-d.js, p-u => p-d.p-u/p-u.js
-
-To help with this scenario, use 
-
-```html
-<xtal-sip selector="[data-imp]" mapping='{"p-":"p-d.p-u/p-$1.js"}'>
-```
-
-xtal-sip only affects anything within its shadow DOM realm (or outside any Shadow DOM if the tag is not inside any Shadow DOM).
-
-**NB** If you are a bundle-phile, this component may not be right for you (depending on how the bundler treats dynamic parameters sent into dynamic imports).
