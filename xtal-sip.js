@@ -5,26 +5,27 @@ import { observeCssSelector } from "xtal-element/observeCssSelector.js";
 const selector = "selector";
 const mapping = "mapping";
 const importmap = document.querySelector('script[type^="importmap"]');
-const mappingLookup = {};
-if (importmap !== null) {
-    const parsed = JSON.parse(importmap.innerHTML);
-    const imp = parsed.imports;
-    for (const key in imp) {
-        const val = imp[key];
-        const hashSplit = val.split('#');
-        if (hashSplit.length === 2) {
-            const tags = hashSplit[1].split(',');
-            tags.forEach(tag => {
-                let tag2 = tag;
-                if (tag === '!') {
-                    const last = key.split('/').pop();
-                    tag2 = last.split('.')[0];
-                }
-                mappingLookup[tag2] = key;
-            });
-        }
-    }
-}
+// let mappingLookup : {[key: string] : string} = {};
+// if(importmap !== null){
+//   const parsed = JSON.parse(importmap.innerHTML);
+//   mappingLookup = parsed.imports;
+// }
+//   for(const key in imp){
+//     const val = imp[key];
+//     const hashSplit = val.split('#');
+//     if(hashSplit.length === 2){
+//       const tags = hashSplit[1].split(',');
+//       tags.forEach(tag =>{
+//         let tag2 = tag;
+//         if(tag==='!'){
+//           const last = key.split('/').pop();
+//           tag2 = last.split('.')[0]; 
+//         }
+//         mappingLookup[tag2] = key;
+//       })
+//     }
+//   }
+// }
 export function replaceAll(source, search, replacement) {
     return source.replace(new RegExp(search, 'g'), replacement);
 }
@@ -94,34 +95,29 @@ export class XtalSip extends observeCssSelector(XtallatX(hydrate(HTMLElement))) 
                 const tagName = target.localName;
                 if (customElements.get(tagName) !== undefined)
                     return;
-                const globalLookup = mappingLookup[tagName];
-                let importStatement = globalLookup;
-                if (importStatement === undefined) {
-                    const localLookup = this._mapping[tagName];
-                    if (localLookup !== undefined) {
-                        importStatement = replaceAll(localLookup, '$0', tagName);
+                const localLookup = this._mapping[tagName];
+                let importStatement = null;
+                if (localLookup !== undefined) {
+                    importStatement = replaceAll(localLookup, '$0', tagName);
+                }
+                else {
+                    if (this._wildMap === undefined) {
+                        this._wildMap = [];
+                        for (const key in this._mapping) {
+                            if (key.endsWith('-'))
+                                this._wildMap.push(key);
+                        }
                     }
-                    else {
-                        if (this._wildMap === undefined) {
-                            this._wildMap = [];
-                            for (const key in this._mapping) {
-                                if (key.endsWith('-'))
-                                    this._wildMap.push(key);
-                            }
-                        }
-                        const match = this._wildMap.find(s => tagName.startsWith(s));
-                        if (match !== undefined) {
-                            const wildCardLookup = this._mapping[match];
-                            const $1 = tagName.replace(match, '');
-                            importStatement = replaceAll(wildCardLookup, '$1', $1);
-                        }
+                    const match = this._wildMap.find(s => tagName.startsWith(s));
+                    if (match !== undefined) {
+                        const wildCardLookup = this._mapping[match];
+                        const $1 = tagName.replace(match, '');
+                        importStatement = replaceAll(wildCardLookup, '$1', $1);
                     }
                 }
-                if (importStatement === undefined) {
+                if (importStatement === null) {
                     importStatement = `${tagName}/${tagName}.js`;
                 }
-                //const importStatement = globalLookup !== undefined ? globalLookup : replaceAll(localLookup ? localLookup : '$0/$0.js' , '$0', tagName);
-                //if(importStatement !== undefined){
                 import(importStatement).then(() => {
                     this.de('loaded-' + tagName, {
                         importStatement: importStatement
