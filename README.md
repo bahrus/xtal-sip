@@ -34,9 +34,40 @@ The goals of xtal-sip are:
 
 We provide two mechanisms to do this, and the two mechanisms can be used in combination -- Global Lookup, and Local (Shadow DOM realm) Lookup.
 
-## Global Lookup - Sample syntax
+
+## Global Lookup - Covention over configuration
 
 Here we use the global importmap script tag.  Either the native browser-based one, or the polyfill linked above, which uses "type=importmap-shim."  (That's why we see the * in the type below, to represent that you can use one or the other):
+
+
+```html
+<html>
+  <head>
+    ...
+    <script type="importmap*">
+    {
+      "imports": {
+        ...
+        "xtal-frappe-chart/xtal-frappe-chart.js": 
+            "https://cdn.jsdelivr.net/npm/xtal-frappe-chart@0.0.22/xtal-frappe-chart.js",
+        ...
+      }
+    }
+    </script>
+    ...
+    
+  </head>
+  <body>
+    <xtal-sip selector="[data-imp]"></xtal-sip>
+    ... 
+
+    <xtal-frappe-chart data-imp></xtal-frappe-chart> 
+  </body>
+</html>
+
+```
+
+When xtal-sip finds a tag with attribute "data-imp", it first checks if there's a entry in the import map with key $0/$0.js, where $0 is the name of the tag. 
 
 ```html
 <html>
