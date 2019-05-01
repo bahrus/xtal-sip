@@ -17,7 +17,7 @@ xtal-sip takes the philosophical stance that at the most micro level, utilizing 
 
 But as one zooms out from the micro to the macro, the nature of the components changes in significant ways.  
 
-At the micro level, components will have few, if any, dependencies, and those dependencies will tend to be quite stable, and likely asll used.  The dependencies will skew more towards tightly coupled utility libraries. 
+At the micro level, components will have few, if any, dependencies, and those dependencies will tend to be quite stable, and likely all be used.  The dependencies will skew more towards tightly coupled utility libraries. 
 
 ES6 Modules (and hopefully HTML and CSS Modules in the near future), combined with import maps to (optionally) centralize management of these dependencies without bundling, works great at the micro level.  But does it scale to the big picture?
 
