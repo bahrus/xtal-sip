@@ -98,15 +98,16 @@ The solution above is a bit dicey, if you are not on good terms with the people 
 There is no procedure that I'm aware of currently to manage the import map based off of package.json's.  
 
 ## Fallback Plan I
-So what's the fallback if you want your web component to be reusable, until the ecosystem behind importmap's is more solid?
 
-The only current failback xtal-sip provides is as follows:
+So what's the fallback if you want your web component to be reusable, until the ecosystem behind importmaps is more solid?
 
-1)  You should stll npm install all your dependencies.
+One approach to providing a fallback is as follows:
+
+1)  You should still npm install all your dependencies.
 2)  You could create a separate js file that is simply a list of static imports of all your web-component dependencies that you want to lazy-load.
 3)  Subscribe to the event "load-failure" mentioned above, and the first time receiving such an event, dynamically load your separate file mentioned in step 2 using dynamic import().
 
-This is the simplest fallback.  It means that all your web component dependencies will load into memory in one step, even if it isn't needed (iif websites don't cooperate with your suggestion).  More sophisticated fallbacks could be developed, but this is probably a good starting point.  It's clearly not ideal.  Ideally, the person consuming your web component would have the patience to add what's needed to the importmap tag in index.html.
+This is the simplest fallback.  It means that all your web component dependencies will load into memory in one step, even if it isn't needed (e.g. if websites don't cooperate with your suggestion).  More sophisticated fallbacks could be developed, but this is probably a good starting point.  It's clearly not ideal.  Ideally, the person consuming your web component would have the patience to add what's needed to the importmap tag in index.html.
 
 Even though loading things into memory only when needed is nice, you might want to pair that with prefetching resources via [preload](https://developer.mozilla.org/en-US/docs/Web/HTML/Preloading_content) and/or [prefetch](https://3perf.com/blog/link-rels/).
 
