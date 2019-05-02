@@ -11,7 +11,7 @@ Dynamically &#34;water&#34; a custom element tag with the necessary dependencies
 
 **Backdrop**: Dynamic imports are (almost) shipping in every modern browser, and the import maps proposal is gelling and is [well polyfilled](https://github.com/guybedford/es-module-shims). 
 
-Most every web application can be recursivly broken down into logical regions, building blocks which are assembled together to form the whole site.
+Most every web application can be recursively broken down into logical regions, building blocks which are assembled together to form the whole site.
 
 xtal-sip takes the philosophical stance that at the most micro level, utilizing highly reusable, generic custom elements -- elements that can extend the HTML vocubulary, elements that could be incorporated into the browser, even -- forms a great fundamental "unit" to build on.
 
@@ -27,7 +27,7 @@ xtal-sip argues that while it is certainly possible to build large applications 
 
 Web components (especially ES Module based) may or may not be the best fit for these application macro "modules".  A better fit might be a server-centric solution, like  [Rails](https://goiabada.blog/rails-components-faedd412ce19), just to take an example.  
 
-A significant pain point has to do with listing all the dependencies used by these macro components / compositions, and loading them into memory only when needed.  
+A significant pain point has to do with loading all the third-party web components these macro components / compositions, and loading them into memory only when needed.  
 
 The goals of xtal-sip are:
 
@@ -37,7 +37,7 @@ The goals of xtal-sip are:
 
 ## Convention over Configuration
 
-xtal-sip takes a cue from Ruby on Rails and adopts the Convention over Configuration philosophy.  Import maps are flexible enough that they should be able to map [name-of-element]/[name-of-element].js to whatever you need it to.  So xtal-sip always assumes that we can list all web components we want to dynamically load with key [name-of-element]/[name-of-element].js in the import map.  
+xtal-sip takes a cue from Ruby on Rails and adopts the Convention over Configuration philosophy.  Import maps are flexible enough that they should be able to map [name-of-element]/[name-of-element].js to whatever you need it to.  So xtal-sip assumes, by default that we can list all web components we want to dynamically load with key [name-of-element]/[name-of-element].js in the import map.  
 
 To customize what key to look for in the importmap JSON, you can subclass xtal-sip and override:
 
@@ -76,7 +76,7 @@ So here's some sample syntax.
     
   </head>
   <body>
-    <xtal-sip selector="[data-imp]"></xtal-sip>
+    <xtal-sip></xtal-sip>
     ... 
 
     <xtal-frappe-chart data-imp></xtal-frappe-chart> 
@@ -84,6 +84,10 @@ So here's some sample syntax.
 </html>
 
 ```
+
+Note that we are using the attribute "data-imp" to signal to xtal-sip that this is an element we want to try to try to dynamically load.  It gets triggered when the tag gets added to an active  DOM tree (i.e. it won't trigger anything while it hides inside an  HTML template).
+
+It is unfortunate that there is no way to ["namespace" attributes](https://discourse.wicg.io/t/proposal-symbol-namespacing-of-attributes/3515/5) in HTML5.  Hence there's a chance that if you use this component inside a Game of Thrones web application, your web component could find itself on trial for poisoning the King.
 
 ## I know what you're thinking
 
@@ -93,6 +97,7 @@ The solution above is a bit dicey, if you are not on good terms with the people 
 
 There is no procedure that I'm aware of currently to manage the import map based off of package.json's.  
 
+## Fallback Plan I
 So what's the fallback if you want your web component to be reusable, until the ecosystem behind importmap's is more solid?
 
 The only current failback xtal-sip provides is as follows:
@@ -105,8 +110,19 @@ This is the simplest fallback.  It means that all your web component dependencie
 
 Even though loading things into memory only when needed is nice, you might want to pair that with prefetching resources via [preload](https://developer.mozilla.org/en-US/docs/Web/HTML/Preloading_content) and/or [prefetch](https://3perf.com/blog/link-rels/).
 
-xtal-sip only affects anything within its shadow DOM realm (or outside any Shadow DOM if the tag is not inside any Shadow DOM).  
+xtal-sip only affects anything within its shadow DOM realm (or outside any Shadow DOM if the tag is not inside any Shadow DOM). 
 
-## To run locally
+## Fallback(?) Plan II (untested)
+
+[pika-web](https://www.pikapkg.com/blog/pika-web-a-future-without-webpack/) is an interesting alternative to importmaps, that recommmends "hard-coding" references to "web_modules".
+
+Regardless, if you want to specify an alternative import statement to try, assuming that a relevant key is not found in the importmap JSON, you can do so thusly:
+
+```html
+<xtal-frappe-chart data-imp="web_modules/xtal-frappe-chart.js"></xtal-frappe-chart>
+```
+
+
+## To run locally:
 
 npm run serve
