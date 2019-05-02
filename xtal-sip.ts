@@ -54,7 +54,7 @@ export class XtalSip extends observeCssSelector(
     if (!this._conn || this._disabled || !this._selector) return;
     let id = this.id || XtalSip.is;
     if (!this._aL) {
-      this.addCSSListener(XtalSip.is, this._selector, this.insertListener);
+      this.addCSSListener(this.animationName, this._selector, this.insertListener);
       this._aL = true;
     }
   }
@@ -65,8 +65,12 @@ export class XtalSip extends observeCssSelector(
     return `${tagName}/${tagName}.js`;
   }
 
+  get animationName(){
+    return XtalSip.is;
+  }
+
   insertListener(e: any) {
-    if (e.animationName === XtalSip.is) {
+    if (e.animationName === this.animationName) {
       const target = e.target as HTMLElement;
       setTimeout(() => {
         const tagName = target.localName;

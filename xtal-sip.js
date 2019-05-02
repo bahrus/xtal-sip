@@ -50,15 +50,18 @@ export class XtalSip extends observeCssSelector(XtallatX(hydrate(HTMLElement))) 
             return;
         let id = this.id || XtalSip.is;
         if (!this._aL) {
-            this.addCSSListener(XtalSip.is, this._selector, this.insertListener);
+            this.addCSSListener(this.animationName, this._selector, this.insertListener);
             this._aL = true;
         }
     }
     getImportKey(tagName) {
         return `${tagName}/${tagName}.js`;
     }
+    get animationName() {
+        return XtalSip.is;
+    }
     insertListener(e) {
-        if (e.animationName === XtalSip.is) {
+        if (e.animationName === this.animationName) {
             const target = e.target;
             setTimeout(() => {
                 const tagName = target.localName;
