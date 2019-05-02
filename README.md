@@ -9,11 +9,11 @@
 
 Dynamically &#34;water&#34; a custom element tag with the necessary dependencies to sprout the tag from an inert seedling to a thing of beauty.
 
-Backdrop: Dynamic imports are (almost) shipping in every modern browser, and the import maps proposal is gelling and is [well polyfilled](https://github.com/guybedford/es-module-shims). 
+**Backdrop**: Dynamic imports are (almost) shipping in every modern browser, and the import maps proposal is gelling and is [well polyfilled](https://github.com/guybedford/es-module-shims). 
 
 Most every web application can be recursivly broken down into logical regions, building blocks which are assembled together to form the whole site.
 
-xtal-sip takes the philosophical stance that at the most micro level, utilizing highly reusable, generic custom elements -- that can extend the HTML vocubulary; candidates to be incorporated into the browser, even -- forms a great fundamental "unit" to build on.
+xtal-sip takes the philosophical stance that at the most micro level, utilizing highly reusable, generic custom elements -- elements that can extend the HTML vocubulary, elements that could be incorporated into the browser, even -- forms a great fundamental "unit" to build on.
 
 But as one zooms out from the micro to the macro, the nature of the components changes in significant ways.  
 
@@ -32,18 +32,18 @@ A significant pain point has to do with listing all the dependencies used by the
 The goals of xtal-sip are:
 
 1.  Provide a declarative way of progressively, dynamically loading web component dependencies into memory, only when needed.
-2.  Do so without introducing another listing of dependencies.
-
+2.  Do so without introducing another additional listing of dependencies.
 
 
 ## Convention over Configuration
 
-xtal-sip takes a cue from Ruby on Rails and adopts the Convention over Configuration philosophy.  Import maps are flexible enough that they should be able to map [name-of-element]/[name-of-element].js to whatever you need it to.  So xtal-sip always assumes that [name-of-element]/[name-of-element].js will be the key to a import map.  
+xtal-sip takes a cue from Ruby on Rails and adopts the Convention over Configuration philosophy.  Import maps are flexible enough that they should be able to map [name-of-element]/[name-of-element].js to whatever you need it to.  So xtal-sip always assumes that we can list all web components we want to dynamically load with key [name-of-element]/[name-of-element].js in the import map.  
 
 To customize what key to look for in the importmap JSON, you can subclass xtal-sip and override:
 
 ```JavaScript
   getImportKey(tagName: string) {
+    //Override this if you want
     return `${tagName}/${tagName}.js`;
   }
 ```
@@ -87,6 +87,8 @@ So here's some sample syntax.
 
 ## I know what you're thinking
 
+While this solution works fine for your Ruby on Rails application, what if you are building a reusable web component?
+
 The solution above is a bit dicey, if you are not on good terms with the people who configure the web sites usuing your web component.  You will need to convince them (via documentation or some other way) to a)  Add an importmap in index.html, and b)  add a bunch of entries for all your dynamically loaded web components.
 
 There is no procedure that I'm aware of currently to manage the import map based off of package.json's.  
@@ -99,8 +101,9 @@ The only current failback xtal-sip provides is as follows:
 2)  You could create a separate js file that is simply a list of static imports of all your web-component dependencies that you want to lazy-load.
 3)  Subscribe to the event "load-failure" mentioned above, and the first time receiving such an event, dynamically load your separate file mentioned in step 2 using dynamic import().
 
-This is the simplest fallback.  It means that all your web component dependencies will load into memory in one step, even if it isn't needed.  More sophisticated fallbacks could be developed, but this is probably a good starting point.  It's clearly not ideal.  Ideally, the person consuming your web component would have the patience to add what's needed to the importmap tag in index.html.
+This is the simplest fallback.  It means that all your web component dependencies will load into memory in one step, even if it isn't needed (iif websites don't cooperate with your suggestion).  More sophisticated fallbacks could be developed, but this is probably a good starting point.  It's clearly not ideal.  Ideally, the person consuming your web component would have the patience to add what's needed to the importmap tag in index.html.
 
+Even though loading things into memory only when needed is nice, you might want to pair that with prefetching resources via [preload](https://developer.mozilla.org/en-US/docs/Web/HTML/Preloading_content) and/or [prefetch](https://3perf.com/blog/link-rels/).
 
 xtal-sip only affects anything within its shadow DOM realm (or outside any Shadow DOM if the tag is not inside any Shadow DOM).  
 
