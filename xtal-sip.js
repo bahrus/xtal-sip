@@ -60,6 +60,10 @@ export class XtalSip extends observeCssSelector(XtallatX(hydrate(HTMLElement))) 
     get animationName() {
         return XtalSip.is;
     }
+    de2(type1, type2, tagName, detail) {
+        this.de(type1 + tagName, detail, true);
+        this.de(type2, detail, true);
+    }
     insertListener(e) {
         if (e.animationName === this.animationName) {
             const target = e.target;
@@ -78,17 +82,20 @@ export class XtalSip extends observeCssSelector(XtallatX(hydrate(HTMLElement))) 
                         customElements
                             .whenDefined(tagName)
                             .then(() => {
-                            this.de("loaded-" + tagName, detail, true);
-                            this.de('load-success', detail, true);
+                            // this.de("loaded-" + tagName, detail, true);
+                            // this.de('load-success', detail, true)
+                            this.de2('loaded-', 'load-success', tagName, detail);
                         })
                             .catch(() => {
-                            this.de("failed-to-load-" + tagName, detail, true);
-                            this.de('load-failure', detail);
+                            // this.de("failed-to-load-" + tagName, detail, true);
+                            // this.de('load-failure', detail);
+                            this.de2('failed-to-load-', 'load-failure', tagName, detail);
                         });
                     })
                         .catch(e => {
-                        this.de("failed-to-load-" + tagName, detail, true);
-                        this.de('load-failure', detail, true);
+                        // this.de("failed-to-load-" + tagName, detail, true);
+                        // this.de('load-failure', detail, true);
+                        this.de2('failed-to-load-', 'load-failure', tagName, detail);
                     });
                 }
             }, 0);

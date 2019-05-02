@@ -104,3 +104,6 @@ This is the simplest fallback.  It means that all your web component dependencie
 
 xtal-sip only affects anything within its shadow DOM realm (or outside any Shadow DOM if the tag is not inside any Shadow DOM).  
 
+## To run locally
+
+npm run serve
