@@ -125,7 +125,7 @@ Regardless, if you want to specify an alternative import statement to try, assum
 
 ## [TODO]
 
-Suppose you have 100 web components, all of which depend on a subset of the same 10 .  This poses a few difficult dilemmas.  Let me walk through my current thinking on this.
+Suppose you have 100 web components, all of which depend on a subset of the same 10 mixins.  This poses a few difficult dilemmas.  Let me walk through my current thinking on this.
 
 1.  If http were frictionless, i.e. there was no gain from bundling, even for first time loading, keeping the files separate would be a slam dunk, due to the improved ability to employ fine-grained caching (not to mention less objective benefits like fewer opportunities for abstraction leaks).  But http/2 isn't there yet.  
 
@@ -133,9 +133,19 @@ Suppose you have 100 web components, all of which depend on a subset of the same
 
 3.  But where the PikaWeb approach feels most painful is when thinking about those common mixins that keep getting downloaded and  loaded into memory multiple times.  If a severe security bug is found in one of the mixins, this would effectively render the entire cache toxic.
 
-4.  There's something else to consider regarding mixins, that argues strongly for the importance of downloading only one mixin.  A serious problem with downloading multiple copies of the mixins is if the mixins make use of ES6 Symbols.  Symbols seem like the perfect solution to one of the more compelling [arguments against the use of mixins](https://reactjs.org/blog/2016/07/13/mixins-considered-harmful.html?utm_source=javascriptweekly&utm_medium=email#mixins-cause-name-clashes).  But unless I'm missing something, the symbol solution falls apart if you are counting on multiple components downloading their own copy of the mixin, but having the expectation to be able to access some global, namespace protected variable using a symbol as a key.  
+4.  There's something else to consider regarding mixins, that argues strongly for the importance of downloading only one mixin.  A serious problem with downloading multiple copies of the mixins is if the mixins make use of ES6 Symbols.  Symbols seem like the perfect solution to one of the more compelling [arguments against the use of mixins](https://reactjs.org/blog/2016/07/13/mixins-considered-harmful.html?utm_source=javascriptweekly&utm_medium=email#mixins-cause-name-clashes).  But unless I'm missing something, the symbol solution falls apart if you are counting on multiple components downloading their own copy of the mixin, but having the expectation to be able to access some global, namespace protected variable using a symbol as a key.  (By the way, string based guids would solve this problem, but who wants to memorize what the guids mean?)
 
-5.  Import maps can solve issue 4, only if bundling isn't used.  So this would appear to make the approach of pikaweb not valid, if cross-component symbols are required.
+5.  Import maps can solve issue 4, only if bundling isn't used.  So this would appear to make the approach of pikaweb not valid, if cross-component symbols are required.  In addition, at such an early stage of import maps, having web components *require* the use of importmaps would seriously diminish the audience willing to use the component.
+
+So what to do?
+
+If downloading of files were sequential and predictable, the solution would be simple -- the first file would contain all the mixins that are needed more than once.  But this is of course unreleastic, but it kind of suggests a pathway:
+
+1.  Each component in the family sharing mixins should provide two distributions -- unbundled, and bundled, that includes all the mixins that that particular component requires.  Each commonly shared mixin is given a never changing string guid.
+2.  Being that JavaScript is currently single threaded, this step is thankfully easy -- each component only uses its own copy of the mixin if it isn't yet registered using the string based guid as the key identifier.  Otherwise, it uses the already registered one (there goes Typescript support?)
+3.  The "quarterback" (which I'm thinking xtal-sip would be) we choose which version of the component to retrieve, based on what mixins have been established.  For this to work, the quarterback would need to have a lookup for each component (including components that haven't loaded), with the needed mixins.  Now we are veering into a "separate dependency" registry, which it was one my goals to avoid. 
+
+
 
 
 
