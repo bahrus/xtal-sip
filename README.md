@@ -85,7 +85,7 @@ So here's some sample syntax.
 
 ```
 
-Note that we are using the attribute "data-imp" to signal to xtal-sip that this is an element we want to try to try to dynamically load.  It gets triggered when the tag gets added to an active  DOM tree (i.e. it won't trigger anything while it hides inside an  HTML template).
+Note that we are using the attribute "data-imp" to signal to xtal-sip that this is an element we want to try to dynamically load.  It gets triggered when the tag gets added to an active  DOM tree (i.e. it won't trigger anything while it hides inside an  HTML template).
 
 It is unfortunate that there is no way to ["namespace" attributes](https://discourse.wicg.io/t/proposal-symbol-namespacing-of-attributes/3515/5) in HTML5.  Hence there's a chance that if you use this component inside a Game of Thrones web application, your web component could find itself on trial for poisoning the King.
 
