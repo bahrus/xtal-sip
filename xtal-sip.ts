@@ -3,8 +3,6 @@ import { define } from "trans-render/define.js";
 import { XtallatX } from "xtal-element/xtal-latx.js";
 import { observeCssSelector } from "xtal-element/observeCssSelector.js";
 
-//const selector = "selector";
-//const mapping = "mapping";
 const importmap = document.querySelector('script[type^="importmap"]');
 
 let mappingLookup: { [key: string]: string } = {};
@@ -20,32 +18,12 @@ export class XtalSip extends observeCssSelector(
   static get is() {
     return "xtal-sip";
   }
-  // static get observedAttributes() {
-  //   return super.observedAttributes.concat([selector, mapping]);
-  // }
-  // _selector: string;
-  // get selector() {
-  //   return this._selector;
-  // }
-  // set selector(nv) {
-  //   this.attr(selector, nv);
-  // }
+  
 
   get selector(){
     return '[data-imp]';
   }
 
-  // attributeChangedCallback(name: string, oldVal: string, newVal: string) {
-  //   let foundMatch = false;
-  //   switch (name) {
-  //     case selector:
-  //       this._selector = newVal;
-  //       foundMatch = true;
-  //       break;
-  //   }
-  //   if (!foundMatch) super.attributeChangedCallback(name, oldVal, newVal);
-  //   this.onPropsChange();
-  // }
 
   _conn = false;
   connectedCallback() {
@@ -92,19 +70,13 @@ export class XtalSip extends observeCssSelector(
       customElements
         .whenDefined(tagName)
         .then(() => {
-          // this.de("loaded-" + tagName, detail, true);
-          // this.de('load-success', detail, true)
           this.de2('loaded-', 'load-success', tagName, detail);
         })
         .catch(() => {
-          // this.de("failed-to-load-" + tagName, detail, true);
-          // this.de('load-failure', detail);
           this.de2('failed-to-load-', 'load-failure', tagName, detail);
         });
     })
     .catch(e => {
-      // this.de("failed-to-load-" + tagName, detail, true);
-      // this.de('load-failure', detail, true);
       this.de2('failed-to-load-', 'load-failure', tagName, detail);
     });
   }
