@@ -66,7 +66,7 @@ export class XtalSip extends observeCssSelector(
   _wildMap: string[];
 
   getImportKey(tagName: string) {
-    return `${tagName}/${tagName}.js`;
+    return `${tagName}`;
   }
 
   get animationName(){

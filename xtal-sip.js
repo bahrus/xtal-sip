@@ -58,7 +58,7 @@ export class XtalSip extends observeCssSelector(XtallatX(hydrate(HTMLElement))) 
         }
     }
     getImportKey(tagName) {
-        return `${tagName}/${tagName}.js`;
+        return `${tagName}`;
     }
     get animationName() {
         return XtalSip.is;

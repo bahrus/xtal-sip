@@ -37,14 +37,14 @@ The goals of xtal-sip are:
 
 ## Convention over Configuration
 
-xtal-sip takes a cue from Ruby on Rails and adopts the Convention over Configuration philosophy.  Import maps are flexible enough that they should be able to map [name-of-element]/[name-of-element].js to whatever you need it to.  So xtal-sip assumes, by default that we can list all web components we want to dynamically load with key [name-of-element]/[name-of-element].js in the import map.  
+xtal-sip takes a cue from Ruby on Rails and adopts the Convention over Configuration philosophy.  Import maps are flexible enough that they should be able to map "name-of-element" to whatever you need it to.  So xtal-sip assumes, by default that we can list all web components we want to dynamically load with key "name-of-element" in the import map.  
 
 To customize what key to look for in the importmap JSON, you can subclass xtal-sip and override:
 
 ```JavaScript
   getImportKey(tagName: string) {
     //Override this if you want
-    return `${tagName}/${tagName}.js`;
+    return `${tagName}`;
   }
 ```
 
@@ -66,7 +66,7 @@ So here's some sample syntax.
     {
       "imports": {
         ...
-        "xtal-frappe-chart/xtal-frappe-chart.js": 
+        "xtal-frappe-chart": 
             "https://cdn.jsdelivr.net/npm/xtal-frappe-chart@0.0.22/xtal-frappe-chart.js",
         ...
       }
@@ -93,7 +93,7 @@ It is unfortunate that there is no way to ["namespace" attributes](https://disco
 
 While this solution works fine for your Ruby on Rails application, what if you are building a reusable web component?
 
-The solution above is a bit dicey, if you are not on good terms with the people who configure the web sites usuing your web component.  You will need to convince them (via documentation or some other way) to a)  Add an importmap in index.html, and b)  add a bunch of entries for all your dynamically loaded web components.
+The solution above is a bit dicey, if you are not on good terms with the people who configure the web sites using your web component.  You will need to convince them (via documentation or some other way) to a)  Add an importmap in index.html, and b)  add a bunch of entries for all your dynamically loaded web components.
 
 There is no procedure that I'm aware of currently to manage the import map based off of package.json's.  
 
