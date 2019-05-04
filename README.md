@@ -137,7 +137,7 @@ Suppose you have 100 web components, all of which depend on a subset of the same
 
 1.  If http were frictionless, i.e. there was no gain from bundling, even for first time loading, keeping the files separate would be a slam dunk, due to the improved ability to employ fine-grained caching (not to mention less objective benefits like fewer opportunities for abstraction leaks -- and a few additional benefits we will uncover below).  But http/2 isn't there yet.  
 
-2.  PikaWeb takes a programmatic approach to this.  It assumes that the initial view will rarely, if ever, require loading more than ~100 separately packaged components, which is a good rule of thumb for the upper limit where http2's benefits (caching, etc.) outweigh the costs (the friction mentioned above).  So PikaWeb bundles each distinct package individually, which sounds quite appealing.
+2.  PikaWeb takes a pragmatic approach to this.  It assumes that the initial view will rarely, if ever, require loading more than ~100 separately packaged components, which is a good rule of thumb for the upper limit where http2's benefits (caching, etc.) outweigh the costs (the friction mentioned above).  So PikaWeb bundles each distinct package individually, which sounds quite appealing.
 
 3.  But where the PikaWeb approach feels most painful is when thinking about those common mixins or base classes that keep getting downloaded and  loaded into memory multiple times.  If a severe security bug is found in one of the mixins / base classes, this would effectively render the entire cache toxic.
 
