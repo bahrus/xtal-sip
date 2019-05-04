@@ -26,6 +26,7 @@ export class XtalSip extends observeCssSelector(XtallatX(hydrate(HTMLElement))) 
         const promiseAll = Promise.all(keys.map(key => this.doImport(this.getImportKey(key), key)));
         promiseAll.then(val => {
             this._preLoaded = true;
+            this.onPropsChange();
         });
     }
     attributeChangedCallback(n, ov, nv) {
