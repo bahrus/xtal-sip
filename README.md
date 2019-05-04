@@ -105,7 +105,7 @@ One approach to providing a fallback is as follows:
 
 1)  You should still npm install all your dependencies.
 2)  You could create a separate js file that is simply a list of static imports of all your web-component dependencies that you want to lazy-load.
-3)  Subscribe to the event "load-failure" mentioned above, and the first time receiving such an event, dynamically load your separate file mentioned in step 2 using dynamic import().
+3)  Subscribe to the event "load-failure" mentioned above, and the first time receiving such an event, dynamically load your separate file mentioned in step 2 using dynamic import().  Here you are implicitly relying on applicaions using some bundler (or some other mechanism) that can handle bare import specifiers, including those using dyanic imports with a hardcoded string (inside a condition).
 
 This is the simplest fallback.  It means that all your web component dependencies will load into memory in one step, even if it isn't needed (e.g. if websites don't cooperate with your suggestion).  More sophisticated fallbacks could be developed, but this is probably a good starting point.  It's clearly not ideal.  Ideally, the person consuming your web component would have the patience to add what's needed to the importmap tag in index.html.
 
@@ -123,13 +123,13 @@ Regardless, if you want to specify an alternative import statement to try, assum
 <xtal-frappe-chart data-imp="web_modules/xtal-frappe-chart.js"></xtal-frappe-chart>
 ```
 
-## [TODO]
+## The most long-winded explanation for a simple attribute since the invention of README 
 
 Suppose you have 100 web components, all of which depend on a subset of the same 10 mixins.  This poses a few difficult dilemmas.  Let me walk through my current thinking on this.
 
 1.  If http were frictionless, i.e. there was no gain from bundling, even for first time loading, keeping the files separate would be a slam dunk, due to the improved ability to employ fine-grained caching (not to mention less objective benefits like fewer opportunities for abstraction leaks -- and a few additional benefits we will uncover below).  But http/2 isn't there yet.  
 
-2.  PikaWeb takes a programmatic approach to this.  It assumes that the initial view will rarely, if ever, require loading more than ~100 separately packaged components, which is a good rule of thumb for where http2's benefits (caching, etc.) outweigh the costs (the friction mentioned above).  So PikaWeb bundles each distinct package individually, which sounds quite appealing.
+2.  PikaWeb takes a programmatic approach to this.  It assumes that the initial view will rarely, if ever, require loading more than ~100 separately packaged components, which is a good rule of thumb for the upper limit where http2's benefits (caching, etc.) outweigh the costs (the friction mentioned above).  So PikaWeb bundles each distinct package individually, which sounds quite appealing.
 
 3.  But where the PikaWeb approach feels most painful is when thinking about those common mixins or base classes that keep getting downloaded and  loaded into memory multiple times.  If a severe security bug is found in one of the mixins / base classes, this would effectively render the entire cache toxic.
 
@@ -139,9 +139,9 @@ Suppose you have 100 web components, all of which depend on a subset of the same
 
 So what to do?
 
-### Approach I
+If downloading of files were sequential and predictable, the solution would be simple -- the first file would contain all the mixins that are needed more than once.  But this is of course unreleastic, but it kind of suggests two possible pathways.
 
-If downloading of files were sequential and predictable, the solution would be simple -- the first file would contain all the mixins that are needed more than once.  But this is of course unreleastic, but it kind of suggests a pathway:
+### Approach I
 
 1.  Each component in the family sharing mixins should provide two distributions -- unbundled, and bundled, that includes all the mixins that that particular component requires.  Each commonly shared mixin is given a never changing string guid.
 2.  Being that JavaScript is currently single threaded, this step is thankfully easy -- each component only uses its own copy of the mixin if it isn't yet registered using the string based guid as the key identifier.  Otherwise, it uses the already registered one (there goes Typescript support?)
@@ -149,8 +149,18 @@ If downloading of files were sequential and predictable, the solution would be s
 
 ### Aproach II
 
-The mixins provide one of two distributions -- undundled, that must resolve to a single copy (if symbols are used) within a ShadowDOM based "realm", or II all bundled together.
+1.  A web component is created that just has all the mixins packaged together.  Call it the Mixin Buffet web component
+2.  Web components that use the mixins first check if the Mixin Buffet web component is registered.  If not, dynamically load the mixin's 
+à la carte style.  This fallback again rests on either import maps or some bundling process able to work with node-like bare specifier imports. 
 
+
+xtal-sip considers Approach II to be more promising, especially as it suggests an additional feature that seems like it would be useful anyway:
+
+## Preemptive Imports
+
+```html
+<xtal-sip prereqs="my-mixin-buffet-web-component;some-other-side-preemptive-web-component"></xtal-sip>
+```
 
 ## To run locally:
 
