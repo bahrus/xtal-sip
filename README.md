@@ -41,7 +41,7 @@ xtal-sip takes a cue from Ruby on Rails and adopts the Convention over Configura
 
 To customize what key to look for in the importmap JSON, you can subclass xtal-sip and override:
 
-```JavaScript
+```TypeScript
   getImportKey(tagName: string) {
     //Override this if you want
     return `${tagName}`;
@@ -85,9 +85,19 @@ So here's some sample syntax.
 
 ```
 
-Note that we are using the attribute "data-imp" to signal to xtal-sip that this is an element we want to try to dynamically load.  It gets triggered when the tag gets added to an active  DOM tree (i.e. it won't trigger anything while it hides inside an  HTML template).
+Note that we are using the attribute "data-imp" to signal to xtal-sip that this is an element we want to try to dynamically load.  It gets triggered when the tag gets added to an active DOM tree (i.e. it won't trigger anything while it hides inside an  HTML template).
+
+xtal-sip only affects anything within its shadow DOM realm (or outside any Shadow DOM if the tag is not inside any Shadow DOM).
 
 It is unfortunate that there is no way to ["namespace" attributes](https://discourse.wicg.io/t/proposal-symbol-namespacing-of-attributes/3515/5) in HTML5.  Hence there's a chance that if you use this component inside a Game of Thrones web application, your web component could find itself on trial for poisoning the King.
+
+In such circumstances, you can subclass xtal-sip and override:
+
+```JavaScript
+  get selector(){
+    return '[data-imp]';
+  }
+```
 
 ## I know what you're thinking
 
@@ -105,13 +115,11 @@ One approach to providing a fallback is as follows:
 
 1)  You should still npm install all your dependencies.
 2)  You could create a separate js file that is simply a list of static imports of all your web-component dependencies that you want to lazy-load.
-3)  Subscribe to the event "load-failure" mentioned above, and the first time receiving such an event, dynamically load your separate file mentioned in step 2 using dynamic import().  Here you are implicitly relying on applicaions using some bundler (or some other mechanism) that can handle bare import specifiers, including those using dyanic imports with a hardcoded string (inside a condition).
+3)  Subscribe to the event "load-failure" mentioned above, and the first time receiving such an event, dynamically load your separate file mentioned in step 2 using dynamic import().  Here you are implicitly relying on applicaions using some bundler (or some other mechanism) that can handle bare import specifiers, including those using dynamic imports with a hardcoded string (inside a condition).
 
-This is the simplest fallback.  It means that all your web component dependencies will load into memory in one step, even if it isn't needed (e.g. if websites don't cooperate with your suggestion).  More sophisticated fallbacks could be developed, but this is probably a good starting point.  It's clearly not ideal.  Ideally, the person consuming your web component would have the patience to add what's needed to the importmap tag in index.html.
+This is the simplest fallback.  It means that all your web component dependencies will load into memory in one step, even if they aren't needed (e.g. if websites don't cooperate with your suggestion).  More sophisticated fallbacks could be developed, but this is probably a good starting point.  It's clearly not ideal.  Ideally, the person consuming your web component would have the patience to add what's needed to the importmap tag in index.html.
 
 Even though loading things into memory only when needed is nice, you might want to pair that with prefetching resources via [preload](https://developer.mozilla.org/en-US/docs/Web/HTML/Preloading_content) and/or [prefetch](https://3perf.com/blog/link-rels/).
-
-xtal-sip only affects anything within its shadow DOM realm (or outside any Shadow DOM if the tag is not inside any Shadow DOM). 
 
 ## Fallback(?) Plan II (untested)
 
@@ -139,7 +147,7 @@ Suppose you have 100 web components, all of which depend on a subset of the same
 
 So what to do?
 
-If downloading of files were sequential and predictable, the solution would be simple -- the first file would contain all the mixins that are needed more than once.  But this is of course unreleastic, but it kind of suggests two possible pathways.
+If downloading of files were sequential and predictable, the solution would be simple -- the first file would contain all the mixins that are needed more than once.  But this is of course unrealistic, but it kind of suggests two possible pathways.
 
 ### Approach I
 
@@ -149,9 +157,9 @@ If downloading of files were sequential and predictable, the solution would be s
 
 ### Aproach II
 
-1.  A web component is created that just has all the mixins packaged together.  Call it the Mixin Buffet web component
+1.  A web component is created that just has all the mixins packaged together.  Call it the Mixin Buffet web component.  It exposes each mixin as a static property.
 2.  Web components that use the mixins first check if the Mixin Buffet web component is registered.  If not, dynamically load the mixin's 
-à la carte style.  This fallback again rests on either import maps or some bundling process able to work with node-like bare specifier imports. 
+à la carte style.  This fallback again rests on either import maps or some bundling process being able to work with node-like bare specifier imports. 
 
 
 xtal-sip considers Approach II to be more promising, especially as it suggests an additional feature that seems like it would be useful anyway:
@@ -159,7 +167,7 @@ xtal-sip considers Approach II to be more promising, especially as it suggests a
 ## Preemptive Imports
 
 ```html
-<xtal-sip prereqs="my-mixin-buffet-web-component;some-other-side-preemptive-web-component"></xtal-sip>
+<xtal-sip prereqs="my-mixin-buffet-web-component;some-other-preemptive-web-component"></xtal-sip>
 ```
 
 ## To run locally:
