@@ -1,4 +1,4 @@
-import { hydrate } from "trans-render/hydrate.js";
+import { hydrate, up } from "trans-render/hydrate.js";
 import { define } from "trans-render/define.js";
 import { XtallatX } from "xtal-element/xtal-latx.js";
 import { observeCssSelector } from "xtal-element/observeCssSelector.js";
@@ -8,25 +8,55 @@ if (importmap !== null) {
     const parsed = JSON.parse(importmap.innerHTML);
     mappingLookup = parsed.imports;
 }
+const prereq = 'prereq';
 export class XtalSip extends observeCssSelector(XtallatX(hydrate(HTMLElement))) {
     constructor() {
         super(...arguments);
+        this._preLoaded = true;
         this._conn = false;
         this._aL = false;
     }
     static get is() {
         return "xtal-sip";
     }
+    static get observedAttributes() {
+        return super.observedAttributes.concat([prereq]);
+    }
+    loadAll(keys) {
+        const promiseAll = Promise.all(keys.map(key => this.doImport(this.getImportKey(key), key)));
+        promiseAll.then(val => {
+            this._preLoaded = true;
+        });
+    }
+    attributeChangedCallback(n, ov, nv) {
+        let foundAttrib = false;
+        switch (n) {
+            case prereq:
+                foundAttrib = true;
+                this._preLoaded = false;
+                this._prereq = nv;
+                break;
+        }
+        if (!foundAttrib)
+            super.attributeChangedCallback(n, ov, nv);
+        this.onPropsChange();
+    }
+    get prereq() {
+        return this._prereq;
+    }
+    set prereq(nv) {
+        this.attr(prereq, nv);
+    }
     get selector() {
         return '[data-imp]';
     }
     connectedCallback() {
-        //this[up]([selector]);
+        this[up]([prereq]);
         this._conn = true;
         this.onPropsChange();
     }
     onPropsChange() {
-        if (!this._conn || this._disabled || !this.selector)
+        if (!this._conn || this._disabled || !this.selector || !this._preLoaded)
             return;
         let id = this.id || XtalSip.is;
         if (!this._aL) {
@@ -40,9 +70,10 @@ export class XtalSip extends observeCssSelector(XtallatX(hydrate(HTMLElement))) 
     get animationName() {
         return XtalSip.is;
     }
-    de2(type1, type2, tagName, detail) {
+    de2(type1, type2, tagName, detail, promise) {
         this.de(type1 + tagName, detail, true);
         this.de(type2, detail, true);
+        promise(detail);
     }
     tryBackup(target) {
         const imp = target.dataset.imp;
@@ -50,24 +81,26 @@ export class XtalSip extends observeCssSelector(XtallatX(hydrate(HTMLElement))) 
             this.doImport(imp, target.localName);
         }
     }
-    doImport(key, tagName) {
-        const detail = {
-            tagName: tagName,
-            importStatement: key
-        };
-        import(key)
-            .then(() => {
-            customElements
-                .whenDefined(tagName)
+    async doImport(key, tagName) {
+        return new Promise(resolve => {
+            const detail = {
+                tagName: tagName,
+                importStatement: key
+            };
+            import(key)
                 .then(() => {
-                this.de2('loaded-', 'load-success', tagName, detail);
+                customElements
+                    .whenDefined(tagName)
+                    .then(() => {
+                    this.de2('loaded-', 'load-success', tagName, detail, resolve);
+                })
+                    .catch(() => {
+                    this.de2('failed-to-load-', 'load-failure', tagName, detail, resolve);
+                });
             })
-                .catch(() => {
-                this.de2('failed-to-load-', 'load-failure', tagName, detail);
+                .catch(e => {
+                this.de2('failed-to-load-', 'load-failure', tagName, detail, resolve);
             });
-        })
-            .catch(e => {
-            this.de2('failed-to-load-', 'load-failure', tagName, detail);
         });
     }
     insertListener(e) {

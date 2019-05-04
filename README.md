@@ -164,7 +164,7 @@ If downloading of files were sequential and predictable, the solution would be s
 
 xtal-sip considers Approach II to be more promising, especially as it suggests an additional feature that seems like it would be useful anyway:
 
-## Preemptive Imports
+## Preemptive Imports (untested)
 
 ```html
 <xtal-sip prereqs="my-mixin-buffet-web-component;some-other-preemptive-web-component"></xtal-sip>
