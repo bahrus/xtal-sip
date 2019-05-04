@@ -60,6 +60,7 @@ export class XtalSip extends observeCssSelector(XtallatX(hydrate(HTMLElement))) 
 
   _conn = false;
   connectedCallback() {
+    this.style.display = 'none';
     this[up]([prereq]);
     this._conn = true;
     this.onPropsChange();
