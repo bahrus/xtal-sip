@@ -111,7 +111,7 @@ In such circumstances, you can subclass xtal-sip and override:
 
 ~~The solution above is a bit dicey, if you are not on good terms with the people who configure the web sites using your web component.  You will need to convince them (via documentation or some other way) to a)  Add an importmap in index.html, and b)  add a bunch of entries for all your dynamically loaded web components.~~
 
-~~There is no procedure that I'm aware of currently to manage the import map based off of package.json's. ~~ 
+~~There is no procedure that I'm aware of currently to manage the import map based off of package.json's.~~ 
 
 ~~## Fallback Plan I~~
 
