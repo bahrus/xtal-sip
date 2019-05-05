@@ -1,9 +1,19 @@
-import { hydrate, up} from "trans-render/hydrate.js";
-import { define } from "trans-render/define.js";
-import { XtallatX } from "xtal-element/xtal-latx.js";
-import { observeCssSelector } from "xtal-element/observeCssSelector.js";
+export function getHost(el: HTMLElement) : HTMLElement | null {
+  let parent : any = el;
+  while (parent = (parent.parentNode)) {
+      if (parent.nodeType === 11) {
+          return (<any>parent)['host'] as HTMLElement;
+      } else if ((<HTMLElement>parent).tagName.indexOf('-') > -1) {
+          return parent;
+      }  else if (parent.tagName === 'BODY') {
+          return null;
+      }
+  }
+  return null;
+}
 
 const importmap = document.querySelector('script[type^="importmap"]');
+
 
 let mappingLookup: { [key: string]: string } = {};
 if (importmap !== null) {
@@ -11,45 +21,13 @@ if (importmap !== null) {
   mappingLookup = parsed.imports;
 }
 
-//const prereq = 'prereq';
-export class XtalSip extends observeCssSelector(XtallatX(hydrate(HTMLElement))) {
+const eventNames = ["animationstart", "MSAnimationStart", "webkitAnimationStart"];
+
+export class XtalSip extends HTMLElement {
   static get is() {
     return "xtal-sip";
   }
 
-  // static get observedAttributes(){
-  //   return super.observedAttributes.concat([prereq]);
-  // }
-
-  _preLoaded = true;
-
-
-
-  // attributeChangedCallback(n: string, ov: string, nv: string){
-  //   let foundAttrib = false;
-  //   switch(n){
-  //     case prereq:
-  //       foundAttrib = true;
-  //       this._preLoaded = false;
-  //       this._prereq = nv;
-  //       break;
-  //   }
-  //   if(!foundAttrib) super.attributeChangedCallback(n, ov, nv);
-  //   this.onPropsChange();
-  // }
-
-  // _prereq: string;
-  // get prereq(){
-  //   return this._prereq;
-  // }
-  // set prereq(nv){
-  //   this.attr(prereq, nv);
-  // }
-  
-
-  // get selector(){
-  //   return '[data-imp]';
-  // }
 
 
   _conn = false;
@@ -62,7 +40,7 @@ export class XtalSip extends observeCssSelector(XtallatX(hydrate(HTMLElement))) 
   _aL = false;
   _fS = false;
   onPropsChange() {
-    if (!this._conn || this._disabled ||  !this._preLoaded) return;
+    if (!this._conn) return;
     let id = this.id || XtalSip.is;
     this.loadScript()
   }
@@ -70,7 +48,6 @@ export class XtalSip extends observeCssSelector(XtallatX(hydrate(HTMLElement))) 
   loadAll(immediate: string[], lazy: string[]){
     const promiseAll = Promise.all(immediate.map(key => this.doImport(this.getImportKey(key), key)));
     promiseAll.then(val =>{
-      this._preLoaded = true;
       this.initCssListener(lazy.join(','));
     })
 
@@ -110,9 +87,22 @@ export class XtalSip extends observeCssSelector(XtallatX(hydrate(HTMLElement))) 
   get animationName(){
     return XtalSip.is;
   }
+
+
+  de(name: string, detail: any) {
+    const eventName = name;
+    const newEvent = new CustomEvent(eventName, {
+        detail: detail,
+        bubbles: true,
+        composed: false,
+    } as CustomEventInit);
+    this.dispatchEvent(newEvent);
+    this.setAttribute(eventName, '');
+    return newEvent;
+}
   de2(type1: string, type2: string, tagName: string, detail: any, promise: any){
-    this.de(type1 + tagName, detail, true);
-    this.de(type2, detail, true);
+    this.de(type1 + tagName, detail);
+    this.de(type2, detail);
     promise(detail);
   }
 
@@ -156,5 +146,56 @@ export class XtalSip extends observeCssSelector(XtallatX(hydrate(HTMLElement))) 
       }, 0);
     }
   }
+
+  _boundInsertListener!: any;
+
+  addCSSListener(id: string, targetSelector: string, insertListener: any){
+      // See https://davidwalsh.name/detect-node-insertion
+      if(this._boundInsertListener) return;
+      const styleInner = /* css */`
+      @keyframes ${id} {
+          from {
+              opacity: 0.99;
+          }
+          to {
+              opacity: 1;
+          }
+      }
+
+      ${targetSelector}{
+          animation-duration: 0.001s;
+          animation-name: ${id};
+      }
+      `;
+      const style = document.createElement('style');
+      style.innerHTML = styleInner;
+      const host = <any>getHost((<any>this as HTMLElement));
+      if(host !== null){
+          host.shadowRoot.appendChild(style);
+      }else{
+          document.head.appendChild(style);
+      }
+      this._boundInsertListener = insertListener.bind(this);
+      const container = host ? host.shadowRoot : document;
+      eventNames.forEach(name =>{
+          container.addEventListener(name, this._boundInsertListener, false);
+      })
+
+  }
+
+  disconnectedCallback(){
+      if(this._boundInsertListener){
+          const host = <any>getHost(this);
+          const container = host ? host.shadowRoot : document;
+          eventNames.forEach(name =>{
+              container.removeEventListener(name, this._boundInsertListener);
+          })
+
+      }
+  }
+
+
+
+
 }
-define(XtalSip);
+customElements.define(XtalSip.is, XtalSip);

@@ -7,10 +7,7 @@
   "repository": "https://github.com/bahrus/xtal-sip",
   "author": "bahrus <anderson.bruce.b@gmail.com>",
   "license": "MIT",
-  "dependencies": {
-    "trans-render": "0.0.110",
-    "xtal-element": "0.0.58"
-  },
+  "dependencies": {},
   "devDependencies": {
     "@types/node": "11.13.7",
     "@types/tape": "4.2.33",

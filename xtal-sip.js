@@ -1,43 +1,28 @@
-import { hydrate } from "trans-render/hydrate.js";
-import { define } from "trans-render/define.js";
-import { XtallatX } from "xtal-element/xtal-latx.js";
-import { observeCssSelector } from "xtal-element/observeCssSelector.js";
+export function getHost(el) {
+    let parent = el;
+    while (parent = (parent.parentNode)) {
+        if (parent.nodeType === 11) {
+            return parent['host'];
+        }
+        else if (parent.tagName.indexOf('-') > -1) {
+            return parent;
+        }
+        else if (parent.tagName === 'BODY') {
+            return null;
+        }
+    }
+    return null;
+}
 const importmap = document.querySelector('script[type^="importmap"]');
 let mappingLookup = {};
 if (importmap !== null) {
     const parsed = JSON.parse(importmap.innerHTML);
     mappingLookup = parsed.imports;
 }
-//const prereq = 'prereq';
-export class XtalSip extends observeCssSelector(XtallatX(hydrate(HTMLElement))) {
+const eventNames = ["animationstart", "MSAnimationStart", "webkitAnimationStart"];
+export class XtalSip extends HTMLElement {
     constructor() {
         super(...arguments);
-        // static get observedAttributes(){
-        //   return super.observedAttributes.concat([prereq]);
-        // }
-        this._preLoaded = true;
-        // attributeChangedCallback(n: string, ov: string, nv: string){
-        //   let foundAttrib = false;
-        //   switch(n){
-        //     case prereq:
-        //       foundAttrib = true;
-        //       this._preLoaded = false;
-        //       this._prereq = nv;
-        //       break;
-        //   }
-        //   if(!foundAttrib) super.attributeChangedCallback(n, ov, nv);
-        //   this.onPropsChange();
-        // }
-        // _prereq: string;
-        // get prereq(){
-        //   return this._prereq;
-        // }
-        // set prereq(nv){
-        //   this.attr(prereq, nv);
-        // }
-        // get selector(){
-        //   return '[data-imp]';
-        // }
         this._conn = false;
         this._aL = false;
         this._fS = false;
@@ -53,7 +38,7 @@ export class XtalSip extends observeCssSelector(XtallatX(hydrate(HTMLElement))) 
         this.onPropsChange();
     }
     onPropsChange() {
-        if (!this._conn || this._disabled || !this._preLoaded)
+        if (!this._conn)
             return;
         let id = this.id || XtalSip.is;
         this.loadScript();
@@ -61,7 +46,6 @@ export class XtalSip extends observeCssSelector(XtallatX(hydrate(HTMLElement))) 
     loadAll(immediate, lazy) {
         const promiseAll = Promise.all(immediate.map(key => this.doImport(this.getImportKey(key), key)));
         promiseAll.then(val => {
-            this._preLoaded = true;
             this.initCssListener(lazy.join(','));
         });
     }
@@ -95,9 +79,20 @@ export class XtalSip extends observeCssSelector(XtallatX(hydrate(HTMLElement))) 
     get animationName() {
         return XtalSip.is;
     }
+    de(name, detail) {
+        const eventName = name;
+        const newEvent = new CustomEvent(eventName, {
+            detail: detail,
+            bubbles: true,
+            composed: false,
+        });
+        this.dispatchEvent(newEvent);
+        this.setAttribute(eventName, '');
+        return newEvent;
+    }
     de2(type1, type2, tagName, detail, promise) {
-        this.de(type1 + tagName, detail, true);
-        this.de(type2, detail, true);
+        this.de(type1 + tagName, detail);
+        this.de(type2, detail);
         promise(detail);
     }
     async doImport(key, tagName) {
@@ -139,5 +134,48 @@ export class XtalSip extends observeCssSelector(XtallatX(hydrate(HTMLElement))) 
             }, 0);
         }
     }
+    addCSSListener(id, targetSelector, insertListener) {
+        // See https://davidwalsh.name/detect-node-insertion
+        if (this._boundInsertListener)
+            return;
+        const styleInner = /* css */ `
+      @keyframes ${id} {
+          from {
+              opacity: 0.99;
+          }
+          to {
+              opacity: 1;
+          }
+      }
+
+      ${targetSelector}{
+          animation-duration: 0.001s;
+          animation-name: ${id};
+      }
+      `;
+        const style = document.createElement('style');
+        style.innerHTML = styleInner;
+        const host = getHost(this);
+        if (host !== null) {
+            host.shadowRoot.appendChild(style);
+        }
+        else {
+            document.head.appendChild(style);
+        }
+        this._boundInsertListener = insertListener.bind(this);
+        const container = host ? host.shadowRoot : document;
+        eventNames.forEach(name => {
+            container.addEventListener(name, this._boundInsertListener, false);
+        });
+    }
+    disconnectedCallback() {
+        if (this._boundInsertListener) {
+            const host = getHost(this);
+            const container = host ? host.shadowRoot : document;
+            eventNames.forEach(name => {
+                container.removeEventListener(name, this._boundInsertListener);
+            });
+        }
+    }
 }
-define(XtalSip);
+customElements.define(XtalSip.is, XtalSip);
