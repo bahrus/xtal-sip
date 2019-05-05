@@ -51,7 +51,7 @@ To customize what key to look for in the importmap JSON, you can subclass xtal-s
 xtal-sip checks if that key can be found in the global importmap.
 
 
-If the code finds the validated tag name as an import map key, it tries to do a dynamic import of that key, as soon as it detects a relevant tag name added to the active DOM tree within its shadow DOM realm.  If that succeeds, and the tagName gets successfully registered, a custom event is fired: "load-success", which includes the tag name that was successfully loaded in the custom event detail.
+If the code finds the (modified) tag name as an import map key, it tries to do a dynamic import of that key, as soon as it detects that tag name added to the active DOM tree within its shadow DOM realm.  If that succeeds, and the tagName gets successfully registered, a custom event is fired: "load-success", which includes the tag name that was successfully loaded in the custom event detail.
 
 If no such key is found in the importmap JSON, or if the dependency fails to load, or doesn't succeed in registering the custom element, another custom event is fired, "load-failure" with the same detail information.
 
@@ -145,6 +145,10 @@ Just add an exclamation (!) at the end of the tag name:
 
 ```
 
+## To run locally:
+
+npm run serve
+
 <!--
 ```html
 <xtal-frappe-chart data-imp="web_modules/xtal-frappe-chart.js"></xtal-frappe-chart>
@@ -193,6 +197,4 @@ xtal-sip considers Approach II to be more promising, especially as it suggests a
 ```
 --
 
-## To run locally:
 
-npm run serve
