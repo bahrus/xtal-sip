@@ -47,9 +47,9 @@ export class XtalSip extends observeCssSelector(XtallatX(hydrate(HTMLElement))) 
   // }
   
 
-  get selector(){
-    return '[data-imp]';
-  }
+  // get selector(){
+  //   return '[data-imp]';
+  // }
 
 
   _conn = false;
@@ -60,11 +60,38 @@ export class XtalSip extends observeCssSelector(XtallatX(hydrate(HTMLElement))) 
     this.onPropsChange();
   }
   _aL = false;
+  _fS = false;
   onPropsChange() {
-    if (!this._conn || this._disabled || !this.selector || !this._preLoaded) return;
+    if (!this._conn || this._disabled ||  !this._preLoaded) return;
     let id = this.id || XtalSip.is;
+    this.loadScript()
+  }
+
+  loadAll(immediate: string[], lazy: string[]){
+    const promiseAll = Promise.all(immediate.map(key => this.doImport(this.getImportKey(key), key)));
+    promiseAll.then(val =>{
+      this._preLoaded = true;
+      this.initCssListener(lazy.join(','));
+    })
+
+  }
+
+  loadScript(){
+    if(this._fS) return;
+    const script = this.querySelector('script');
+    if(script === null){
+      setTimeout(() => this.loadScript(), 10);
+      return;
+    }
+    const json = JSON.parse(script.innerHTML) as string[];
+    const immediate = json.filter(s => s.endsWith('!'));
+    const lazy = json.filter(s => !s.endsWith('!'));
+    this.loadAll(immediate, lazy);
+  }
+
+  initCssListener(selector: string){
     if (!this._aL) {
-      this.addCSSListener(this.animationName, this.selector, this.insertListener);
+      this.addCSSListener(this.animationName, selector, this.insertListener);
       this._aL = true;
     }
   }
@@ -88,13 +115,7 @@ export class XtalSip extends observeCssSelector(XtallatX(hydrate(HTMLElement))) 
     this.de(type2, detail, true);
     promise(detail);
   }
-  // tryBackup(target: HTMLElement){
-  //   const imp = target.dataset.imp;
-    
-  //   if(imp !== undefined && imp.length > 0){
-  //     this.doImport(imp, target.localName);
-  //   }
-  // }
+
   async doImport(key: string, tagName: string){
     return new Promise(resolve =>{
       const detail = {

@@ -31,7 +31,9 @@
   <body>
     <div>
       <h3>Basic xtal-frappe-chart demo</h3>
-      <xtal-sip selector="[data-imp]"></xtal-sip>
+      <xtal-sip>
+        <script nomodule>["xtal-frappe-chart"]</script>
+      </xtal-sip>
       <xtal-insert-json input="[]">
         <script type="application/json">
           [
@@ -64,7 +66,7 @@
         </script>
       </xtal-insert-json>
       <p-d on="merged-prop-changed" prop="data" val="target.value"></p-d>
-      <xtal-frappe-chart data-imp></xtal-frappe-chart>
+      <xtal-frappe-chart></xtal-frappe-chart>
       <p-d on="selected-element-changed" prop="input" val="target.value"></p-d>
       <xtal-json-editor options="{}"  height="300px"></xtal-json-editor>
 

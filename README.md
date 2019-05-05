@@ -82,28 +82,19 @@ So here's some sample syntax.
     
   </head>
   <body>
-    <xtal-sip></xtal-sip>
+      <xtal-sip>
+        <script nomodule>["xtal-frappe-chart"]</script>
+      </xtal-sip>
     ... 
 
-    <xtal-frappe-chart data-imp></xtal-frappe-chart> 
+    <xtal-frappe-chart></xtal-frappe-chart> 
   </body>
 </html>
 
 ```
 
-Note that we are using the attribute "data-imp" to signal to xtal-sip that this is an element we want to try to dynamically load.  It gets triggered when the tag gets added to an active DOM tree (i.e. it won't trigger anything while it hides inside an  HTML template).
-
 xtal-sip only affects anything within its shadow DOM realm (or outside any Shadow DOM if the tag is not inside any Shadow DOM).
 
-It is unfortunate that there is no way to ["namespace" attributes](https://discourse.wicg.io/t/proposal-symbol-namespacing-of-attributes/3515/5) in HTML5.  Hence there's a chance that if you use this component inside a Game of Thrones web application, your web component could find itself on trial for poisoning the King.
-
-In such circumstances, you can subclass xtal-sip and override:
-
-```JavaScript
-  get selector(){
-    return '[data-imp]';
-  }
-```
 
 ~~## I know what you're thinking~~
 
