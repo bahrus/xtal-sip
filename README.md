@@ -50,7 +50,13 @@ To customize what key to look for in the importmap JSON, you can subclass xtal-s
 
 xtal-sip checks if that key can be found in the global importmap.
 
-If it finds it, it tries to do a dynamic import of that key, and if that succeeds, and the tagName gets successfully registered, a custom event is fired: "load-success", which includes the tag name that was successfully loaded in the custom event detail.
+Note that we are allowing a tag name to invoke a dynamic import, passing in the name of the tag, which [now I'm thinking may raise security concerns](https://github.com/w3c/webappsec-csp/issues/243). Some additional functionality listed below has been removed, in order to guarantee better security.
+
+By default, the component will confirm that the tag name is a valid custom element name.
+
+If you feel the need to add additional checks, you can override the validator "validateTagName(tagName: string)" and add more stringent checks.
+
+If the code finds the validated tag name as an import map key, it tries to do a dynamic import of that key, and if that succeeds, and the tagName gets successfully registered, a custom event is fired: "load-success", which includes the tag name that was successfully loaded in the custom event detail.
 
 If no such key is found in the importmap JSON, or if the dependency fails to load, or doesn't succeed in registering the custom element, another custom event is fired, "load-failure" with the same detail information.
 
@@ -99,37 +105,41 @@ In such circumstances, you can subclass xtal-sip and override:
   }
 ```
 
-## I know what you're thinking
+~~## I know what you're thinking~~
 
-While this solution works fine for your Ruby on Rails application, what if you are building a reusable web component?
+~~While this solution works fine for your Ruby on Rails application, what if you are building a reusable web component?~~
 
-The solution above is a bit dicey, if you are not on good terms with the people who configure the web sites using your web component.  You will need to convince them (via documentation or some other way) to a)  Add an importmap in index.html, and b)  add a bunch of entries for all your dynamically loaded web components.
+~~The solution above is a bit dicey, if you are not on good terms with the people who configure the web sites using your web component.  You will need to convince them (via documentation or some other way) to a)  Add an importmap in index.html, and b)  add a bunch of entries for all your dynamically loaded web components.~~
 
-There is no procedure that I'm aware of currently to manage the import map based off of package.json's.  
+~~There is no procedure that I'm aware of currently to manage the import map based off of package.json's. ~~ 
 
-## Fallback Plan I
+~~## Fallback Plan I~~
 
-So what's the fallback if you want your web component to be reusable, until the ecosystem behind importmaps is more solid?
+~~So what's the fallback if you want your web component to be reusable, until the ecosystem behind importmaps is more solid?~~
 
-One approach to providing a fallback is as follows:
+~~One approach to providing a fallback is as follows:~~
 
-1)  You should still npm install all your dependencies.
+~~1)  You should still npm install all your dependencies.
 2)  You could create a separate js file that is simply a list of static imports of all your web-component dependencies that you want to lazy-load.
-3)  Subscribe to the event "load-failure" mentioned above, and the first time receiving such an event, dynamically load your separate file mentioned in step 2 using dynamic import().  Here you are implicitly relying on applicaions using some bundler (or some other mechanism) that can handle bare import specifiers, including those using dynamic imports with a hardcoded string (inside a condition).
+3)  Subscribe to the event "load-failure" mentioned above, and the first time receiving such an event, dynamically load your separate file mentioned in step 2 using dynamic import().  Here you are implicitly relying on applicaions using some bundler (or some other mechanism) that can handle bare import specifiers, including those using dynamic imports with a hardcoded string (inside a condition).~~
 
-This is the simplest fallback.  It means that all your web component dependencies will load into memory in one step, even if they aren't needed (e.g. if websites don't cooperate with your suggestion).  More sophisticated fallbacks could be developed, but this is probably a good starting point.  It's clearly not ideal.  Ideally, the person consuming your web component would have the patience to add what's needed to the importmap tag in index.html.
+~~This is the simplest fallback.  It means that all your web component dependencies will load into memory in one step, even if they aren't needed (e.g. if websites don't cooperate with your suggestion).  More sophisticated fallbacks could be developed, but this is probably a good starting point.  It's clearly not ideal.  Ideally, the person consuming your web component would have the patience to add what's needed to the importmap tag in index.html.~~
 
-Even though loading things into memory only when needed is nice, you might want to pair that with prefetching resources via [preload](https://developer.mozilla.org/en-US/docs/Web/HTML/Preloading_content) and/or [prefetch](https://3perf.com/blog/link-rels/).
+~~Even though loading things into memory only when needed is nice, you might want to pair that with prefetching resources via [preload](https://developer.mozilla.org/en-US/docs/Web/HTML/Preloading_content) and/or [prefetch](https://3perf.com/blog/link-rels/).~~
 
-## Fallback(?) Plan II (untested)
+~~## Fallback(?) Plan II (untested)~~
 
-[pika-web](https://www.pikapkg.com/blog/pika-web-a-future-without-webpack/) is an interesting alternative to importmaps, that recommends "hard-coding" references to "web_modules".
+~~[pika-web](https://www.pikapkg.com/blog/pika-web-a-future-without-webpack/) is an interesting alternative to importmaps, that recommends "hard-coding" references to "web_modules".~~
 
-Regardless, if you want to specify an alternative import statement to try, assuming that a relevant key is not found in the importmap JSON, you can do so thusly:
+~~Regardless, if you want to specify an alternative import statement to try, assuming that a relevant key is not found in the importmap JSON, you can do so thusly:~~
 
+<!--
 ```html
 <xtal-frappe-chart data-imp="web_modules/xtal-frappe-chart.js"></xtal-frappe-chart>
 ```
+
+
+
 
 ## The most long-winded explanation for a simple attribute since the invention of README 
 
@@ -169,6 +179,7 @@ xtal-sip considers Approach II to be more promising, especially as it suggests a
 ```html
 <xtal-sip prereqs="my-mixin-buffet-web-component;some-other-preemptive-web-component"></xtal-sip>
 ```
+--
 
 ## To run locally:
 

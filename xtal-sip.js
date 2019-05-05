@@ -1,4 +1,4 @@
-import { hydrate, up } from "trans-render/hydrate.js";
+import { hydrate } from "trans-render/hydrate.js";
 import { define } from "trans-render/define.js";
 import { XtallatX } from "xtal-element/xtal-latx.js";
 import { observeCssSelector } from "xtal-element/observeCssSelector.js";
@@ -8,52 +8,46 @@ if (importmap !== null) {
     const parsed = JSON.parse(importmap.innerHTML);
     mappingLookup = parsed.imports;
 }
-const prereq = 'prereq';
+//const prereq = 'prereq';
 export class XtalSip extends observeCssSelector(XtallatX(hydrate(HTMLElement))) {
     constructor() {
         super(...arguments);
+        // static get observedAttributes(){
+        //   return super.observedAttributes.concat([prereq]);
+        // }
         this._preLoaded = true;
         this._conn = false;
         this._aL = false;
+        this._re = /^[a-z-]+$/;
     }
     static get is() {
         return "xtal-sip";
     }
-    static get observedAttributes() {
-        return super.observedAttributes.concat([prereq]);
-    }
-    loadAll(keys) {
-        const promiseAll = Promise.all(keys.map(key => this.doImport(this.getImportKey(key), key)));
-        promiseAll.then(val => {
-            this._preLoaded = true;
-            this.onPropsChange();
-        });
-    }
-    attributeChangedCallback(n, ov, nv) {
-        let foundAttrib = false;
-        switch (n) {
-            case prereq:
-                foundAttrib = true;
-                this._preLoaded = false;
-                this._prereq = nv;
-                break;
-        }
-        if (!foundAttrib)
-            super.attributeChangedCallback(n, ov, nv);
-        this.onPropsChange();
-    }
-    get prereq() {
-        return this._prereq;
-    }
-    set prereq(nv) {
-        this.attr(prereq, nv);
-    }
+    // attributeChangedCallback(n: string, ov: string, nv: string){
+    //   let foundAttrib = false;
+    //   switch(n){
+    //     case prereq:
+    //       foundAttrib = true;
+    //       this._preLoaded = false;
+    //       this._prereq = nv;
+    //       break;
+    //   }
+    //   if(!foundAttrib) super.attributeChangedCallback(n, ov, nv);
+    //   this.onPropsChange();
+    // }
+    // _prereq: string;
+    // get prereq(){
+    //   return this._prereq;
+    // }
+    // set prereq(nv){
+    //   this.attr(prereq, nv);
+    // }
     get selector() {
         return '[data-imp]';
     }
     connectedCallback() {
         this.style.display = 'none';
-        this[up]([prereq]);
+        //this[up]([prereq]);
         this._conn = true;
         this.onPropsChange();
     }
@@ -67,7 +61,12 @@ export class XtalSip extends observeCssSelector(XtallatX(hydrate(HTMLElement))) 
         }
     }
     getImportKey(tagName) {
+        if (!this.validateTagName(tagName))
+            throw "Invalid Key";
         return `${tagName}`;
+    }
+    validateTagName(tagName) {
+        return tagName.search(this._re) !== -1;
     }
     get animationName() {
         return XtalSip.is;
@@ -77,12 +76,12 @@ export class XtalSip extends observeCssSelector(XtallatX(hydrate(HTMLElement))) 
         this.de(type2, detail, true);
         promise(detail);
     }
-    tryBackup(target) {
-        const imp = target.dataset.imp;
-        if (imp !== undefined && imp.length > 0) {
-            this.doImport(imp, target.localName);
-        }
-    }
+    // tryBackup(target: HTMLElement){
+    //   const imp = target.dataset.imp;
+    //   if(imp !== undefined && imp.length > 0){
+    //     this.doImport(imp, target.localName);
+    //   }
+    // }
     async doImport(key, tagName) {
         return new Promise(resolve => {
             const detail = {
@@ -117,7 +116,7 @@ export class XtalSip extends observeCssSelector(XtallatX(hydrate(HTMLElement))) 
                     this.doImport(key, tagName);
                 }
                 else {
-                    this.tryBackup(target);
+                    //this.tryBackup(target)
                 }
             }, 0);
         }
