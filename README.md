@@ -96,33 +96,28 @@ So here's some sample syntax.
 xtal-sip only affects anything within its shadow DOM realm (or outside any Shadow DOM if the tag is not inside any Shadow DOM).
 
 
-~~## I know what you're thinking~~
+## I know what you're thinking
 
-~~While this solution works fine for your Ruby on Rails application, what if you are building a reusable web component?~~
+While this solution works fine for your Ruby on Rails application, what if you are building a reusable web component?
 
-~~The solution above is a bit dicey, if you are not on good terms with the people who configure the web sites using your web component.  You will need to convince them (via documentation or some other way) to a)  Add an importmap in index.html, and b)  add a bunch of entries for all your dynamically loaded web components.~~
+The solution above is a bit dicey, if you are not on good terms with the people who configure the web sites using your web component.  You will need to convince them (via documentation or some other way) to a)  Add an importmap in index.html, and b)  add a bunch of entries for all your dynamically loaded web components.
 
-~~There is no procedure that I'm aware of currently to manage the import map based off of package.json's.~~ 
+There is no procedure that I'm aware of currently to manage the import map based off of package.json's. 
 
-~~## Fallback Plan I~~
+## Fallback Plan 
 
-~~So what's the fallback if you want your web component to be reusable, until the ecosystem behind importmaps is more solid?~~
+So what's the fallback if you want your web component to be reusable, until the ecosystem behind importmaps is more solid?
 
-~~One approach to providing a fallback is as follows:~~
+One approach to providing a fallback is as follows:
 
-~~1)  You should still npm install all your dependencies.
+1)  You should still npm install all your dependencies.
 2)  You could create a separate js file that is simply a list of static imports of all your web-component dependencies that you want to lazy-load.
-3)  Subscribe to the event "load-failure" mentioned above, and the first time receiving such an event, dynamically load your separate file mentioned in step 2 using dynamic import().  Here you are implicitly relying on applicaions using some bundler (or some other mechanism) that can handle bare import specifiers, including those using dynamic imports with a hardcoded string (inside a condition).~~
+3)  Subscribe to the event "load-failure" mentioned above, and the first time receiving such an event, dynamically load your separate file mentioned in step 2 using dynamic import().  Here you are implicitly relying on applicaions using some bundler (or some other mechanism) that can handle bare import specifiers, including those using dynamic imports with a hardcoded string (inside a condition).
 
-~~This is the simplest fallback.  It means that all your web component dependencies will load into memory in one step, even if they aren't needed (e.g. if websites don't cooperate with your suggestion).  More sophisticated fallbacks could be developed, but this is probably a good starting point.  It's clearly not ideal.  Ideally, the person consuming your web component would have the patience to add what's needed to the importmap tag in index.html.~~
+This is the simplest fallback.  It means that all your web component dependencies will load into memory in one step, even if they aren't needed (e.g. if websites don't cooperate with your suggestion).  More sophisticated fallbacks could be developed, but this is probably a good starting point.  It's clearly not ideal.  Ideally, the person consuming your web component would have the patience to add what's needed to the importmap tag in index.html.~~
 
-~~Even though loading things into memory only when needed is nice, you might want to pair that with prefetching resources via [preload](https://developer.mozilla.org/en-US/docs/Web/HTML/Preloading_content) and/or [prefetch](https://3perf.com/blog/link-rels/).~~
+Even though loading things into memory only when needed is nice, you might want to pair that with prefetching resources via [preload](https://developer.mozilla.org/en-US/docs/Web/HTML/Preloading_content) and/or [prefetch](https://3perf.com/blog/link-rels/).
 
-~~## Fallback(?) Plan II (untested)~~
-
-~~[pika-web](https://www.pikapkg.com/blog/pika-web-a-future-without-webpack/) is an interesting alternative to importmaps, that recommends "hard-coding" references to "web_modules".~~
-
-~~Regardless, if you want to specify an alternative import statement to try, assuming that a relevant key is not found in the importmap JSON, you can do so thusly:~~
 
 <!--
 ```html
