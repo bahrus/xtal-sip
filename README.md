@@ -52,11 +52,8 @@ xtal-sip checks if that key can be found in the global importmap.
 
 Note that we are allowing a tag name to invoke a dynamic import, passing in the name of the tag, which [now I'm thinking may raise security concerns](https://github.com/w3c/webappsec-csp/issues/243). Some additional functionality listed below has been removed, in order to guarantee better security.
 
-By default, the component will confirm that the tag name is a valid custom element name.
 
-If you feel the need to add additional checks, you can override the validator "validateTagName(tagName: string)" and add more stringent checks.
-
-If the code finds the validated tag name as an import map key, it tries to do a dynamic import of that key, and if that succeeds, and the tagName gets successfully registered, a custom event is fired: "load-success", which includes the tag name that was successfully loaded in the custom event detail.
+If the code finds the validated tag name as an import map key, it tries to do a dynamic import of that key, as soon as it detects a relevant tag name added to the active DOM tree within its shadow DOM realm.  If that succeeds, and the tagName gets successfully registered, a custom event is fired: "load-success", which includes the tag name that was successfully loaded in the custom event detail.
 
 If no such key is found in the importmap JSON, or if the dependency fails to load, or doesn't succeed in registering the custom element, another custom event is fired, "load-failure" with the same detail information.
 
@@ -93,8 +90,6 @@ So here's some sample syntax.
 
 ```
 
-xtal-sip only affects anything within its shadow DOM realm (or outside any Shadow DOM if the tag is not inside any Shadow DOM).
-
 
 ## I know what you're thinking
 
@@ -118,6 +113,39 @@ This is the simplest fallback.  It means that all your web component dependencie
 
 Even though loading things into memory only when needed is nice, you might want to pair that with prefetching resources via [preload](https://developer.mozilla.org/en-US/docs/Web/HTML/Preloading_content) and/or [prefetch](https://3perf.com/blog/link-rels/).
 
+## Preemptive Loading 
+
+Just add an exclamation (!) at the end of the tag name:
+
+```html
+<html>
+  <head>
+    ...
+    <!-- Polyfill: <script type="importmap-shim"> -->
+    <script type="importmap"> 
+    {
+      "imports": {
+        ...
+        "xtal-frappe-chart": 
+            "https://cdn.jsdelivr.net/npm/xtal-frappe-chart@0.0.22/xtal-frappe-chart.js",
+        ...
+      }
+    }
+    </script>
+    ...
+    
+  </head>
+  <body>
+      <xtal-sip>
+        <script nomodule>["xtal-frappe-chart!"]</script>
+      </xtal-sip>
+    ... 
+
+    <xtal-frappe-chart></xtal-frappe-chart> 
+  </body>
+</html>
+
+```
 
 <!--
 ```html
