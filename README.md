@@ -50,8 +50,6 @@ To customize what key to look for in the importmap JSON, you can subclass xtal-s
 
 xtal-sip checks if that key can be found in the global importmap.
 
-Note that we are allowing a tag name to invoke a dynamic import, passing in the name of the tag, which [now I'm thinking may raise security concerns](https://github.com/w3c/webappsec-csp/issues/243). Some additional functionality listed below has been removed, in order to guarantee better security.
-
 
 If the code finds the validated tag name as an import map key, it tries to do a dynamic import of that key, as soon as it detects a relevant tag name added to the active DOM tree within its shadow DOM realm.  If that succeeds, and the tagName gets successfully registered, a custom event is fired: "load-success", which includes the tag name that was successfully loaded in the custom event detail.
 
