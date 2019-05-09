@@ -100,10 +100,10 @@ export class XtalSip extends HTMLElement {
     this.setAttribute(eventName, '');
     return newEvent;
 }
-  de2(type1: string, type2: string, tagName: string, detail: any, promise: any){
+  de2(type1: string, type2: string, tagName: string, detail: any, promise?: any){
     this.de(type1 + tagName, detail);
     this.de(type2, detail);
-    promise(detail);
+    if(promise) promise(detail);
   }
 
   async doImport(key: string, tagName: string){
@@ -111,7 +111,7 @@ export class XtalSip extends HTMLElement {
       const detail = {
         tagName: tagName,
         importStatement: key
-      };
+      } as any;
       import(key)
       .then(() => {
         customElements
@@ -125,6 +125,7 @@ export class XtalSip extends HTMLElement {
           });
       })
       .catch(e => {
+        detail.err = e.message;
         this.de2('failed-to-load-', 'load-failure', tagName, detail, resolve);
       });
     })
@@ -141,7 +142,11 @@ export class XtalSip extends HTMLElement {
 
           this.doImport(key, tagName);
         }else{
-          //this.tryBackup(target)
+          this.de2('failed-to-load-', 'load-failure', tagName, {
+            key: key,
+            tagName: tagName,
+            msg: "key not found in importmap"
+          });
         }
       }, 0);
     }

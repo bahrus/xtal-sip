@@ -93,7 +93,8 @@ export class XtalSip extends HTMLElement {
     de2(type1, type2, tagName, detail, promise) {
         this.de(type1 + tagName, detail);
         this.de(type2, detail);
-        promise(detail);
+        if (promise)
+            promise(detail);
     }
     async doImport(key, tagName) {
         return new Promise(resolve => {
@@ -113,6 +114,7 @@ export class XtalSip extends HTMLElement {
                 });
             })
                 .catch(e => {
+                detail.err = e.message;
                 this.de2('failed-to-load-', 'load-failure', tagName, detail, resolve);
             });
         });
@@ -129,7 +131,11 @@ export class XtalSip extends HTMLElement {
                     this.doImport(key, tagName);
                 }
                 else {
-                    //this.tryBackup(target)
+                    this.de2('failed-to-load-', 'load-failure', tagName, {
+                        key: key,
+                        tagName: tagName,
+                        msg: "key not found in importmap"
+                    });
                 }
             }, 0);
         }
