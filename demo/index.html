@@ -10,21 +10,19 @@
             <script type="importmap-shim">
               {
                 "imports": {
-                  "xtal-element/": "../node_modules/xtal-element/",
-                  "trans-render/": "../node_modules/trans-render/",
-                  "xtal-json-merge/": "https://cdn.jsdelivr.net/npm/xtal-json-merge@0.2.35/",
-                  "xtal-json-editor/": "https://cdn.jsdelivr.net/npm/xtal-json-editor@0.0.34/",
-                  "p-d.p-u/": "https://cdn.jsdelivr.net/npm/p-d.p-u@0.0.120/",
-                  "xtal-frappe-chart": "https://cdn.jsdelivr.net/npm/xtal-frappe-chart@0.0.28/xtal-frappe-chart.js",
-                  "frappe-charts/": "https://cdn.jsdelivr.net/npm/frappe-charts@1.1.0/"
+                  "xtal-element/": "https://cdn.jsdelivr.net/npm/xtal-element@0.0.59/",
+                  "trans-render/": "https://cdn.jsdelivr.net/npm/trans-render@0.0.111/",
+                  "frappe-charts/": "https://cdn.jsdelivr.net/npm/frappe-charts@1.1.0/",
+                  "xtal-insert-json": "https://cdn.jsdelivr.net/npm/xtal-json-merge@0.2.37/xtal-insert-json.js",
+                  "xtal-json-editor": "https://cdn.jsdelivr.net/npm/xtal-json-editor@0.0.35/xtal-json-editor.js",
+                  "p-d": "https://cdn.jsdelivr.net/npm/p-d.p-u@0.0.122/p-d.js",
+                  "xtal-frappe-chart": "https://cdn.jsdelivr.net/npm/xtal-frappe-chart@0.0.29/xtal-frappe-chart.js"
+                  
                 }
               }
               </script>
             <script  type="module-shim">
               import '../xtal-sip.js';
-              import 'xtal-json-merge/xtal-insert-json.js';
-              import 'xtal-json-editor/xtal-json-editor.js';
-              import 'p-d.p-u/p-d.js';
             </script>
     
   </head>
@@ -32,7 +30,7 @@
     <div>
       <h3>Basic xtal-frappe-chart demo</h3>
       <xtal-sip>
-        <script nomodule>["xtal-frappe-chart"]</script>
+        <script nomodule>["xtal-frappe-chart", "xtal-insert-json", "xtal-json-editor", "p-d"]</script>
       </xtal-sip>
       <xtal-insert-json input="[]">
         <script type="application/json">
@@ -70,8 +68,6 @@
       <p-d on="selected-element-changed" prop="input" val="target.value"></p-d>
       <xtal-json-editor options="{}"  height="300px"></xtal-json-editor>
 
-      <script src="https://unpkg.com/@webcomponents/webcomponentsjs/webcomponents-loader.js"></script>
-    
 
     </div>
   </body>

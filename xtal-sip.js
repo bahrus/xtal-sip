@@ -60,7 +60,7 @@ export class XtalSip extends HTMLElement {
         const json = JSON.parse(script.innerHTML);
         const immediate = json.filter(s => s.endsWith('!'));
         const lazy = json.filter(s => !s.endsWith('!'));
-        this.loadAll(immediate, lazy);
+        this.loadAll(immediate.map(s => s.substr(0, s.length - 1)), lazy);
     }
     initCssListener(selector) {
         if (!this._aL) {
