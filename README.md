@@ -34,6 +34,7 @@ The goals of xtal-sip are:
 1.  Provide a declarative way of progressively, dynamically loading web component dependencies into memory, only when needed.
 2.  Do so without introducing another additional listing of dependencies.
 
+##  That's Easy
 
 ## Convention over Configuration
 
@@ -88,8 +89,26 @@ So here's some sample syntax.
 
 ```
 
+## I know what you're thinking, Part I
 
-## I know what you're thinking
+Q:  Why not just do this?
+
+```html
+<script type="module">import('xtal-import-chart');</script>
+<xtal-frappe-chart></xtal-frappe-chart>
+```
+
+A:  There are so many things wrong with doing that.
+
+1.  It completely invalidates the usefulness of this web component.
+2.  Kind of boring, don't you think?
+3.  You bore me.
+4.  For simple cases, sure.  But if you have lots of conditional loading logic, you have to remember to include the script line alongside the element.  
+5.  The script might detract from the beautiful markup.
+6.  That's lots of little script lines the browser has to parse.
+
+
+## I know what you're thinking, Part II
 
 While this solution works fine for your Ruby on Rails application, what if you are building a reusable web component?
 
