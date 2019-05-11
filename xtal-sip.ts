@@ -73,16 +73,12 @@ export class XtalSip extends HTMLElement {
     }
   }
 
-  _wildMap: string[];
+  //_wildMap: string[];
 
   getImportKey(tagName: string) {
-    if(!this.validateTagName(tagName)) throw "Invalid Key";
     return `${tagName}`;
   }
-  _re = /^[a-z-]+$/
-  validateTagName(tagName: string){
-    return tagName.search(this._re) !== -1;
-  }
+
 
   get animationName(){
     return XtalSip.is;

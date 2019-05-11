@@ -26,7 +26,6 @@ export class XtalSip extends HTMLElement {
         this._conn = false;
         this._aL = false;
         this._fS = false;
-        this._re = /^[a-z-]+$/;
     }
     static get is() {
         return "xtal-sip";
@@ -68,13 +67,9 @@ export class XtalSip extends HTMLElement {
             this._aL = true;
         }
     }
+    //_wildMap: string[];
     getImportKey(tagName) {
-        if (!this.validateTagName(tagName))
-            throw "Invalid Key";
         return `${tagName}`;
-    }
-    validateTagName(tagName) {
-        return tagName.search(this._re) !== -1;
     }
     get animationName() {
         return XtalSip.is;
