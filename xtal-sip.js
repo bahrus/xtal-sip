@@ -104,8 +104,9 @@ export class XtalSip extends HTMLElement {
                     .then(() => {
                     this.de2('loaded-', 'load-success', tagName, detail, resolve);
                 })
-                    .catch(() => {
+                    .catch(e => {
                     this.de2('failed-to-load-', 'load-failure', tagName, detail, resolve);
+                    console.error(e.message);
                 });
             })
                 .catch(e => {

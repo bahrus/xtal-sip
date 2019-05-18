@@ -34,8 +34,6 @@ The goals of xtal-sip are:
 1.  Provide a declarative way of progressively, dynamically loading web component dependencies into memory, only when needed.
 2.  Do so without introducing another additional listing of dependencies.
 
-##  That's Easy
-
 ## Convention over Configuration
 
 xtal-sip takes a cue from Ruby on Rails and adopts the Convention over Configuration philosophy.  Import maps are flexible enough that they should be able to map "name-of-element" to whatever you need it to.  So xtal-sip assumes, by default, that we can list all web components we want to dynamically load with key "name-of-element" in the import map.  
