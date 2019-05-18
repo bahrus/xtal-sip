@@ -139,11 +139,13 @@ export class XtalSip extends HTMLElement {
 
           this.doImport(key, tagName);
         }else{
-          this.de2('failed-to-load-', 'load-failure', tagName, {
+          const detail = {
             key: key,
             tagName: tagName,
-            msg: "key not found in importmap"
-          });
+            msg: key + " not found in importmap."
+          };
+          this.de2('failed-to-load-', 'load-failure', tagName, detail);
+          console.error(detail.msg);
         }
       }, 0);
     }
