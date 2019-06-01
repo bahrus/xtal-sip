@@ -67,7 +67,7 @@ export class XtalSip extends HTMLElement {
     }
     de3(tagName, detail, resolve, e) {
         this.de2('failed-to-load-', 'load-failure', tagName, detail, resolve);
-        console.error(e);
+        console.error(tagName, e);
     }
     loadAll(immediate, lazy, host) {
         const promiseAll = Promise.all(immediate.map(key => this.doImport(this.getImportKey(key), key)));

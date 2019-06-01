@@ -72,7 +72,7 @@ export class XtalSip extends HTMLElement {
   }
   de3(tagName, detail, resolve, e){
     this.de2('failed-to-load-', 'load-failure', tagName, detail, resolve);
-    console.error(e);
+    console.error(tagName, e);
   }
 
   loadAll(immediate: string[], lazy: string[], host: HTMLElement | Document){
