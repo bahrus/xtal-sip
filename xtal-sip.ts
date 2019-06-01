@@ -35,7 +35,6 @@ export class XtalSip extends HTMLElement {
   _c = false;
   connectedCallback() {
     this.style.display = 'none';
-    //this[up]([prereq]);
     this._c = true;
     this.onPropsChange();
   }
@@ -66,11 +65,14 @@ export class XtalSip extends HTMLElement {
       const detail = {
         key: key,
         tagName: tagName,
-        msg: key + " not found in importmap."
+        message: key + " not found in importmap."
       };
-      this.de2('failed-to-load-', 'load-failure', tagName, detail);
-      console.error(detail.msg);
+      this.de3(tagName, detail, null, detail);
     }
+  }
+  de3(tagName, detail, resolve, e){
+    this.de2('failed-to-load-', 'load-failure', tagName, detail, resolve);
+    console.error(e);
   }
 
   loadAll(immediate: string[], lazy: string[], host: HTMLElement | Document){
@@ -106,14 +108,6 @@ export class XtalSip extends HTMLElement {
 
   }
 
-  // initCssListener(selector: string){
-  //   if (!this._aL) {
-  //     this.addCSSListener(this.animationName, selector, this.insertListener);
-  //     this._aL = true;
-  //   }
-  // }
-
-  //_wildMap: string[];
 
   getImportKey(tagName: string) {
     return `${tagName}`;
@@ -156,14 +150,15 @@ export class XtalSip extends HTMLElement {
             this.de2('loaded-', 'load-success', tagName, detail, resolve);
           })
           .catch(e => {
-            this.de2('failed-to-load-', 'load-failure', tagName, detail, resolve);
-            console.error(e.message);
+            //this.de2('failed-to-load-', 'load-failure', tagName, detail, resolve);
+            this.de3(tagName, detail, resolve, e);
+            
           });
       })
       .catch(e => {
         detail.err = e.message;
-        this.de2('failed-to-load-', 'load-failure', tagName, detail, resolve);
-        console.error(e.message);
+        //this.de2('failed-to-load-', 'load-failure', tagName, detail, resolve);
+        this.de3(tagName, detail, resolve, e);
       });
     })
 
@@ -172,11 +167,7 @@ export class XtalSip extends HTMLElement {
 
   disconnectedCallback(){
     if(this._listener) this._listener.disconnect();
-
   }
-
-
-
 
 }
 customElements.define(XtalSip.is, XtalSip);
