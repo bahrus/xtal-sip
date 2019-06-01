@@ -19,11 +19,11 @@ if (importmap !== null) {
     const parsed = JSON.parse(importmap.innerHTML);
     mappingLookup = parsed.imports;
 }
-const eventNames = ["animationstart", "MSAnimationStart", "webkitAnimationStart"];
+//const eventNames = ["animationstart", "MSAnimationStart", "webkitAnimationStart"];
 export class XtalSip extends HTMLElement {
     constructor() {
         super(...arguments);
-        this._conn = false;
+        this._c = false;
         this._aL = false;
         this._fS = false;
     }
@@ -33,19 +33,45 @@ export class XtalSip extends HTMLElement {
     connectedCallback() {
         this.style.display = 'none';
         //this[up]([prereq]);
-        this._conn = true;
+        this._c = true;
         this.onPropsChange();
     }
     onPropsChange() {
-        if (!this._conn)
+        if (!this._c)
             return;
         let id = this.id || XtalSip.is;
         this.loadScript();
     }
-    loadAll(immediate, lazy) {
+    async addCSSListener(lazy, host) {
+        if (lazy.length === 0)
+            return;
+        const { CSSListener } = await import('./CSSListener.js');
+        this._listener = new CSSListener(lazy.join(','), host, this, XtalSip.is, this.newTag);
+    }
+    newTag(target) {
+        debugger;
+        const tagName = target.localName;
+        if (customElements.get(tagName) !== undefined)
+            return;
+        const key = this.getImportKey(tagName);
+        if (mappingLookup[key] !== undefined) {
+            this.doImport(key, tagName);
+        }
+        else {
+            const detail = {
+                key: key,
+                tagName: tagName,
+                msg: key + " not found in importmap."
+            };
+            this.de2('failed-to-load-', 'load-failure', tagName, detail);
+            console.error(detail.msg);
+        }
+    }
+    loadAll(immediate, lazy, host) {
         const promiseAll = Promise.all(immediate.map(key => this.doImport(this.getImportKey(key), key)));
         promiseAll.then(val => {
-            this.initCssListener(lazy.join(','));
+            this.addCSSListener(lazy, host);
+            //this.initCssListener(lazy.join(','));
         });
     }
     loadScript() {
@@ -59,14 +85,24 @@ export class XtalSip extends HTMLElement {
         const json = JSON.parse(script.innerHTML);
         const immediate = json.filter(s => s.endsWith('!'));
         const lazy = json.filter(s => !s.endsWith('!'));
-        this.loadAll(immediate.map(s => s.substr(0, s.length - 1)), lazy);
+        const host = getHost(this) || document;
+        const reallyLazy = [];
+        lazy.forEach(tag => {
+            if (host.querySelector(tag) !== null) {
+                immediate.push(tag + '!');
+            }
+            else {
+                reallyLazy.push(tag);
+            }
+        });
+        this.loadAll(immediate.map(s => s.substr(0, s.length - 1)), reallyLazy, host);
     }
-    initCssListener(selector) {
-        if (!this._aL) {
-            this.addCSSListener(this.animationName, selector, this.insertListener);
-            this._aL = true;
-        }
-    }
+    // initCssListener(selector: string){
+    //   if (!this._aL) {
+    //     this.addCSSListener(this.animationName, selector, this.insertListener);
+    //     this._aL = true;
+    //   }
+    // }
     //_wildMap: string[];
     getImportKey(tagName) {
         return `${tagName}`;
@@ -116,71 +152,9 @@ export class XtalSip extends HTMLElement {
             });
         });
     }
-    insertListener(e) {
-        if (e.animationName === this.animationName) {
-            const target = e.target;
-            setTimeout(() => {
-                const tagName = target.localName;
-                if (customElements.get(tagName) !== undefined)
-                    return;
-                const key = this.getImportKey(tagName);
-                if (mappingLookup[key] !== undefined) {
-                    this.doImport(key, tagName);
-                }
-                else {
-                    const detail = {
-                        key: key,
-                        tagName: tagName,
-                        msg: key + " not found in importmap."
-                    };
-                    this.de2('failed-to-load-', 'load-failure', tagName, detail);
-                    console.error(detail.msg);
-                }
-            }, 0);
-        }
-    }
-    addCSSListener(id, targetSelector, insertListener) {
-        // See https://davidwalsh.name/detect-node-insertion
-        if (this._boundInsertListener)
-            return;
-        const styleInner = /* css */ `
-      @keyframes ${id} {
-          from {
-              opacity: 0.99;
-          }
-          to {
-              opacity: 1;
-          }
-      }
-
-      ${targetSelector}{
-          animation-duration: 0.001s;
-          animation-name: ${id};
-      }
-      `;
-        const style = document.createElement('style');
-        style.innerHTML = styleInner;
-        const host = getHost(this);
-        if (host !== null) {
-            host.shadowRoot.appendChild(style);
-        }
-        else {
-            document.head.appendChild(style);
-        }
-        this._boundInsertListener = insertListener.bind(this);
-        const container = host ? host.shadowRoot : document;
-        eventNames.forEach(name => {
-            container.addEventListener(name, this._boundInsertListener, false);
-        });
-    }
     disconnectedCallback() {
-        if (this._boundInsertListener) {
-            const host = getHost(this);
-            const container = host ? host.shadowRoot : document;
-            eventNames.forEach(name => {
-                container.removeEventListener(name, this._boundInsertListener);
-            });
-        }
+        if (this._listener)
+            this._listener.disconnect();
     }
 }
 customElements.define(XtalSip.is, XtalSip);
