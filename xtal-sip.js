@@ -100,7 +100,7 @@ export class XtalSip extends HTMLElement {
         this.loadAll(immediate.map(s => s.substr(0, s.length - 1)), reallyLazy, host);
     }
     getImportKey(tagName) {
-        return `${tagName}`;
+        return `tagName`;
     }
     get animationName() {
         return XtalSip.is;

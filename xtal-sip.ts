@@ -110,7 +110,7 @@ export class XtalSip extends HTMLElement {
 
 
   getImportKey(tagName: string) {
-    return `${tagName}`;
+    return `tagName`;
   }
 
 
