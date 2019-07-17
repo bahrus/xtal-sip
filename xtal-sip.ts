@@ -5,8 +5,6 @@ export function getHost(el: HTMLElement) : HTMLElement | null {
   while (parent = (parent.parentNode)) {
       if (parent.nodeType === 11) {
           return parent;
-      }  else if (parent.tagName === 'BODY') {
-          return parent;
       }
   }
   return null;
@@ -52,7 +50,6 @@ export class XtalSip extends HTMLElement {
   }
 
   newTag(target: HTMLElement){
-    debugger;
     const tagName = target.localName;
     if (customElements.get(tagName) !== undefined) return;
     const key = this.getImportKey(tagName);

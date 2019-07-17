@@ -5,9 +5,6 @@ export function getHost(el) {
         if (parent.nodeType === 11) {
             return parent;
         }
-        else if (parent.tagName === 'BODY') {
-            return parent;
-        }
     }
     return null;
 }
@@ -46,7 +43,6 @@ export class XtalSip extends HTMLElement {
         this._listener = new CSSListener(lazy.join(','), host, this, XtalSip.is, this.newTag);
     }
     newTag(target) {
-        debugger;
         const tagName = target.localName;
         if (customElements.get(tagName) !== undefined)
             return;
