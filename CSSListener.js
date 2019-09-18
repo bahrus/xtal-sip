@@ -39,7 +39,7 @@ export class CSSListener {
         `;
         const style = document.createElement("style");
         style.innerHTML = styleInner;
-        if (this.host.host) {
+        if (this.host.host && this.host.host.shadowRoot) {
             this.host.appendChild(style);
         }
         else {
