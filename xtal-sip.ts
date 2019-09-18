@@ -44,7 +44,7 @@ export class XtalSip extends HTMLElement {
   }
 
   _listener: any;
-  async addCSSListener(lazy: string[], host: HTMLElement | Document){
+  async addCSSListener(lazy: string[], host: HTMLElement | Document | DocumentFragment){
     if(lazy.length === 0) return;
     const {CSSListener} = await import('./CSSListener.js');
     const listener  = new CSSListener(lazy.join(','), host, this, XtalSip.is, this.newTag.bind(this));
@@ -73,7 +73,7 @@ export class XtalSip extends HTMLElement {
     console.error(tagName, e);
   }
 
-  loadAll(immediate: string[], lazy: string[], host: HTMLElement | Document){
+  loadAll(immediate: string[], lazy: string[], host: HTMLElement | Document | DocumentFragment){
     const promiseAll = Promise.all(immediate.map(key => this.doImport(this.getImportKey(key), key)));
     promiseAll.then(val =>{
       this.addCSSListener(lazy, host);
@@ -92,7 +92,8 @@ export class XtalSip extends HTMLElement {
     const json = JSON.parse(script.innerHTML) as string[];
     const immediate = json.filter(s => s.endsWith('!'));
     const lazy = json.filter(s => !s.endsWith('!'));
-    const host = getHost(this) || document;
+    let host : HTMLElement | ShadowRoot | Document = getHost(this);
+    host = (host && host.shadowRoot) ? host.shadowRoot  : document ;
 
     const reallyLazy  = [];
     lazy.forEach(tag =>{

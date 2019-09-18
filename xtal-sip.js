@@ -85,7 +85,8 @@ export class XtalSip extends HTMLElement {
         const json = JSON.parse(script.innerHTML);
         const immediate = json.filter(s => s.endsWith('!'));
         const lazy = json.filter(s => !s.endsWith('!'));
-        const host = getHost(this) || document;
+        let host = getHost(this);
+        host = (host && host.shadowRoot) ? host.shadowRoot : document;
         const reallyLazy = [];
         lazy.forEach(tag => {
             if (host.querySelector(tag) !== null) {
