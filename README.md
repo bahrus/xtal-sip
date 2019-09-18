@@ -87,6 +87,7 @@ So here's some sample syntax.
 
 ```
 
+
 ## I know what you're thinking, Part I
 
 Q:  Why not just do this?
@@ -104,6 +105,24 @@ A:  There are so many things wrong with doing that.
 4.  For simple cases, sure.  But if you have lots of conditional loading logic, you have to remember to include the script line alongside the element.  
 5.  The script might detract from the beautiful markup.
 6.  That's lots of little script lines the browser has to parse.
+7.  This actually doesn't work if the html is dynamically generated on the client (for example, comes from a cloned template inside shadowDOM)
+
+Adding CSS Matching
+
+You can also do this:
+
+```html
+  <body>
+      <xtal-sip>
+        <script nomodule>["xtal-frappe-chart[load]"]</script>
+      </xtal-sip>
+    ... 
+
+    <xtal-frappe-chart></xtal-frappe-chart> 
+  </body>
+```
+
+This will not load the xtal-frappe-chart library until attribute "load" is added to the xtal-frappe-chart tag.
 
 
 ## I know what you're thinking, Part II
@@ -112,7 +131,7 @@ While this solution works fine for your Ruby on Rails application, what if you a
 
 The solution above is a bit dicey, if you are not on good terms with the people who configure the web sites using your web component.  You will need to convince them (via documentation or some other way) to a)  Add an importmap in index.html, and b)  add a bunch of entries for all your dynamically loaded web components.
 
-There is no procedure that I'm aware of currently to manage the import map based off of package.json's. 
+We are only [beginning to see automated solutions](https://github.com/open-wc/open-wc/tree/master/packages/import-maps-generate) for generating import mappings inside an html file, so watch this space.
 
 ## Fallback Plan 
 
