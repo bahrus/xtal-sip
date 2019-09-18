@@ -8,11 +8,13 @@ export function getHost(el) {
     }
     return null;
 }
+//let usesShim = false;
 const importmap = document.querySelector('script[type^="importmap"]');
 let mappingLookup = {};
 if (importmap !== null) {
     const parsed = JSON.parse(importmap.innerHTML);
     mappingLookup = parsed.imports;
+    //usesShim = importmap.type!=="importmap";
 }
 //const eventNames = ["animationstart", "MSAnimationStart", "webkitAnimationStart"];
 export class XtalSip extends HTMLElement {
@@ -40,10 +42,12 @@ export class XtalSip extends HTMLElement {
         if (lazy.length === 0)
             return;
         const { CSSListener } = await import('./CSSListener.js');
-        this._listener = new CSSListener(lazy.join(','), host, this, XtalSip.is, this.newTag);
+        const listener = new CSSListener(lazy.join(','), host, this, XtalSip.is, this.newTag.bind(this));
+        listener.addCSSListener(this.id || 'xtal-sip');
+        this._listener = listener;
     }
-    newTag(target) {
-        const tagName = target.localName;
+    newTag(e) {
+        const tagName = e.target.localName;
         if (customElements.get(tagName) !== undefined)
             return;
         const key = this.getImportKey(tagName);

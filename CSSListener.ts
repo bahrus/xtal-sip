@@ -17,7 +17,7 @@ export class CSSListener {
     }
   }
 
-  addCSSListener(id: string, selector: string, insertListener: any) {
+  addCSSListener(id: string) {
     // See https://davidwalsh.name/detect-node-insertion
     if (this._boundInsertListener) return;
     const styleInner = /* css */ `
@@ -30,22 +30,22 @@ export class CSSListener {
             }
         }
   
-        ${selector}{
+        ${this.selector}{
             animation-duration: 0.001s;
             animation-name: ${id};
         }
         `;
     const style = document.createElement("style");
     style.innerHTML = styleInner;
-    if (this.host !== null) {
+    if (this.host.shadowRoot) {
       this.host.shadowRoot.appendChild(style);
     } else {
       document.head.appendChild(style);
     }
-    this._boundInsertListener = insertListener.bind(this);
-    const container = this.host ? this.host.shadowRoot : document;
+    //this._boundInsertListener = this.callback.bind(this);
+    const container = this.host;// ? this.host.shadowRoot : document;
     eventNames.forEach(name => {
-      container.addEventListener(name, this._boundInsertListener, false);
+      container.addEventListener(name, this.callback, false);
     });
   }
 
@@ -53,7 +53,7 @@ export class CSSListener {
     if(this._boundInsertListener){
         const container = this.host ? this.host.shadowRoot : document;
         eventNames.forEach(name =>{
-            container.removeEventListener(name, this._boundInsertListener);
+            container.removeEventListener(name, this.callback);
         })
 
     }

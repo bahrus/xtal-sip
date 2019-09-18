@@ -10,13 +10,15 @@ export function getHost(el: HTMLElement) : HTMLElement | null {
   return null;
 }
 
-const importmap = document.querySelector('script[type^="importmap"]');
+//let usesShim = false;
+const importmap = document.querySelector('script[type^="importmap"]') as HTMLScriptElement;
 
 
 let mappingLookup: { [key: string]: string } = {};
 if (importmap !== null) {
   const parsed = JSON.parse(importmap.innerHTML);
   mappingLookup = parsed.imports;
+  //usesShim = importmap.type!=="importmap";
 }
 
 //const eventNames = ["animationstart", "MSAnimationStart", "webkitAnimationStart"];
@@ -25,7 +27,6 @@ export class XtalSip extends HTMLElement {
   static get is() {
     return "xtal-sip";
   }
-
 
 
   _c = false;
@@ -46,11 +47,13 @@ export class XtalSip extends HTMLElement {
   async addCSSListener(lazy: string[], host: HTMLElement | Document){
     if(lazy.length === 0) return;
     const {CSSListener} = await import('./CSSListener.js');
-    this._listener = new CSSListener(lazy.join(','), host, this, XtalSip.is, this.newTag);
+    const listener  = new CSSListener(lazy.join(','), host, this, XtalSip.is, this.newTag.bind(this));
+    listener.addCSSListener(this.id || 'xtal-sip');
+    this._listener = listener;
   }
 
-  newTag(target: HTMLElement){
-    const tagName = target.localName;
+  newTag(e: Event){
+    const tagName = (e.target as HTMLElement).localName;
     if (customElements.get(tagName) !== undefined) return;
     const key = this.getImportKey(tagName);
     if (mappingLookup[key] !== undefined) {
