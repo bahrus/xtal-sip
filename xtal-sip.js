@@ -3,7 +3,7 @@ export function getHost(el) {
     let parent = el;
     while (parent = (parent.parentNode)) {
         if (parent.nodeType === 11) {
-            return parent;
+            return parent.host;
         }
     }
     return null;
