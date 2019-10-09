@@ -9,7 +9,7 @@
 
 Dynamically &#34;water&#34; a custom element tag with the necessary dependencies to sprout the tag from an inert seedling to a thing of beauty.
 
-**Backdrop**: Dynamic imports are (almost) shipping in every modern browser, and the import maps proposal is gelling and is [well polyfilled](https://github.com/guybedford/es-module-shims). 
+**Backdrop**: Dynamic imports are shipping in every modern browser, and the import maps proposal is gelling and is [well polyfilled](https://github.com/guybedford/es-module-shims). 
 
 Most every web application can be recursively broken down into logical regions, building blocks which are assembled together to form the whole site.
 
@@ -19,7 +19,7 @@ But as one zooms out from the micro to the macro, the nature of the components c
 
 At the micro level, components will have few, if any, dependencies, and those dependencies will tend to be quite stable, and likely all be used.  The dependencies will skew more towards tightly coupled utility libraries. 
 
-ES6 Modules (and hopefully HTML and CSS Modules in the near future), combined with import maps to (optionally) centralize management of these dependencies without bundling, works great at the micro level.  But does it scale to the big picture?
+ES6 Modules (and hopefully HTML and Stylesheet Modules in the near future), combined with import maps to (optionally) centralize management of these dependencies without bundling, works great at the micro level.  But does it scale to the big picture?
 
 xtal-sip argues that while it is certainly possible to build large applications with just modules and import maps, there are some pain points which will surface.
 
@@ -33,6 +33,7 @@ The goals of xtal-sip are:
 
 1.  Provide a declarative way of progressively, dynamically loading web component dependencies into memory, only when needed.
 2.  Do so without introducing another additional listing of dependencies.
+3.  Help reduce boilerplate import map configuration
 
 ## Convention over Configuration
 
@@ -123,6 +124,21 @@ You can also do this:
 ```
 
 This will not load the xtal-frappe-chart library until attribute "load" is added to the xtal-frappe-chart tag.
+
+## Collapsing [TODO]
+
+Because the import map proposal doesn't currently allow any kind of wildcard / collapsing resolutions (apparently supported by web packaging), it is quite cumbersome to maintain a one-to-one mapping in some cases.
+
+```html
+<body>
+  <xtal-sip>
+  <script nomodule>[{
+    "startsWith" : "ui5-",
+    "key": "@ui5-buffet"
+  }]</script>
+  </xtal-sip>
+</body>
+```
 
 
 ## I know what you're thinking, Part II
