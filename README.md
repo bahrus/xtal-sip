@@ -125,21 +125,23 @@ You can also do this:
 
 This will not load the xtal-frappe-chart library until attribute "load" is added to the xtal-frappe-chart tag.
 
-## Collapsing [TODO]
+## Collapsing / Key specifying [TODO, experimental syntax]
 
-Because the import map proposal doesn't currently allow any kind of wildcard / collapsing resolutions (apparently supported by web packaging), it is quite cumbersome to maintain a one-to-one mapping in some cases.
+Because the import map proposal doesn't currently allow any kind of wildcard / collapsing resolutions (apparently to be supported by web packaging), it is quite cumbersome to maintain a one-to-one mapping in some cases.
+
+To support this scenario, the following import map non standard keys are interpreted by xtal-sip in a special way:
 
 ```html
-<body>
-  <xtal-sip>
-  <script nomodule>[{
-    "startsWith" : "ui5-",
-    "key": "@ui5-buffet"
-  }]</script>
-  </xtal-sip>
-</body>
+<script type="importmap">
+{
+    "imports": {
+      "-md": "https://cdn.pika.dev/myMDThemedComponents",
+      "xtal-": "https://cdn.pika.dev/myXtalScopedComponents",
+      "xtal-*-md": "https://cdn.pika.dev/myXtalScopedMDThemedComponents"
+    }
+}
+</script>
 ```
-
 
 ## I know what you're thinking, Part II
 

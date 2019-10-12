@@ -1,4 +1,3 @@
-//import { CSSListener } from './CSSListener.js';
 export function getHost(el) {
     let parent = el;
     while (parent = (parent.parentNode)) {
@@ -11,10 +10,43 @@ export function getHost(el) {
 //let usesShim = false;
 const importmap = document.querySelector('script[type^="importmap"]');
 let mappingLookup = {};
+let collapsedMap = [];
 if (importmap !== null) {
     const parsed = JSON.parse(importmap.innerHTML);
-    mappingLookup = parsed.imports;
-    //usesShim = importmap.type!=="importmap";
+    const imports = parsed.imports;
+    if (typeof imports !== undefined) {
+        const filteredMappingLookup = {};
+        for (const key in imports) {
+            const val = imports[key];
+            let iPos = -1;
+            if (key.startsWith('-')) {
+                const collapse = {
+                    endsWith: key,
+                    path: val,
+                };
+                collapsedMap.push(collapse);
+            }
+            else if (key.endsWith('-')) {
+                const collapse = {
+                    startsWith: key,
+                    path: val,
+                };
+                collapsedMap.push(collapse);
+            }
+            else if ((iPos = key.indexOf('-*-')) > -1) {
+                const collapse = {
+                    startsWith: key.substr(0, iPos + 1),
+                    endsWith: key.substr(iPos + 3),
+                    path: val,
+                };
+                collapsedMap.push(collapse);
+            }
+            else {
+                filteredMappingLookup[key] = imports[key];
+            }
+        }
+        mappingLookup = filteredMappingLookup;
+    }
 }
 //const eventNames = ["animationstart", "MSAnimationStart", "webkitAnimationStart"];
 export class XtalSip extends HTMLElement {
@@ -55,6 +87,27 @@ export class XtalSip extends HTMLElement {
             this.doImport(key, tagName);
         }
         else {
+            collapsedMap.forEach(item => {
+                let foundStartsWithMatch = false;
+                let foundEndsWithMatch = false;
+                if (item.startsWith !== undefined) {
+                    if (key.startsWith(item.startsWith)) {
+                        foundStartsWithMatch = true;
+                        foundEndsWithMatch = (item.endsWith === undefined);
+                    }
+                }
+                if (key.endsWith !== undefined) {
+                    if (key.endsWith(item.endsWith)) {
+                        foundEndsWithMatch = true;
+                        if (item.startsWith === undefined)
+                            foundStartsWithMatch = true;
+                    }
+                }
+                if (foundStartsWithMatch && foundEndsWithMatch) {
+                    this.doImport(item.path, tagName);
+                    return;
+                }
+            });
             const detail = {
                 key: key,
                 tagName: tagName,
