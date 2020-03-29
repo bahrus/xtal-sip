@@ -8,18 +8,14 @@
   "author": "bahrus <anderson.bruce.b@gmail.com>",
   "license": "MIT",
   "dependencies": {
+    "trans-render": "0.0.143",
     "xtal-element": "0.0.59"
   },
   "devDependencies": {
-    "@types/node": "11.13.7",
-    "@types/tape": "4.2.33",
-    "@webcomponents/webcomponentsjs": "2.2.10",
-    "jiife": "0.0.12",
-    "tape": "4.10.1",
-    "xtal-test": "0.0.18"
+    "@webcomponents/webcomponentsjs": "2.4.3",
+    "xtal-test": "0.0.44"
   },
   "scripts": {
-    "test": "node createIIFE.js && tape test/*.js",
     "serve": "node node_modules/xtal-test/serve.js"
   }
 }
