@@ -13,7 +13,7 @@ Dynamically &#34;water&#34; a custom element tag with the necessary dependencies
 
 Most every web application can be recursively broken down into logical regions, building blocks which are assembled together to form the whole site.
 
-xtal-sip takes the philosophical stance that at the most micro level, utilizing highly reusable, generic custom elements -- elements that can extend the HTML vocubulary, elements that could be incorporated into the browser, even -- forms a great fundamental "unit" to build on.
+xtal-sip takes the philosophical stance that at the most micro level, utilizing highly reusable, generic custom elements -- elements that can extend the HTML vocabulary, elements that could be incorporated into the browser, even -- forms a great fundamental "unit" to build on.
 
 But as one zooms out from the micro to the macro, the nature of the components changes in significant ways.  
 
@@ -203,3 +203,20 @@ Just add an exclamation (!) at the end of the tag name:
 
 npm run serve
 
+
+Take three:
+
+Generate import mapping dynamically from 
+
+```html
+<xtal-sip activate-when-match-found="my-element1,my-element2">
+  <template>
+    <script type="module">
+      import '@my/my-element';
+      import '@my/my-element2';
+    </script>
+  </template>
+</xtal-sip>
+```
+
+let import maps take care of rest
