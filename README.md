@@ -213,8 +213,14 @@ Take three:
     <script type=module pour-on="my-element">import '@my/my-element';</script>
     <script type=module pour-on="my-element2">import '@my/my-element2';</script>
     <script type=module pour-on="my-element,my-element2">
-      //this code will  only be invoked if either two script tags above fail,
-      //for example, because using a web server or browser that doesn't support import maps
+       //this code will  only be invoked if either two script tags above fail,
+       //for example, because using a web server or browser that doesn't support import maps
+       import 'https://cdn.pika.dev/@my/bundled.js';
+    </script>
+    <script type=module pour-on="my-element,my-element2">
+       //this code will  only be invoked if any of the three script tags above fail,
+       //for example, because using a web server or browser that doesn't support import maps
+       //and suppose pika web services are down
       import 'https://unpkg.com/@my/my-element?module';
       import 'https://unpkg.com/@my/my-element2?module';
     <script>
