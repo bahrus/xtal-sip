@@ -214,7 +214,7 @@ Take three:
     <script type=module pour-on="my-element2">import '@my/my-element2';</script>
     <script type=module pour-on="my-element,my-element2">
        //this code will  only be invoked if either two script tags above fail,
-       //for example, because using a web server or browser that doesn't support import maps
+       //for example, because using a web server or browser that doesn't support bare import specifiers / import maps
        import 'https://cdn.pika.dev/@my/bundled.js';
     </script>
     <script type=module pour-on="my-element,my-element2">
