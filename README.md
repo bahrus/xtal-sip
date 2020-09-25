@@ -27,7 +27,7 @@ xtal-sip argues that while it is certainly possible to build large applications 
 
 Web components (especially ES Module based) may or may not be the best fit for these application macro "modules".  A better fit might be a server-centric solution, like  [Rails](https://goiabada.blog/rails-components-faedd412ce19), just to take an example.  
 
-A significant pain point has to do with loading all the third-party web components these macro components / compositions, and loading them into memory only when needed.  
+A significant pain point has to do with loading all the third-party web components these macro components / compositions require, and loading them into memory only when needed.  
 
 The goals of xtal-sip are:
 
@@ -94,7 +94,7 @@ So here's some sample syntax.
 Q:  Why not just do this?
 
 ```html
-<script type="module">import('xtal-import-chart');</script>
+<script type="module">import('xtal-frappe-chart');</script>
 <xtal-frappe-chart></xtal-frappe-chart>
 ```
 
@@ -206,15 +206,18 @@ npm run serve
 
 Take three:
 
-Generate import mapping dynamically from 
 
 ```html
-<xtal-sip activate-when-match-found="my-element1,my-element2">
+<xtal-sip>
   <template>
-    <script type="module">
-      import '@my/my-element';
-      import '@my/my-element2';
-    </script>
+    <script type=module pour-on="my-element">import '@my/my-element';</script>
+    <script type=module pour-on="my-element2">import '@my/my-element2';</script>
+    <script type=module pour-on="my-element,my-element2">
+      //this code will  only be invoked if either two script tags above fail,
+      //for example, because using a web server or browser that doesn't support import maps
+      import 'https://unpkg.com/@my/my-element?module';
+      import 'https://unpkg.com/@my/my-element2?module';
+    <script>
   </template>
 </xtal-sip>
 ```
