@@ -206,26 +206,24 @@ npm run serve
 
 Take three:
 
+xtal-sip just emits events when encounters first instance of tag, if tag not already registered.
 
-```html
-<xtal-sip>
-  <template>
-    <script type=module pour-on="my-element">import '@my/my-element';</script>
-    <script type=module pour-on="my-element2">import '@my/my-element2';</script>
-    <script type=module pour-on="my-element,my-element2">
-       //this code will  only be invoked if either two script tags above fail,
-       //for example, because using a web server or browser that doesn't support bare import specifiers / import maps
-       import 'https://cdn.pika.dev/@my/bundled.js';
-    </script>
-    <script type=module pour-on="my-element,my-element2">
-       //this code will  only be invoked if any of the three script tags above fail,
-       //for example, because using a web server or browser that doesn't support import maps
-       //and suppose pika web services are down
-      import 'https://unpkg.com/@my/my-element?module';
-      import 'https://unpkg.com/@my/my-element2?module';
-    <script>
-  </template>
-</xtal-sip>
+xtal-sip provides api ("tryImport") where can pass in preferred sequence of imports, including some "collapsing" logic so multiple tag names map to same resource, as an option.
+
+So:
+
+```JavaScript
+const myCDN1 = 'https://unpkg.com/';
+const myCDN2 = 'https://cdn.pika.dev/';
+const mod = '?module';
+const opt = true; //short for optimize
+const imports = [
+
+]
+tryImport(() => import('@myScope/my-element.js'), opt ? [myCDN2,] : [myCDN,,mod]]]);
 ```
 
-let import maps take care of rest
+It first tries to do import('@myScope/my-element.js') by evaluating the first element of the array.
+If that fails, extract out the path from the import, and join the array with no delimiter, after replacing the empty element of erray with extracted path 
+
+
