@@ -206,24 +206,27 @@ npm run serve
 
 Take three:
 
-xtal-sip just emits events when encounters first instance of tag, if tag not already registered.
+xtal-sip just emits events when it encounters first instance of tag, if tag not already registered.
 
 xtal-sip provides api ("tryImport") where can pass in preferred sequence of imports, including some "collapsing" logic so multiple tag names map to same resource, as an option.
 
 So:
 
 ```JavaScript
-const myCDN1 = 'https://unpkg.com/';
-const myCDN2 = 'https://cdn.pika.dev/';
+const unpkg = 'https://unpkg.com/';
+const pika = 'https://cdn.pika.dev/';
 const mod = '?module';
-const opt = true; //short for optimize
+const version = '@^1.2.3';
+const bundled = true; 
 const imports = [
 
 ]
-tryImport(() => import('@myScope/my-element.js'), opt ? [myCDN2,] : [myCDN,,mod]]]);
+tryImport(() => import('@myScope/my-element.js'), version, bundled ? pika : [unpkg, mod]]]);
 ```
 
-It first tries to do import('@myScope/my-element.js') by evaluating the first element of the array.
-If that fails, extract out the path from the import, and join the array with no delimiter, after replacing the empty element of erray with extracted path 
-
+1.  It first tries to do import('@myScope/my-element.js') by evaluating the first element of the array.
+2.  If import works, skip the rest.
+2.  If it fails, extract out the path from the import, insert the version specified in the second parameter.  In this example, we have @myScope@1.2.3/my-element.js
+3.  The third parameter is a  base CDN url, or an array consisting of the base CDN url and a suffix string.  
+4.  import([fullyQualifiedCNDUrl from step 3]).
 
