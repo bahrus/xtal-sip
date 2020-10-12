@@ -24,16 +24,16 @@ The bad:
 
 When it comes to cross package resolution, on the other hand, the only proposal on the table is import maps. But whether import maps are going to be there for the long haul remains an open question, in my mind.  It has been [sitting behind a flag since version 74 in Chrome, and no release date has been announced](https://www.chromestatus.com/feature/5315286962012160).  Part of the reason for its languishing behind the flag, I think, is the lackluster response from other vendor browsers.  It is [well polyfilled](https://github.com/guybedford/es-module-shims), at least.   
 
-Firefox is being quite unhelpful [https://github.com/mozilla/standards-positions/issues/146] in the most fundamental task of functionalities, found in virtually all modern language -- neither approving nor providing any good reasons why not to approve.  And even that is probably more than can be said for Safari.  It's almost like they want the web to fail.  Until at least one of those vendors either goes out of business, or gives a whiff of a nod of approval, at least, relying on bare import resolution still feels much more tenuous than I'd like.  The strongest case for relying on bare import resolution is there is no competing alternative, for now.  I think, though, without some assurance of the longevity of specification, it will be an uphill battle building the infrastructure around import maps that it so sorely needs.
+Firefox is being quite unhelpful [https://github.com/mozilla/standards-positions/issues/146] in this most fundamental task of functionalities, found in virtually all modern languages -- neither approving nor providing any good reasons why not to approve.  And even that is probably more than can be said for Safari.  It's almost like they want the web to fail.  Until at least one of those vendors either goes out of business, or gives a whiff of a nod of approval, at least, relying on bare import resolution still feels much more tenuous than I'd like.  The strongest case for relying on bare import resolution is there is no competing alternative, for now.  I think, though, without some assurance of the longevity of the specification, it will be an uphill battle building the infrastructure around import maps that it so sorely needs.
 
 Back to the good:
 
-1.  It seems (by design) that the strict rules that govern bare import specifiers happens to be largely compatible with the considerably more lenient rules that bundling tools like webpack and parcel support, and which developers have grown used to using, even during development. 
+1.  It seems (by design) that the strict rules that govern bare import specifiers happens to be largely compatible with the considerably more lenient rules that bundling tools like webpack and Parcel support, and which developers have grown used to using, even during development. 
 2.  For those of us who enjoy the lightweight, instantaneous feedback of build-less development, the es-dev-server does a great job of server-side "polyfilling" import maps (or bare import specifiers with package.json serving as a substitute for import maps, to be accurate).  
 
 Back to the bad:
 
-However, even in the sphere of web component development, not all web component libraries are making themselves compatible with the es-dev-server.  Some of that is due to legacy / backwards compatibility needs, which hopefully will fade with time.  But another looming cause is that a sizable portion of web component libraries are built on stencil (and perhaps other JSX libraries), which tends to work best with a bundling step, even during development.  The fact that the library uses JSX means that some compiling will be necessary anyway, so from that point of view, they may not care much.  But it does mean that there's a bit of a rift there.  I've tried, unsuccessfully, to use Ionic components, and Shoelace components, using bare import specifiers and the es-dev-server.  On the other hand Ionic and shoelace both provide easy CDN url's.  But pointing a library to CDN url doesn't seem like the right solution.
+However, even in the sphere of web component development, not all web component libraries are making themselves compatible with the es-dev-server.  Some of that is due to legacy / backwards compatibility needs, which hopefully will fade with time.  But another looming cause is that a sizable portion of web component libraries are built on stencil (and perhaps other JSX libraries), which tends to work best with a bundling step, even during development.  The fact that the library uses JSX means that some compiling will be necessary anyway, so from that point of view, they may not care much.  But it does mean that there's a bit of a rift there.  I've tried, unsuccessfully, to use Ionic components, and Shoelace components, using bare import specifiers and the es-dev-server.  On the other hand Ionic and shoelace both provide easy CDN url's.  But pointing a library exclusively to a CDN url in the raw code doesn't seem like the right solution.
 
 Back to the good:
 
@@ -41,9 +41,11 @@ Unlike other types of library references, web components have one nice advantage
 
 Back to the bad:
 
-Without browser support, all of these solutions depend on node.js as the development environment.  That kind of technological, exclusive cultural monoculture should give us pause.
+Without browser support, all of these solutions depend on node.js as the development environment.  That kind of technological, exclusive cultural monoculture should give us pause.  And to take advantage of all modern web component libraries may require a bundling step as well.  Even more exclusive.
 
 </details>
+
+In addition to the problems discussed in detail in the "Backdrop" section above, consider this problem:
 
 Most every web application can be recursively broken down into logical regions, building blocks which are assembled together to form the whole site.
 
@@ -53,7 +55,7 @@ But as one zooms out from the micro to the macro, the nature of the components c
 
 At the micro level, components will have few, if any, dependencies, and those dependencies will tend to be quite stable, and likely all be used.  The dependencies will skew more towards tightly coupled utility libraries. 
 
-"Macro" level components will tend to be heavy on business-domain specific data, heavy on gluing / orchestrating smaller components, light on difficult, esoteric JavaScript.  They aren't confined to static JS files, but could include dynamic content as well.  They will also be heavy on conditional sections of the application only loading if requested by the user.
+"Macro" level components will tend to be heavy on business-domain specific data, heavy on gluing / orchestrating smaller components, light on difficult, esoteric JavaScript.  They aren't confined to static JS files, and likely will include dynamic content as well.  They will also be heavy on conditional sections of the application only loading if requested by the user.
 
 ES module based web components may or may not be the best fit for these application macro "modules".  A better fit might be a server-centric solution, like  [Rails](https://goiabada.blog/rails-components-faedd412ce19), just to take an example.  
 
@@ -62,9 +64,11 @@ A significant pain point has to do with loading all the third-party web componen
 The goals of xtal-sip are:
 
 1.  Provide a declarative way of progressively, dynamically loading web component dependencies into memory, only when needed.
-2.  Do so without introducing another additional listing of dependencies.
+2.  Do so without introducing another additional listing of dependencies that competes with import maps / package.json.
 3.  Provide workarounds for referencing libraries where tooling solutions and browser support for bare import specifiers is inconsistent.
 4.  Be compatible with technologies outside the node.js monoculture.
+
+## Back to basics
 
 ## Convention over Configuration
 
