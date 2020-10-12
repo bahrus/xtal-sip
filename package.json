@@ -8,14 +8,16 @@
   "author": "bahrus <anderson.bruce.b@gmail.com>",
   "license": "MIT",
   "dependencies": {
-    "trans-render": "0.0.143",
-    "xtal-element": "0.0.59"
+    "trans-render": "0.0.265",
+    "xtal-element": "0.0.305"
   },
   "devDependencies": {
-    "@webcomponents/webcomponentsjs": "2.4.3",
-    "xtal-test": "0.0.44"
+    "@webcomponents/webcomponentsjs": "2.4.4",
+    "xtal-test": "0.0.48",
+    "es-dev-server": "1.57.5"
   },
   "scripts": {
-    "serve": "node node_modules/xtal-test/serve.js"
+    "serve": "node node_modules/xtal-test/serve.js",
+    "start": "es-dev-server --app-index demo/dev.html --node-resolve --watch --open"
   }
 }
