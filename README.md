@@ -159,7 +159,11 @@ dynamicImport(shadowDOMPeerElement, {
 
 ```
 
-Note that I'm floating something I've not seen proposed anywhere -- that (at least for css references) the dynamic import function be extended to get the mapping look-up via an id to a link element, which contains the fully qualified resource URL, hashintegrities, etc.
+Note that I'm floating something I've not seen proposed anywhere -- that (at least for css references) the dynamic import function be extended to get the mapping look-up via an id to a link element, which contains the fully qualified resource URL, hashintegrities, etc.  Relative references (relative to the JS file location) would still work with no mapping:
+
+```JavaScript
+import('./my-css.css', {type: 'css'})
+```
 
 The concern raised by Firefox is a good one -- ideally there *would* be one solution for everything.  In other words, the idea that there should be a single mapping that manages all cross-package mappings, for all types of resources, and for all types of attributes, is a good one, but, like other similar attempts, [seems out of reach of mortals for the time being](https://en.wikipedia.org/wiki/Unified_field_theory).  That ship has sailed, essentially, by the existence of preload tags, in my opinion.
 
