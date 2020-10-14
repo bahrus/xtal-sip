@@ -161,7 +161,7 @@ dynamicImport(shadowDOMPeerElement, {
 
 ```
 
-Note that I'm (indirectly) floating something I've not seen proposed anywhere -- that (at least for css references) the dynamic import function be extended to get the mapping look-up via a css selector to a link element in document.head, which contains the fully qualified resource URL, hashintegrities, etc.  scope = "global" signifies that this a css file, like a font file (font-awesome, google web fonts, etc) that needs to be added to the head tag (or some equivalent).  Being that import doesn't support this currently, we simply map to a JS configuration object instead, in lieu of some standard approach.
+Note that I'm (indirectly) floating something I've not seen proposed anywhere -- that (at least for css references) the dynamic import function be extended to get the mapping look-up via a css selector to a link element in document.head, which contains the fully qualified resource URL, hashintegrities, etc.  scope = "global" signifies that this is a global css file, like a font file (font-awesome, google web fonts, etc) that needs to be added to the head tag (or some equivalent).  Being that import doesn't support this currently, we simply map to a JS configuration object instead, in lieu of some standard approach.
 
 Relative references (relative to the JS file location) would still work with no mapping:
 
@@ -169,19 +169,21 @@ Relative references (relative to the JS file location) would still work with no 
 import('./my-css.css', {type: 'css'})
 ```
 
+working in some (fuzzy in my mind) constructible stylesheets.
+
 https://bugzilla.mozilla.org/show_bug.cgi?id=1520690
 
 https://www.chromestatus.com/features/5394843094220800
 
 https://github.com/WICG/construct-stylesheets/issues/45#issuecomment-577674453
 
-working in some (fuzzy in my mind) constructible stylesheets.
+
 
 The concern raised by Firefox is a good one -- ideally there *would* be one solution for everything.  And it's certainly worth bringing up the issue early, to gain a fuzzy idea how this will work.  But I'm reasonably certain that the idea that there should be a single mapping that manages all cross-package mappings, for all types of resources, and for all types of attributes, is a good one to consider, but, like other similar attempts, [seems out of reach of mortals for the time being](https://en.wikipedia.org/wiki/Unified_field_theory).  That ship has sailed, essentially, by the existence of preload tags, in my opinion.
 
-Note that the solution above relies on three systems of mapping -- JS mapping between custom element names, and a symbolic reference.  Then, for JS files, we need an importmaps JSON provides that takes us from a "branding / scope" to a concrete domain/context/generalized resource ID for JS files, but an additional mapping that serves the useful purpose of prefetching without parsing.  This last mapping seems like the right place to include things like hashintegrity, specific versions, maybe even media specific mappings, etc.  And storing in this format, it can be naturally streamed, more so, perhaps, than JSON.
+Note that the solution above relies on three systems of mapping -- JS mapping between custom element names, and a symbolic reference.  Then, for JS files, we need an importmaps JSON data structure that takes us from a "branding / scope" to a concrete domain/context/generalized resource ID for JS files, but an optional additional mapping that serves the useful purpose of prefetching without parsing.  This last mapping seems like the right place to include things like hashintegrity, specific versions, maybe even media specific mappings, etc.  And storing in this format, it can be naturally streamed, more so, perhaps, than JSON.
 
-I don't think we should feel that better that there isn't perfect symmetry between JS and CSS mapping.
+I don't think we should feel that bad that there isn't perfect symmetry between JS and CSS mapping.
 
 1.  The early years of the web demonstrate that HTML can be useful by itself without external CSS files.  And clearly JS by itself can be useful -- web components can be built using JS by itself, as can many useful software applications.  But there has yet to be a significant role played by CSS files by themselves.  They exist to serve HTML.  What this means is that while the demand for JS to be able to reference other packages has been proven by the rapid rise of npm, and while the demand for HTML being able to reference third-party HTML demonstrated by the ubiquity of iframes.  This demand goes well beyond any concerns about reducing bandwidth by sharing common code.
 2.  Yes, there can be popular self-contained CSS libraries, like Bootstrap or web fonts, that could be shared via a CDN.
