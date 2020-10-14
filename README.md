@@ -24,7 +24,7 @@ The bad:
 
 When it comes to cross package resolution, on the other hand, the only proposal on the table is import maps. But whether import maps are going to be there for the long haul remains an open question, in my mind.  It has been [sitting behind a flag since version 74 in Chrome, and no release date has been announced](https://www.chromestatus.com/feature/5315286962012160).  Part of the reason for its languishing behind the flag, I think, is the lackluster response from other vendor browsers.  It is [well polyfilled](https://github.com/guybedford/es-module-shims), at least.   
 
-Firefox is taking a bit of a "I want you to have this job. Of course..." approach to the question [https://github.com/mozilla/standards-positions/issues/146].  Relying on bare import resolution still feels much more tenuous than I'd like.  The strongest case for relying on bare import resolution is there is no competing alternative, for now.  I think, though, without some assurance of the longevity of the specification, it will be an uphill battle building the infrastructure around import maps that it so sorely needs.
+Firefox is taking a bit of a ["I want you to have this job. Of course..."](https://www.youtube.com/watch?v=VBn8XttrSew)  [https://github.com/mozilla/standards-positions/issues/146](approach to the question).  Relying on bare import resolution still feels much more tenuous than I'd like.  The strongest case for relying on bare import resolution is there is no competing alternative, for now.  I think, though, without some assurance of the longevity of the specification, it will be an uphill battle building the infrastructure around import maps that it so sorely needs.  I've seen countless "misses" from the VS Code / TypeScript support as far as supporting bare import specifiers (ironically, VSCode is more helpful in this regard if one sticks with JS).  I would be motivated to raise bug reports in VS Code / TypeScript's crushing sea of issues, but on what basis can I argue that they are under any obligation to support this "standard" in its current state?
 
 Back to the good:
 
@@ -34,6 +34,8 @@ Back to the good:
 Back to the bad:
 
 However, even in the sphere of web component development, not all web component libraries are making themselves compatible with the es-dev-server.  Some of that is due to legacy / backwards compatibility needs, which hopefully will fade with time.  But another looming cause is that a sizable portion of web component libraries are built on stencil (and perhaps other JSX libraries), which tends to work best with a bundling step, even during development.  The fact that the library uses JSX means that some compiling will be necessary anyway, so from that point of view, they may not care much.  But it does mean that there's a bit of a rift there.  I've tried, unsuccessfully, to use Ionic components, and Shoelace components, using bare import specifiers and the es-dev-server.  On the other hand Ionic and shoelace both provide easy CDN url's.  But pointing a library exclusively to a CDN url in the raw code doesn't seem like the right solution.
+
+Another weakness of import maps, in my mind, is it isn't easy collapse mappings of multiple bare import endpoints to a single bundled (CDN) url.  Perhaps this will come with bundled exchanges, but my guess is bundled exchanges will land in all browsers by the end of the decade.  It still seems to be only google people spearheading this initiative.  So what to do until then?
 
 Back to the good:
 
@@ -68,20 +70,32 @@ The goals of xtal-sip are:
 3.  Provide workarounds for referencing libraries where tooling solutions and browser support for bare import specifiers is inconsistent.
 4.  Be compatible with technologies outside the node.js monoculture.
 
-## Back to basics
+## tryImport
 
-## Convention over Configuration
+xtal-sip provides a function "tryImport" which can passed in a pair of imports to use.
 
-xtal-sip takes a cue from Ruby on Rails and adopts the Convention over Configuration philosophy.  Import maps are flexible enough that they should be able to map "name-of-element" to whatever you need it to.  So xtal-sip assumes, by default, that we can list all web components we want to dynamically load with key "name-of-element" in the import map.  
+So:
 
-To customize what key to look for in the importmap JSON, you can subclass xtal-sip and override:
+```JavaScript
+const unpkg = 'https://unpkg.com/';
+const pika = 'https://cdn.pika.dev/';
+const mod = '?module';
+const version = '@^1.2.3';
+const bundled = true; 
+const imports = [
 
-```TypeScript
-  getImportKey(tagName: string) {
-    //Override this if you want
-    return `${tagName}`;
-  }
+]
+tryImport(() => import('@myScope/my-element.js'), version, bundled ? pika : [unpkg, mod]]]);
 ```
+
+1.  It first tries to do import('@myScope/my-element.js') by evaluating the first element of the array.
+2.  If import works, skip the rest.
+3.  If it fails, extract out the path from the import, insert the version specified in the second parameter (if it is defined).  In this example, we have @myScope@1.2.3/my-element.js
+4.  The third parameter is a  base CDN url, or an array consisting of the base CDN url and a suffix string.  
+5.  import([fullyQualifiedCDNUrl from step 3]).
+
+```JavaScript
+const bundledPath
 
 xtal-sip checks if that key can be found in the global importmap.
 
@@ -243,25 +257,5 @@ Take three:
 
 xtal-sip just emits events when it encounters first instance of tag, if tag not already registered.
 
-xtal-sip provides api ("tryImport") where can pass in preferred sequence of imports, including some "collapsing" logic so multiple tag names map to same resource, as an option.
 
-So:
-
-```JavaScript
-const unpkg = 'https://unpkg.com/';
-const pika = 'https://cdn.pika.dev/';
-const mod = '?module';
-const version = '@^1.2.3';
-const bundled = true; 
-const imports = [
-
-]
-tryImport(() => import('@myScope/my-element.js'), version, bundled ? pika : [unpkg, mod]]]);
-```
-
-1.  It first tries to do import('@myScope/my-element.js') by evaluating the first element of the array.
-2.  If import works, skip the rest.
-2.  If it fails, extract out the path from the import, insert the version specified in the second parameter.  In this example, we have @myScope@1.2.3/my-element.js
-3.  The third parameter is a  base CDN url, or an array consisting of the base CDN url and a suffix string.  
-4.  import([fullyQualifiedCNDUrl from step 3]).
 
