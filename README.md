@@ -110,11 +110,17 @@ This is subject to change as the CSS/stylesheet module proposal flaps in the win
 tryImport({
   [() => import('@myScope/my-element.js'), version, bundled ? pika : [unpkg, mod]],
   [() => import('@myScope/my-font.css', {type: 'css', scope: 'global' /* document.head */})],
-  [() => import('@myScope/my-shadow-style.css'), {type: 'css', scope: 'local' /* construtible stylesheets ? */}]
+  [() => import('@myScope/my-shadow-style.css'), {type: 'css', scope: 'local' /* constructible stylesheets ? */}]
 }).then(({MyElement, MyShadowStyle}) =>{
   //???
 })
 ```
+
+https://bugzilla.mozilla.org/show_bug.cgi?id=1520690
+
+https://www.chromestatus.com/features/5394843094220800
+
+https://github.com/WICG/construct-stylesheets/issues/45#issuecomment-577674453
 
 ```JavaScript
 const bundledPath
