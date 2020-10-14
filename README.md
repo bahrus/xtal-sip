@@ -134,6 +134,7 @@ dynamicImport(shadowDOMPeerElement, {
   'my-element-2':[
     [() => import('@myScope/my-element-2.js'), '.@myScope'],
     [() => import('@myScope/my-shadow-style.css', {type: 'css', scope: 'local' /* constructible stylesheets ? */}), '.@myScopeCSS']
+    //wrong(?):  why wouldn't js library import its own css?
   ],
   'your-element-1':[
     [() => import('@yourScope/your-element-1.js'), '.@yourScope']
