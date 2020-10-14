@@ -24,7 +24,7 @@ The bad:
 
 When it comes to cross package resolution, on the other hand, the only proposal on the table is import maps. But whether import maps are going to be there for the long haul remains an open question, in my mind.  It has been [sitting behind a flag since version 74 in Chrome, and no release date has been announced](https://www.chromestatus.com/feature/5315286962012160).  Part of the reason for its languishing behind the flag, I think, is the lackluster response from other vendor browsers.  It is [well polyfilled](https://github.com/guybedford/es-module-shims), at least.   
 
-Firefox is taking a bit of a ["I want you to have this job. Of course..."](https://www.youtube.com/watch?v=VBn8XttrSew)  [https://github.com/mozilla/standards-positions/issues/146](approach to the question).  Relying on bare import resolution still feels much more tenuous than I'd like.  The strongest case for relying on bare import resolution is there is no better competing alternative, for now.  I think, though, without some assurance of the longevity of the specification, it will be an uphill battle building the infrastructure around import maps that it so sorely needs.  I've seen countless "misses" from the VS Code / TypeScript support as far as supporting bare import specifiers (ironically, VSCode is more helpful in this regard if one sticks with JS).  I would be motivated to raise bug reports in VS Code / TypeScript's crushing sea of issues, but on what basis can I argue that they are under any obligation to support this "standard" in its current state?
+Firefox is taking a bit of a [Of course...](https://www.youtube.com/watch?v=VBn8XttrSew)  [approach to the question](https://github.com/mozilla/standards-positions/issues/146).  Relying on bare import resolution still feels much more tenuous than I'd like.  The strongest case for relying on bare import resolution is there is no better competing alternative, for now.  I think, though, without some assurance of the longevity of the specification, it will be an uphill battle building the infrastructure around import maps that it so sorely needs.  VS Code / TypeScript support is quite confusing and inconsistent, as far as supporting bare import specifiers. Ironically, VSCode is more helpful in this regard if one sticks with JS.  I would be motivated to raise bug reports in VS Code / TypeScript's crushing sea of issues, but on what basis can I argue that they are under any obligation to support this "standard" in its current state?
 
 Back to the good:
 
@@ -93,6 +93,9 @@ So:
 
 Then your library references can look like:
 
+
+
+
 ```JavaScript
 dynamicImport(shadowDOMPeerElement, {
   'my-element-1':[
@@ -117,13 +120,27 @@ Note that the es-dev-server and most bundlers will resolve this just fine (I thi
 
 An extra challenge posed by [shoelace.style](https://shoelace.style/?id=quick-start) and [ionic](https://ionicframework.com/docs/intro/cdn#ionic-framework-cdn) is that their CDN requires not one but two references -- one to a bundled js file, the other to a css file.  I suspect other design libraries built with Stencil will follow suit (and probably has).
 
-It's also been my experience that referencing a css file needs to be made outside the ShadowDOM, [when it comes to fonts](https://github.com/bahrus/scratch-box).
+It's also been my experience that, with web components, referencing a css file that needs to be made outside the ShadowDOM, [when it comes to fonts](https://github.com/bahrus/scratch-box) is a common need.
 
-Of course, CSS (or stylesheet) Modules is the latest contender to die of a thousand "Of course..."'s.  Just for laugh's sake, let's suppose CSS/stylesheet modules somehow survives the waltz ~through Occupied Syrian Golan~ ~to the Philosopher's stone~ ~to the [controlling authorities](https://en.wikipedia.org/wiki/The_Castle_(novel)#Plot)~ ~[who were responsible for Mr. Buttle's death](https://en.wikipedia.org/wiki/Brazil_(1985_film)#Plot)~ [the standards process](https://astrofella.wordpress.com/2019/10/06/jorge-luis-borges-franz-kafka/) and ships before Avatar 2 is released.
 
 How should we modify the dynamicImport function to accommodate both a js reference and a css reference that needs to be added (say) to document.head?
 
 This is subject to change as the CSS/stylesheet module proposal flaps in the wind, but maybe:
+
+```html
+<html>
+  <head>
+    <!-- optional, backup if import maps not supported -->
+    <!-- Use modulepreload if used during initial presentation, lazyload if not -->
+    <link class="@myScope"  cors=...  rel=modulepreload href="https://cdn.snowpack.dev/@myScope@1.2.3/dist/my-bundled-elements.js" hashintegrity=...>
+    <link id="@yourScope/your-element-1"  rel=jsLazyLoad  href="https://unpkg.com/@yourScope@3.2.1/your-element-1.js?module" hashintegrity=...>
+    <link rel=preload id="@myScope/my-css" as="style" href="https://cdn.snowpack.dev/@myScope@1.2.3/dist/my-bundled-font-css.js">
+  </head>
+  <body>
+  ...
+  </body>
+</html>
+```
 
 ```JavaScript
 dynamicImport(shadowDOMPeerElement, {
@@ -133,8 +150,7 @@ dynamicImport(shadowDOMPeerElement, {
   ],
   'my-element-2':[
     [() => import('@myScope/my-element-2.js'), '.@myScope'],
-    [() => import('@myScope/my-shadow-style.css', {type: 'css', scope: 'local' /* constructible stylesheets ? */}), '.@myScopeCSS']
-    //wrong(?):  why wouldn't js library import its own css?
+    [() => import('#@myScope/my-css', {type: 'css'})]
   ],
   'your-element-1':[
     [() => import('@yourScope/your-element-1.js'), '.@yourScope']
@@ -142,6 +158,17 @@ dynamicImport(shadowDOMPeerElement, {
 });
 
 ```
+
+Note that I'm floating something I've not seen proposed anywhere -- that (at least for css references) the dynamic import function be extended to get the mapping look-up via an id to a link element, which contains the fully qualified resource URL, hashintegrities, etc.
+
+The concern raised by Firefox is a good one -- ideally there *would* be one solution for everything.  In other words, the idea that there should be a single mapping that manages all cross-package mappings, for all types of resources, and for all types of attributes, is a good one, but, like other similar attempts, [seems out of reach of mortals for the time being](https://en.wikipedia.org/wiki/Unified_field_theory).  That ship has sailed, essentially, by the existence of preload tags, in my opinion.
+
+Note that the solution above relies on three systems of mapping -- JS mapping between custom element names, and a symbolic reference.  Then the importmaps JSON provides that takes us from a "branding / scope" to a concrete domain/context/generalized resource ID, but an additional mapping that serves the useful purpose of prefetching without parsing.  This last mapping seems like the right place to include things like hashintegrity, specific versions, maybe even media specific mappings, etc.  And storing in this format, it can be naturally streamed, more so than JSON.
+
+
+
+1.  The early years of the web demonstrate that HTML can be useful by itself without external CSS files.  And clearly JS by itself can be useful -- web components can be built using JS by itself, as can many useful software applications.  But there has yet to be a significant role played by CSS files by themselves.  They exist to serve HTML.  What this means is that while the demand for JS to be able to reference other packages has been proven by the rapid rise of npm, and while the demand for HTML being able to reference third-party HTML demonstrated by the ubiquity of iframes.  This demand goes well beyond any concerns about reducing bandwidth by sharing common code.
+2.  Yes, there can be popular self-contained CSS libraries, like Bootstrap, that could be shared 
 
 https://bugzilla.mozilla.org/show_bug.cgi?id=1520690
 
