@@ -24,7 +24,7 @@ The bad:
 
 When it comes to cross package resolution, on the other hand, the only proposal on the table is import maps. But whether import maps are going to be there for the long haul remains an open question, in my mind.  It has been [sitting behind a flag since version 74 in Chrome, and no release date has been announced](https://www.chromestatus.com/feature/5315286962012160).  Part of the reason for its languishing behind the flag, I think, is the lackluster response from other vendor browsers.  It is [well polyfilled](https://github.com/guybedford/es-module-shims), at least.   
 
-Firefox is taking a bit of a ["I want you to have this job. Of course..."](https://www.youtube.com/watch?v=VBn8XttrSew)  [https://github.com/mozilla/standards-positions/issues/146](approach to the question).  Relying on bare import resolution still feels much more tenuous than I'd like.  The strongest case for relying on bare import resolution is there is no competing alternative, for now.  I think, though, without some assurance of the longevity of the specification, it will be an uphill battle building the infrastructure around import maps that it so sorely needs.  I've seen countless "misses" from the VS Code / TypeScript support as far as supporting bare import specifiers (ironically, VSCode is more helpful in this regard if one sticks with JS).  I would be motivated to raise bug reports in VS Code / TypeScript's crushing sea of issues, but on what basis can I argue that they are under any obligation to support this "standard" in its current state?
+Firefox is taking a bit of a ["I want you to have this job. Of course..."](https://www.youtube.com/watch?v=VBn8XttrSew)  [https://github.com/mozilla/standards-positions/issues/146](approach to the question).  Relying on bare import resolution still feels much more tenuous than I'd like.  The strongest case for relying on bare import resolution is there is no better competing alternative, for now.  I think, though, without some assurance of the longevity of the specification, it will be an uphill battle building the infrastructure around import maps that it so sorely needs.  I've seen countless "misses" from the VS Code / TypeScript support as far as supporting bare import specifiers (ironically, VSCode is more helpful in this regard if one sticks with JS).  I would be motivated to raise bug reports in VS Code / TypeScript's crushing sea of issues, but on what basis can I argue that they are under any obligation to support this "standard" in its current state?
 
 Back to the good:
 
@@ -78,7 +78,7 @@ So:
 
 ```JavaScript
 const unpkg = 'https://unpkg.com/';
-const pika = 'https://cdn.pika.dev/';
+const snowpack = 'https://cdn.snowpack.dev/';
 const mod = '?module';
 const version = '@^1.2.3';
 const bundled = true; 
@@ -100,11 +100,21 @@ An extra challenge posed by [shoelace.style](https://shoelace.style/?id=quick-st
 
 It's also been my experience that referencing a css file needs to be made outside the ShadowDOM, [when it comes to fonts](https://github.com/bahrus/scratch-box).
 
-Of course, CSS (or stylesheet) Modules is the latest contender to die of a thousand "Of course..."'s.  Just for laugh's sake, let's suppose CSS/stylesheet modules somehow survives the waltz ~through Occupied Syrian Golan~ ~to the Philosopher's stone~ ~to the [controlling authorities](https://en.wikipedia.org/wiki/The_Castle_(novel)#Plot)~ ~[find someone to take responsibility for Mr. Buttle's death](https://en.wikipedia.org/wiki/Brazil_(1985_film)#Plot)~ the standards process and ships before Avatar 2 is released.
+Of course, CSS (or stylesheet) Modules is the latest contender to die of a thousand "Of course..."'s.  Just for laugh's sake, let's suppose CSS/stylesheet modules somehow survives the waltz ~through Occupied Syrian Golan~ ~to the Philosopher's stone~ ~to the [controlling authorities](https://en.wikipedia.org/wiki/The_Castle_(novel)#Plot)~ ~[find someone to take responsibility for Mr. Buttle's death](https://en.wikipedia.org/wiki/Brazil_(1985_film)#Plot)~ [the standards process](https://astrofella.wordpress.com/2019/10/06/jorge-luis-borges-franz-kafka/) and ships before Avatar 2 is released.
 
 How should we modify the tryImport function to accommodate both a js reference and a css reference that needs to be added (say) to document.head?
 
+This is subject to change as the CSS/stylesheet module proposal flaps in the wind, but maybe:
 
+```JavaScript
+tryImport({
+  [() => import('@myScope/my-element.js'), version, bundled ? pika : [unpkg, mod]],
+  [() => import('@myScope/my-font.css', {type: 'css', scope: 'global' /* document.head */})],
+  [() => import('@myScope/my-shadow-style.css'), {type: 'css', scope: 'local' /* construtible stylesheets ? */}]
+}).then(({MyElement, MyShadowStyle}) =>{
+  //???
+})
+```
 
 ```JavaScript
 const bundledPath
