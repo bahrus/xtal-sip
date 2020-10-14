@@ -98,7 +98,13 @@ Note that the es-dev-server and most bundlers will resolve this just fine, hence
 
 An extra challenge posed by [shoelace.style](https://shoelace.style/?id=quick-start) and [ionic](https://ionicframework.com/docs/intro/cdn#ionic-framework-cdn) is that their CDN requires not one but two references -- one to a bundled js file, the other to a css file.  I suspect other design libraries built with Stencil will follow suit.
 
-Of course, CSS (or stylesheet) Modules is the latest contender to die of a thousand "Of course..."'s.  Just for laugh's sake, let's suppose CSS/stylesheet modules somehow survives the waltz ~through Occupied Syrian Golan~ ~to the Philosopher's stone~ ~to the authorities in charge of [the Castle](https://en.wikipedia.org/wiki/The_Castle_(novel)#Plot)~ ~[find  someone to take responsibility for Mr. Buttle's death](https://en.wikipedia.org/wiki/Brazil_(1985_film)#Plot)~ though the standards process.
+It's also been my experience that referencing a css file needs to be made outside the ShadowDOM, [when it comes to fonts](https://github.com/bahrus/scratch-box).
+
+Of course, CSS (or stylesheet) Modules is the latest contender to die of a thousand "Of course..."'s.  Just for laugh's sake, let's suppose CSS/stylesheet modules somehow survives the waltz ~through Occupied Syrian Golan~ ~to the Philosopher's stone~ ~to the [controlling authorities](https://en.wikipedia.org/wiki/The_Castle_(novel)#Plot)~ ~[find someone to take responsibility for Mr. Buttle's death](https://en.wikipedia.org/wiki/Brazil_(1985_film)#Plot)~ the standards process and ships before Avatar 2 is released.
+
+How should we modify the tryImport function to accommodate both a js reference and a css reference that needs to be added (say) to document.head?
+
+
 
 ```JavaScript
 const bundledPath
