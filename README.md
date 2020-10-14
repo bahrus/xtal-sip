@@ -39,7 +39,7 @@ Another weakness of import maps, in my mind, is it isn't easy to collapse mappin
 
 Back to the good:
 
-Unlike other types of library references, web components have one nice advantage when it comes to imports:  They register global tag names, hence the only think that matters is loading the library.  This, combined with the problem statement below is the impetus (currently) for xtal-sip.
+Unlike other types of library references, web components have one nice advantage when it comes to imports:  They register global tag names, hence the only thing that matters is loading the library.  This, combined with the problem statement below is the impetus (currently) for xtal-sip.
 
 Back to the bad:
 
