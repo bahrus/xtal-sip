@@ -76,44 +76,70 @@ xtal-sip provides a function "tryImport" which can passed in a pair of imports t
 
 So:
 
-```JavaScript
-const unpkg = 'https://unpkg.com/';
-const snowpack = 'https://cdn.snowpack.dev/';
-const mod = '?module';
-const version = '@^1.2.3';
-const bundled = true; 
-const imports = [
+```html
+<html>
+  <head>
+    <!-- optional, backup if import maps not supported -->
+    <!-- Use modulepreload if used during initial presentation, lazyload if not -->
+    <link class="@myScope"    rel=modulepreload href="https://cdn.snowpack.dev/@myScope@1.2.3/dist/my-bundled-elements.js">
+    <link class="@yourScope"  rel=lazyload      href="https://unpkg.com/@yourScope@3.2.1/your-element-1.js?module">
+  </head>
+  <body>
+  ...
+  </body>
+</html>
 
-]
-tryImport(() => import('@myScope/my-element.js'), version, bundled ? pika : [unpkg, mod]]]);
 ```
 
-1.  It first tries to do import('@myScope/my-element.js') by evaluating the first element of the array.
+Then your library references can look like:
+
+```JavaScript
+dynamicImport(shadowDOMPeerElement, {
+  'my-element-1':[
+    [() => import('@myScope/my-element-1.js'), '.@myScope', 'https://unpkg.com/@myScope/my-element-1.js?module']
+  ],
+  'my-element-2':[
+    [() => import('@myScope/my-element-2.js'), '.@myScope'],
+  ],
+  'your-element-1':[
+    [() => import('@yourScope/your-element-1.js'), '.@yourScope']
+  ] 
+});
+```
+
+1.  When element my-element-1 is encountered in the same ShadowDOM realm as shadowDOMPeerElement, it first tries to do import('@myScope/my-element.js') by evaluating the first element of the array, hoping that import maps is supported by the browser and/or server, and that the import map file is set up properly..
 2.  If import works, skip the rest.
-3.  If it fails, extract out the path from the import, insert the version specified in the second parameter (if it is defined).  In this example, we have @myScope@1.2.3/my-element.js
-4.  The third parameter is a  base CDN url, or an array consisting of the base CDN url and a suffix string.  
-5.  import([fullyQualifiedCDNUrl from step 3]).
+3.  If it fails, do a dynamic import(s) of the matching link element(s), based on the css query of the second parameter inside document.head, if at least one node element is found.
+4.  If no node elements found in step 3, use the optional third option.  Including a version in the url seems like a maintenance nightmare, but can certainly be done.
 
-Note that the es-dev-server and most bundlers will resolve this just fine, hence the only penalty is the overhead needed to support the fallback position.
 
-An extra challenge posed by [shoelace.style](https://shoelace.style/?id=quick-start) and [ionic](https://ionicframework.com/docs/intro/cdn#ionic-framework-cdn) is that their CDN requires not one but two references -- one to a bundled js file, the other to a css file.  I suspect other design libraries built with Stencil will follow suit.
+Note that the es-dev-server and most bundlers will resolve this just fine (I think).
+
+An extra challenge posed by [shoelace.style](https://shoelace.style/?id=quick-start) and [ionic](https://ionicframework.com/docs/intro/cdn#ionic-framework-cdn) is that their CDN requires not one but two references -- one to a bundled js file, the other to a css file.  I suspect other design libraries built with Stencil will follow suit (and probably has).
 
 It's also been my experience that referencing a css file needs to be made outside the ShadowDOM, [when it comes to fonts](https://github.com/bahrus/scratch-box).
 
-Of course, CSS (or stylesheet) Modules is the latest contender to die of a thousand "Of course..."'s.  Just for laugh's sake, let's suppose CSS/stylesheet modules somehow survives the waltz ~through Occupied Syrian Golan~ ~to the Philosopher's stone~ ~to the [controlling authorities](https://en.wikipedia.org/wiki/The_Castle_(novel)#Plot)~ ~[find someone to take responsibility for Mr. Buttle's death](https://en.wikipedia.org/wiki/Brazil_(1985_film)#Plot)~ [the standards process](https://astrofella.wordpress.com/2019/10/06/jorge-luis-borges-franz-kafka/) and ships before Avatar 2 is released.
+Of course, CSS (or stylesheet) Modules is the latest contender to die of a thousand "Of course..."'s.  Just for laugh's sake, let's suppose CSS/stylesheet modules somehow survives the waltz ~through Occupied Syrian Golan~ ~to the Philosopher's stone~ ~to the [controlling authorities](https://en.wikipedia.org/wiki/The_Castle_(novel)#Plot)~ ~[who were responsible for Mr. Buttle's death](https://en.wikipedia.org/wiki/Brazil_(1985_film)#Plot)~ [the standards process](https://astrofella.wordpress.com/2019/10/06/jorge-luis-borges-franz-kafka/) and ships before Avatar 2 is released.
 
-How should we modify the tryImport function to accommodate both a js reference and a css reference that needs to be added (say) to document.head?
+How should we modify the dynamicImport function to accommodate both a js reference and a css reference that needs to be added (say) to document.head?
 
 This is subject to change as the CSS/stylesheet module proposal flaps in the wind, but maybe:
 
 ```JavaScript
-tryImport({
-  [() => import('@myScope/my-element.js'), version, bundled ? pika : [unpkg, mod]],
-  [() => import('@myScope/my-font.css', {type: 'css', scope: 'global' /* document.head */})],
-  [() => import('@myScope/my-shadow-style.css'), {type: 'css', scope: 'local' /* constructible stylesheets ? */}]
-}).then(({MyElement, MyShadowStyle}) =>{
-  //???
-})
+dynamicImport(shadowDOMPeerElement, {
+  'my-element-1':[
+    [() => import('@myScope/my-element-1.js'), '.@myScopeJS'],
+    [() => import('@myScope/my-font.css', {type: 'css', scope: 'global' /* document.head */}), '.@myScopeCSS']
+  ],
+  'my-element-2':[
+    [() => import('@myScope/my-element-2.js'), '.@myScope'],
+    [() => import('@myScope/my-shadow-style.css', {type: 'css', scope: 'local' /* constructible stylesheets ? */}), '.@myScopeCSS']
+  ],
+  'your-element-1':[
+    [() => import('@yourScope/your-element-1.js'), '.@yourScope']
+  ] 
+});
+
 ```
 
 https://bugzilla.mozilla.org/show_bug.cgi?id=1520690
