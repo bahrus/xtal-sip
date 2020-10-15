@@ -196,7 +196,7 @@ I don't think we should feel that bad that there isn't perfect symmetry between 
 1.  The early years of the web demonstrate that HTML can be useful by itself without external CSS files.  And clearly JS by itself can be useful -- web components can be built using JS by itself, as can many useful software applications.  But there has yet to be a significant role played by CSS files by themselves.  They exist to serve HTML.  What this means is that while the demand for JS to be able to reference other packages has been proven by the rapid rise of npm, and while the demand for HTML being able to reference third-party HTML demonstrated by the ubiquity of iframes.  This demand goes well beyond any concerns about reducing bandwidth by sharing common code.
 2.  Yes, there can be popular self-contained CSS libraries, like Bootstrap or web fonts, that could be shared via a CDN.
 3.  If CSS/Stylesheet modules allows imports, from JS, via relative paths, then one library could import css packages from another via a JS cross-package reference, which could leverage import maps.
-4.  There is an [interesting proposal](https://discourse.wicg.io/t/proposal-fetch-maps/4259) to make the suggestion in 3. above unecessary.
+4.  There is an [interesting proposal](https://discourse.wicg.io/t/proposal-fetch-maps/4259) to make the suggestion in 3. above unnecessary.
 
 
 
