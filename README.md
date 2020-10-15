@@ -104,7 +104,7 @@ Then your library references can look like:
 ```JavaScript
 dynamicImport(shadowDOMPeerElement, {
   'my-element-1':[
-    ['.@myScope', () => import('@myScope/my-element-1.js'), , 'https://unpkg.com/@myScope/my-element-1.js?module']
+    ['.@myScope', () => import('@myScope/my-element-1.js'), 'https://unpkg.com/@myScope/my-element-1.js?module']
   ],
   'my-element-2':[
     ['.@myScope', () => import('@myScope/my-element-2.js'), 'https://unpkg.com/@myScope/my-element-2.js?module'],
@@ -140,6 +140,8 @@ This is subject to change as the CSS/stylesheet/constructible stylesheet proposa
     <!-- Use modulepreload if used during initial presentation, lazyloadmapping if not -->
     <!-- modulepreloads should go in head tag, lazyloadmapping inside a xtal-sip tag somewhere towards the end -->
     <link rel=modulepreload     href="https://cdn.snowpack.dev/@myScope@1.2.3/dist/my-bundled-elements.js" class="@myScope" integrity=...>
+    <link rel=preload as=style  href="https://cdn.snowpack.dev/@myScope@1.2.3/dist/my-bundled-css-font.css" class="@myScope" integrity=...>
+    <link rel=preload as=style  href="https://www.jsdelivr.com/@someCommonSharedCSSFramework@11.12.13/some-common-css.css" class="@someCommonSharedScope" integrity=...>
   </head>
   <body>
   ...
@@ -150,34 +152,33 @@ This is subject to change as the CSS/stylesheet/constructible stylesheet proposa
 </html>
 ```
 
-If there will be a delay before the bundled font file will be used, then use something different from rel=preload.
 
 ```JavaScript
 dynamicImport(shadowDOMPeerElement, {
   'my-element-1':[
-    [() => import('@myScope/my-element-1.js'), '.@myScopeJS', 'https://cdn.snowpack.dev/@myScope/dist/my-bundled-elements.js'],
-    [() => {type: 'css', scope: 'global', selector: '#@myScope/my-css', fallback: 'https://www.jsdelivr.com/package/npm/@myScope/dist/my-bundled-font.css'}]
+    ['.@myScope', () => import('@myScope/my-element-1.js'), 'https://unpkg.com/@myScope/my-element-1.js?module'],
+    ['.@myScope', {type: 'css', scope: 'global'}, 'https://www.jsdelivr.com/package/npm/@myScope/dist/my-bundled-font.css'],
+    ['.@someCommonSharedCSSFramework', {type: 'css', scope: 'shadow'}, 'https://www.jsdelivr.com/@someCommonSharedCSSFramework@11.12.13/some-common-css.css']
   ],
   'my-element-2':[
-    [() => import('@myScope/my-element-2.js'), '.@myScope'],
-    [() => {type: 'css', scope: 'global', selector: '#@myScope/my-css', fallback: 'https://www.jsdelivr.com/package/npm/@myScope/dist/my-bundled-font.css'}]
+    ['.@myScope', () => import('@myScope/my-element-2.js'), 'https://unpkg.com/@myScope/my-element-2.js?module'],
+    ['.@someCommonSharedCSSFramework', {type: 'css', scope: 'shadow'}, 'https://www.jsdelivr.com/@someCommonSharedCSSFramework@11.12.13/some-common-css.css']
   ],
   'your-element-1':[
-    [() => import('@yourScope/your-element-1.js'), '.@yourScope']
+    [,() => import('@yourScope/your-element-1.js'), 'https://unpkg.com/@yourScope/your-element-1.js?module']
   ] 
 });
 
 ```
 
-Note that I'm (indirectly) floating something I've not seen proposed anywhere -- that (at least for css references) the dynamic import function be extended to get the mapping look-up via a css selector to a link element in document.head, which contains the fully qualified resource URL, hashintegrities, etc.  scope = "global" signifies that this is a global css file, like a font file (font-awesome, google web fonts, etc) that needs to be added to the head tag (or some equivalent).  Being that import doesn't support this currently, we simply map to a JS configuration object instead, in lieu of some standard approach.
 
-Relative references (relative to the JS file location) would still work with no mapping:
+Relative references (relative to the JS file location) would still work with no mapping, should CSS Stylesheet / Modules become a thing:
 
 ```JavaScript
 import('./my-css.css', {type: 'css'})
 ```
 
-working in some (fuzzy in my mind) constructible stylesheets.
+in tandem with constructible stylesheets (how is fuzzy in my mind).
 
 https://bugzilla.mozilla.org/show_bug.cgi?id=1520690
 
