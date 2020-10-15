@@ -70,53 +70,59 @@ The goals of xtal-sip are:
 3.  Provide workarounds for referencing libraries where tooling solutions and browser support for bare import specifiers is inconsistent.
 4.  Be compatible with technologies outside the node.js monoculture.
 
-## tryImport
+## dynamicImport
 
-xtal-sip provides a function "tryImport" which can passed in a pair of imports to use.
+xtal-sip provides a function "dynamicImport" described below.
 
-So:
+xtal-sip operates on a "strongest to weakest" hierarchy of mappings.  At the strongest level are link tags contained either in the head, or inside a footer tag.  Some of them important functionality
+recognized by web browsers, such as preloading resources ahead of time.  Sticking first to JS references, we can define a slew of easily streamable mappings.  For example:
 
 ```html
 <html>
   <head>
-    <!-- optional, backup if import maps not supported -->
-    <!-- Use modulepreload if used during initial presentation, lazyload if not -->
-    <link class="@myScope"    rel=modulepreload href="https://cdn.snowpack.dev/@myScope@1.2.3/dist/my-bundled-elements.js">
-    <link class="@yourScope"  rel=lazyload      href="https://unpkg.com/@yourScope@3.2.1/your-element-1.js?module">
+    <!-- optional, provides the most specific, and powerful mapping -->
+    <!-- Use modulepreload if used during initial presentation, lazyloadmapping if not -->
+    <!-- modulepreloads should go in head tag, lazyloadmapping inside a xtal-sip tag somewhere towards the end -->
+    <link rel=modulepreload     href="https://cdn.snowpack.dev/@myScope@1.2.3/dist/my-bundled-elements.js" class="@myScope" integrity=...>
+    
   </head>
   <body>
   ...
+    <xtal-sip>
+      <link rel=lazyloadmapping   href="https://unpkg.com/@yourScope@3.2.1/your-element-1.js?module" class="@yourScope" data-element="your-element" integrity=...>
+    </xtal-sip>
   </body>
+
 </html>
 
 ```
 
+xtal-sip will be able to work with these link tags, without the benefit of import maps or bare import specifiers.  However, import maps can provide a helpful stepping stone if the browser supports it, as we will discuss below.
+
 Then your library references can look like:
-
-
-
 
 ```JavaScript
 dynamicImport(shadowDOMPeerElement, {
   'my-element-1':[
-    [() => import('@myScope/my-element-1.js'), '.@myScope', 'https://unpkg.com/@myScope/my-element-1.js?module']
+    ['.@myScope', () => import('@myScope/my-element-1.js'), , 'https://unpkg.com/@myScope/my-element-1.js?module']
   ],
   'my-element-2':[
-    [() => import('@myScope/my-element-2.js'), '.@myScope'],
+    ['.@myScope', () => import('@myScope/my-element-2.js'), 'https://unpkg.com/@myScope/my-element-2.js?module'],
   ],
-  'your-element-1':[
-    [() => import('@yourScope/your-element-1.js'), '.@yourScope']
+  'your-element':[
+    [() => import('@yourScope/your-element.js'), '.@yourScope[data-element="your-element"]']
   ] 
 });
 ```
 
-1.  When element my-element-1 is encountered in the same ShadowDOM realm as shadowDOMPeerElement, it first tries to do import('@myScope/my-element.js') by evaluating the first element of the array, hoping that import maps is supported by the browser and/or server, and that the import map file is set up properly..
-2.  If import works, skip the rest.
-3.  If it fails, do a dynamic import(s) of the matching link element(s), based on the css query of the second parameter inside document.head, if at least one node element is found.
-4.  If no node elements found in step 3, use the optional third option.  Including a version in the url seems like a maintenance nightmare, but can certainly be done.
+1.  When element my-element-1 is encountered in the same ShadowDOM realm as shadowDOMPeerElement, then:
+    1.  If the first element of the array is defined, and if a corresponding link can be found (after waiting for an xtal-sip tag to appear somewhere), then the href from the link tag is loaded using import(...).
+    2.  If 1.1 above fails or the first element is undefined, try evaluating the second element of the array.
+    3.  If 1.1 and 1.2 fail or aren't defined, do an import() of the third element of the array.
 
 
-Note that the es-dev-server and most bundlers will resolve this just fine (I think).
+
+Note that the es-dev-server and most bundlers will resolve this just fine (I think), so if no link tags are present, they will resolve.  The penalty of this approach is, of course, a more complicated import statement, but now we have lazy loading into memory, a backup for running the code on a plain http server like nginx, without bundling. 
 
 An extra challenge posed by [shoelace.style](https://shoelace.style/?id=quick-start) and [ionic](https://ionicframework.com/docs/intro/cdn#ionic-framework-cdn) is that their CDN requires not one but two references -- one to a bundled js file, the other to a css file.  I suspect other design libraries built with Stencil will follow suit (and probably has).
 
@@ -125,19 +131,21 @@ It's also been my experience that, with web components, referencing a css file t
 
 How should we modify the dynamicImport function to accommodate both a js reference and a css reference that needs to be added (say) to document.head?
 
-This is subject to change as the CSS/stylesheet module proposal flaps in the wind, but maybe:
+This is subject to change as the CSS/stylesheet/constructible stylesheet proposals flap in the wind, but I'm thinking:
 
 ```html
 <html>
   <head>
-    <!-- optional, backup if import maps not supported -->
-    <!-- Use modulepreload if used during initial presentation, lazyload if not -->
-    <link class="@myScope"  cors=...  rel=modulepreload href="https://cdn.snowpack.dev/@myScope@1.2.3/dist/my-bundled-elements.js" hashintegrity=...>
-    <link id="@yourScope/your-element-1"  rel=jsLazyLoad  href="https://unpkg.com/@yourScope@3.2.1/your-element-1.js?module" hashintegrity=...>
-    <link rel=preload id="@myScope/my-css" as="style" href="https://www.jsdelivr.com/package/npm/@myScope@1.2.3/dist/my-bundled-font.css" hashintegrity=... headers=...>
+    <!-- optional, provides the most specific, and powerful mapping -->
+    <!-- Use modulepreload if used during initial presentation, lazyloadmapping if not -->
+    <!-- modulepreloads should go in head tag, lazyloadmapping inside a xtal-sip tag somewhere towards the end -->
+    <link rel=modulepreload     href="https://cdn.snowpack.dev/@myScope@1.2.3/dist/my-bundled-elements.js" class="@myScope" integrity=...>
   </head>
   <body>
   ...
+    <xtal-sip>
+      <link rel=lazyloadmapping   href="https://unpkg.com/@yourScope@3.2.1/your-element-1.js?module" class="@yourScope" data-element="your-element" integrity=...>
+    </xtal-sip>
   </body>
 </html>
 ```
@@ -147,7 +155,7 @@ If there will be a delay before the bundled font file will be used, then use som
 ```JavaScript
 dynamicImport(shadowDOMPeerElement, {
   'my-element-1':[
-    [() => import('@myScope/my-element-1.js'), '.@myScopeJS'],
+    [() => import('@myScope/my-element-1.js'), '.@myScopeJS', 'https://cdn.snowpack.dev/@myScope/dist/my-bundled-elements.js'],
     [() => {type: 'css', scope: 'global', selector: '#@myScope/my-css', fallback: 'https://www.jsdelivr.com/package/npm/@myScope/dist/my-bundled-font.css'}]
   ],
   'my-element-2':[
