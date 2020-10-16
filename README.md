@@ -127,11 +127,11 @@ Note that the es-dev-server and most bundlers will resolve this just fine (I thi
 
 ## More whittling
 
-JS is expensive, so if anything can be done to reduce the size of JS, while making the api less painful to work with, it's a win-win.
+JS is expensive, so if anything that can be done to reduce the size of JS, while making the api less painful to work with, is a win-win.
 
 ```JavaScript
-// CDN Computed Value For MyScope
-const CVMyScope = name => `https://unpkg.com/@myScope/${name}.js?module`;
+// CDN Computed Value For myScope
+const CVMyScope = ({name}) => `https://unpkg.com/@myScope/${name}.js?module`;
 conditionalImport(shadowDOMPeerElement, {
   'my-element-1':[
     ['.@myScope', () => import('@myScope/my-element-1.js'), CVMyScope]
@@ -152,7 +152,7 @@ Even more dry:
 const CVMyScope = name => `https://unpkg.com/@myScope/my-${name}.js?module`;
 conditionalImport(shadowDOMPeerElement, {
   'my-{name:element-1|element-2}':[
-    ['.@myScope', (name) => import(`@myScope/my-${name}.js`), CVMyScope]
+    ['.@myScope', ({name}) => import(`@myScope/my-${name}.js`), CVMyScope]
   ],
   'your-element':[
     ['.@yourScope[data-element="your-element"]', () => import('@yourScope/your-element.js')]
@@ -160,13 +160,24 @@ conditionalImport(shadowDOMPeerElement, {
 });
 ```
 
+## Do we really need two mapping systems
 
-An extra challenge posed by [shoelace.style](https://shoelace.style/?id=quick-start) and [ionic](https://ionicframework.com/docs/intro/cdn#ionic-framework-cdn) is that their CDN requires not one but two references -- one to a bundled js file, the other to a css file.  I suspect other design libraries built with Stencil will follow suit (and probably has).
+So I'm suggesting no less than two ways of mapping JS files here:
 
-It's also been my experience that, with web components, referencing a css file that needs to be made outside the ShadowDOM, [when it comes to fonts](https://github.com/bahrus/scratch-box) is a common need.
+1.  A flat, streamable list of link tags, placed strategically to fit the loading sequence of files as flexibly as possible.
+2.  A hierchical look-up that recognizes sub-scoping, all in one place.
+
+Having two potentially overlapping lists like this is admittedly [a bit irregular](https://www.youtube.com/watch?v=eOnTnQNNfvg).  I can see ways one of these mapping systems could be used to auto-generate the other.  Or maybe some uber mapping system, not recognized by the browser (like package-lock.json?) could be used to generate both.
+
+But I don't see a way around acknowledging the existence of both of these.
 
 
-How should we modify the dynamicImport function to accommodate both a js reference and a css reference that needs to be added (say) to document.head?
+An extra challenge posed by [shoelace.style](https://shoelace.style/?id=quick-start) and [ionic](https://ionicframework.com/docs/intro/cdn#ionic-framework-cdn) is that their CDN requires not one but two references -- one to a bundled js file, the other to a css file.  I suspect other design libraries built with Stencil will follow suit (and probably have).
+
+It's also been my experience that, with web components, [when it comes to fonts](https://github.com/bahrus/scratch-box), referencing a css file that needs to be placed outside any ShadowDOM is a common need.
+
+
+How should we modify the conditionalImport function to accommodate both a js reference and a css reference that needs to be added (say) to document.head?
 
 This is subject to change as the CSS/stylesheet/constructible stylesheet proposals flap in the wind, but I'm thinking:
 
@@ -174,7 +185,7 @@ This is subject to change as the CSS/stylesheet/constructible stylesheet proposa
 <html>
   <head>
     <!-- optional, provides the most specific, and powerful mapping -->
-    <!-- Use modulepreload if used during initial presentation, lazyloadmapping if not -->
+    <!-- Use modulepreload, preload if used during initial presentation, lazyloadmapping if not -->
     <!-- modulepreloads should go in head tag, lazyloadmapping inside a xtal-sip tag somewhere towards the end -->
     <link rel=modulepreload     href="https://cdn.snowpack.dev/@myScope@1.2.3/dist/my-bundled-elements.js" class="@myScope" integrity=...>
     <link rel=preload as=style  href="https://cdn.snowpack.dev/@myScope@1.2.3/dist/my-bundled-css-font.css" class="@myScope" integrity=...>
@@ -191,15 +202,15 @@ This is subject to change as the CSS/stylesheet/constructible stylesheet proposa
 
 
 ```JavaScript
-dynamicImport(shadowDOMPeerElement, {
+conditionalImport(shadowDOMPeerElement, {
   'my-element-1':[
     ['.@myScope', () => import('@myScope/my-element-1.js'), 'https://unpkg.com/@myScope/my-element-1.js?module'],
-    ['.@myScope', {type: 'css', scope: 'global'}, 'https://www.jsdelivr.com/package/npm/@myScope/dist/my-bundled-font.css'],
-    ['.@someCommonSharedCSSFramework', {type: 'css', scope: 'shadow'}, 'https://www.jsdelivr.com/@someCommonSharedCSSFramework@11.12.13/some-common-css.css']
+    ['.@myScope', {type: 'css', cssScope: 'global'}, 'https://www.jsdelivr.com/package/npm/@myScope/dist/my-bundled-font.css'],
+    ['.@someCommonSharedCSSFramework', {type: 'css', cssScope: 'shadow'}, 'https://www.jsdelivr.com/@someCommonSharedCSSFramework@11.12.13/some-common-css.css']
   ],
   'my-element-2':[
     ['.@myScope', () => import('@myScope/my-element-2.js'), 'https://unpkg.com/@myScope/my-element-2.js?module'],
-    ['.@someCommonSharedCSSFramework', {type: 'css', scope: 'shadow'}, 'https://www.jsdelivr.com/@someCommonSharedCSSFramework@11.12.13/some-common-css.css']
+    ['.@someCommonSharedCSSFramework', {type: 'css', cssScope: 'shadow'}, 'https://www.jsdelivr.com/@someCommonSharedCSSFramework@11.12.13/some-common-css.css']
   ],
   'your-element-1':[
     [,() => import('@yourScope/your-element-1.js'), 'https://unpkg.com/@yourScope/your-element-1.js?module']
