@@ -45,7 +45,7 @@ Unlike other types of library references, web components have one nice advantage
 
 Back to the bad:
 
-Without browser support, all of these solutions depend on node.js as the development environment.  That kind of technological, exclusive cultural monoculture should give us pause.  And to take advantage of all modern web component libraries, including Ionic and Shoelace, may require a bundling step as well if using bare imports only.  Even more exclusive set of technologies.
+Without browser support, all of these solutions depend on node.js as the development environment.  That kind of technological, exclusive technical monoculture should give us pause.  And to take advantage of all modern web component libraries, including Ionic and Shoelace, may require a bundling step as well if using bare imports only.  Even more exclusive set of technologies.
 
 </details>
 
