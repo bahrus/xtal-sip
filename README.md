@@ -26,7 +26,7 @@ The bad:
 
 When it comes to cross package resolution, on the other hand, the only proposal on the table is import maps. But whether import maps are going to be there for the long haul remains an open question, in my mind.  It has been [sitting behind a flag since version 74 in Chrome, and no release date has been announced](https://www.chromestatus.com/feature/5315286962012160).  Part of the reason for its languishing behind the flag, I think, is the lackluster response from other vendor browsers.  It is [well polyfilled](https://github.com/guybedford/es-module-shims), at least.   
 
-Firefox is taking a bit of an [Of course...](https://www.youtube.com/watch?v=VBn8XttrSew)  [approach to the question](https://github.com/mozilla/standards-positions/issues/146), which I suppose is more than can be said of Safari.  Relying on bare import resolution still feels much more tenuous than I'd like.  The strongest case for relying on bare import resolution is there is no better competing alternative, for now.  I think, though, without some assurance of the longevity of the specification via cross-browser postive gestures, it will be an uphill battle building the infrastructure around import maps that it so sorely needs.  VS Code / TypeScript support is quite confusing and inconsistent, as far as supporting bare import specifiers. Ironically, VSCode is more helpful in this regard if one sticks with JS.  I would be motivated to raise bug reports in VS Code / TypeScript's crushing sea of issues, but on what basis can I argue that they are under any obligation to support this "standard" without cross-browser endorsement?
+Firefox is taking a bit of an [Of course...](https://www.youtube.com/watch?v=VBn8XttrSew)  [approach to the question](https://github.com/mozilla/standards-positions/issues/146), which I suppose is more than can be said of Safari.  Relying on bare import resolution still feels much more tenuous than I'd like.  The strongest case for relying on bare import resolution is there is no better competing alternative, for now.  I think, though, without some assurance of the longevity of the specification via cross-browser positive gestures, it will be an uphill battle building the infrastructure around import maps that it so sorely needs.  VS Code / TypeScript support is quite confusing and inconsistent, as far as supporting bare import specifiers. Ironically, VSCode is more helpful in this regard if one sticks with JS.  I would be motivated to raise bug reports in VS Code / TypeScript's crushing sea of issues, but on what basis can I argue that they are under any obligation to support this "standard" without cross-browser endorsement?
 
 Back to the good:
 
@@ -45,7 +45,7 @@ Unlike other types of library references, web components have one nice advantage
 
 Back to the bad:
 
-Without browser support, all of these solutions depend on node.js as the development environment.  That kind of technological, exclusive technical monoculture should give us pause.  And to take advantage of all modern web component libraries, including Ionic and Shoelace, may require a bundling step as well if using bare imports only.  Even more exclusive set of technologies.
+Without browser support, all of these solutions depend on node.js as the development environment.  That kind of exclusive technical monoculture should give us pause.  And to take advantage of all modern web component libraries, including Ionic and Shoelace, may require a bundling step as well if using bare imports only.  Even more exclusive set of technologies.
 
 </details>
 
@@ -84,14 +84,14 @@ xtal-sip operates on a "strongest to weakest" hierarchy of mappings.  At the str
     <!-- optional, provides the most specific, and powerful mapping -->
     <!-- Use modulepreload if used during initial presentation, lazyloadmapping if not -->
     <!-- modulepreloads should go in head tag, lazyloadmapping inside a xtal-sip tag somewhere towards the end -->
-    <link rel=modulepreload     href="https://cdn.snowpack.dev/@myScope@1.2.3/dist/my-bundled-elements.js" class="@myScope" integrity=...>
+    <link rel=modulepreload     href="https://cdn.snowpack.dev/@myScope@1.2.3/dist/my-bundled-elements.js" id="myScope_my_bundled_elements" integrity=...>
     
   </head>
   <body>
   ...
     <xtal-sip>
-      <link rel=lazyloadmapping   href="https://unpkg.com/@yourScope@3.2.1/your-element-1.js?module" class="@yourScope" data-element="your-element-1" integrity=...>
-      <link rel=lazyloadmapping   href="https://unpkg.com/@yourScope@3.2.1/your-element-2.js?module" class="@yourScope" data-element="your-element-2" integrity=...>
+      <link rel=lazyloadmapping   href="https://unpkg.com/@yourScope@3.2.1/your-element-1.js?module" id="yourScope_your_element_1" integrity=...>
+      <link rel=lazyloadmapping   href="https://unpkg.com/@yourScope@3.2.1/your-element-2.js?module" id="yourScope_your_element_2" integrity=...>
     </xtal-sip>
   </body>
 
@@ -106,13 +106,13 @@ Then your library references can look like:
 ```JavaScript
 conditionalImport(shadowDOMPeerElement, {
   'my-element-1':[
-    ['.@myScope', () => import('@myScope/my-element-1.js'), 'https://unpkg.com/@myScope/my-element-1.js?module']
+    ['myScope_my_bundled_elements', () => import('@myScope/my-element-1.js'), 'https://unpkg.com/@myScope/my-element-1.js?module']
   ],
   'my-element-2':[
-    ['.@myScope', () => import('@myScope/my-element-2.js'), 'https://unpkg.com/@myScope/my-element-2.js?module'],
+    ['myScope_my_bundled_elements', () => import('@myScope/my-element-2.js'), 'https://unpkg.com/@myScope/my-element-2.js?module'],
   ],
-  'your-element':[
-    ['.@yourScope[data-element="your-element"]', () => import('@yourScope/your-element.js')]
+  'your-element-1':[
+    ['yourScope_your-element_1"]', () => import('@yourScope/your-element.js')]
   ] 
 });
 ```
