@@ -26,12 +26,12 @@ The bad:
 
 When it comes to cross package resolution, on the other hand, the only proposal on the table is import maps. But whether import maps are going to be there for the long haul remains an open question, in my mind.  It has been [sitting behind a flag since version 74 in Chrome, and no release date has been announced](https://www.chromestatus.com/feature/5315286962012160).  Part of the reason for its languishing behind the flag, I think, is the lackluster response from other vendor browsers.  It is [well polyfilled](https://github.com/guybedford/es-module-shims), at least.   
 
-Firefox is taking a bit of an [Of course...](https://www.youtube.com/watch?v=VBn8XttrSew)  [approach to the question](https://github.com/mozilla/standards-positions/issues/146), which I suppose is more than can be said of Safari.  Relying on bare import resolution still feels much more tenuous than I'd like.  The strongest case for relying on bare import resolution is there is no better competing alternative, for now.  I think, though, without some assurance of the longevity of the specification, it will be an uphill battle building the infrastructure around import maps that it so sorely needs.  VS Code / TypeScript support is quite confusing and inconsistent, as far as supporting bare import specifiers. Ironically, VSCode is more helpful in this regard if one sticks with JS.  I would be motivated to raise bug reports in VS Code / TypeScript's crushing sea of issues, but on what basis can I argue that they are under any obligation to support this "standard" without cross-browser endorsement?
+Firefox is taking a bit of an [Of course...](https://www.youtube.com/watch?v=VBn8XttrSew)  [approach to the question](https://github.com/mozilla/standards-positions/issues/146), which I suppose is more than can be said of Safari.  Relying on bare import resolution still feels much more tenuous than I'd like.  The strongest case for relying on bare import resolution is there is no better competing alternative, for now.  I think, though, without some assurance of the longevity of the specification via cross-browser postive gestures, it will be an uphill battle building the infrastructure around import maps that it so sorely needs.  VS Code / TypeScript support is quite confusing and inconsistent, as far as supporting bare import specifiers. Ironically, VSCode is more helpful in this regard if one sticks with JS.  I would be motivated to raise bug reports in VS Code / TypeScript's crushing sea of issues, but on what basis can I argue that they are under any obligation to support this "standard" without cross-browser endorsement?
 
 Back to the good:
 
-1.  It seems (by design) that the strict rules that govern bare import specifiers happens to be largely compatible with the considerably more lenient rules that bundling tools like webpack and Parcel support.  Tools which developers have grown used to using, even during development. 
-2.  For those of us who enjoy the lightweight, instantaneous feedback of build-less development, the es-dev-server does a great job of server-side "polyfilling" import maps (or bare import specifiers with package.json serving as a substitute for import maps, to be accurate).  Other solutions from snowpack and unpkg.com are also consistent with bare import specifiers.
+1.  It seems (by design) that the strict rules that govern bare import specifiers happens to be largely compatible with the considerably more lenient rules that bundling tools like webpack and Parcel support.  Tools which many, but not all developers have grown used to / fond of using, even during development. 
+2.  For those of us who enjoy the lightweight, instantaneous feedback of build-less development, the es-dev-server does a great job of server-side "polyfilling" import maps (or bare import specifiers with package.json serving as a substitute for import maps, to be accurate).  Other solutions from snowpack and unpkg.com are also consistent with bare import specifiers.  Perhaps with HTTP3, the gap between what is convenient to (this class of developers), and what runs best in production, will continue to narrow.
 
 Back to the bad:
 
@@ -118,7 +118,7 @@ conditionalImport(shadowDOMPeerElement, {
 ```
 
 1.  When element my-element-1 is encountered in the same ShadowDOM realm as shadowDOMPeerElement, then:
-    1.  If the first element of the array is defined, and if a corresponding link can be found (after waiting for an xtal-sip tag to appear somewhere), then the href from the link tag is loaded using import(...).
+    1.  If the first element of the array is defined, and if a corresponding link tag can be found (after waiting for an xtal-sip tag to appear somewhere), then the href from the link tag is loaded using import(...).
     2.  If 1.i above fails or the first element is undefined, try evaluating the second element of the array.
     3.  If 1.i and 1.ii fail or aren't defined, do an import() of the third element of the array.
 
@@ -166,11 +166,11 @@ conditionalImport(shadowDOMPeerElement, {
 So I'm suggesting no less than two ways of mapping JS files here:
 
 1.  A flat, streamable list of link tags, placed strategically to fit the loading sequence of files as flexibly as possible.
-2.  A hierarchical look-up that recognizes sub-scoping, all in one place.
+2.  A hierarchical look-up that recognizes sub-scoping, all in one place, tailored specifically for JS.
 
 Having two potentially overlapping lists like this is admittedly [a bit irregular](https://www.youtube.com/watch?v=eOnTnQNNfvg).  I can see ways one of these mapping systems could be used to auto-generate the other.  Or maybe some uber mapping system, not recognized by the browser (like package-lock.json?) could be used to generate both.
 
-But I don't see a way around acknowledging the existence of both of these.
+But I don't see a way around acknowledging the existence of both of these, as far as the browser runtime.
 
 ## Language of the middle
 
@@ -247,7 +247,7 @@ I don't think we should feel that bad that there isn't perfect symmetry between 
 2.  node.css only has a fraction of the download rate as node.js.
 3.  If CSS/Stylesheet modules allows imports from JS, via relative paths, then one library package could import css packages from another via a JS cross-package "bridge" reference, which could leverage import maps. 
 4.  CSS has had a language for importing other css files for years.  Perhaps it could be improved, but the case for reinventing the wheel, in order to match what is done for JS, is quite weak.
-5.  There is an [interesting proposal](https://discourse.wicg.io/t/proposal-fetch-maps/4259) to make the suggestion in 4 above unnecessary, backed by one of the foremost experts in the area (imports of various formats / fetch / etc).  This proposal seems to impose little to no adjustments on the way JS import maps work.
+5.  There is an [interesting proposal](https://discourse.wicg.io/t/proposal-fetch-maps/4259) to make the suggestion in 3 above unnecessary, backed by one of the foremost experts in the area (imports of various formats / fetch / etc).  This proposal seems to impose little to no adjustments on the way JS import maps work.
 
 
 
