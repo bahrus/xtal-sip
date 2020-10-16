@@ -146,7 +146,7 @@ conditionalImport(shadowDOMPeerElement, {
 });
 ```
 
-Even more dry:
+Extra dry:
 
 ```JavaScript
 // CDN Computed Value For MyScope
@@ -160,6 +160,8 @@ conditionalImport(shadowDOMPeerElement, {
   ] 
 });
 ```
+
+Unfortunately, this syntax may break bundling solutions.
 
 ## Do we really need two mapping systems?
 
