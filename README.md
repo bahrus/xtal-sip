@@ -145,6 +145,21 @@ conditionalImport(shadowDOMPeerElement, {
 });
 ```
 
+Even more dry:
+
+```JavaScript
+// CDN Computed Value For MyScope
+const CVMyScope = name => `https://unpkg.com/@myScope/my-${name}.js?module`;
+conditionalImport(shadowDOMPeerElement, {
+  'my-{name:element-1|element-2}':[
+    ['.@myScope', (name) => import(`@myScope/my-${name}.js`), CVMyScope]
+  ],
+  'your-element':[
+    ['.@yourScope[data-element="your-element"]', () => import('@yourScope/your-element.js')]
+  ] 
+});
+```
+
 
 An extra challenge posed by [shoelace.style](https://shoelace.style/?id=quick-start) and [ionic](https://ionicframework.com/docs/intro/cdn#ionic-framework-cdn) is that their CDN requires not one but two references -- one to a bundled js file, the other to a css file.  I suspect other design libraries built with Stencil will follow suit (and probably has).
 
