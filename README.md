@@ -103,7 +103,7 @@ xtal-sip will be able to work with these link tags, without the benefit of impor
 Then your library references can look like:
 
 ```JavaScript
-dynamicImport(shadowDOMPeerElement, {
+conditionalImport(shadowDOMPeerElement, {
   'my-element-1':[
     ['.@myScope', () => import('@myScope/my-element-1.js'), 'https://unpkg.com/@myScope/my-element-1.js?module']
   ],
@@ -111,19 +111,40 @@ dynamicImport(shadowDOMPeerElement, {
     ['.@myScope', () => import('@myScope/my-element-2.js'), 'https://unpkg.com/@myScope/my-element-2.js?module'],
   ],
   'your-element':[
-    [() => import('@yourScope/your-element.js'), '.@yourScope[data-element="your-element"]']
+    ['.@yourScope[data-element="your-element"]', () => import('@yourScope/your-element.js')]
   ] 
 });
 ```
 
 1.  When element my-element-1 is encountered in the same ShadowDOM realm as shadowDOMPeerElement, then:
     1.  If the first element of the array is defined, and if a corresponding link can be found (after waiting for an xtal-sip tag to appear somewhere), then the href from the link tag is loaded using import(...).
-    2.  If 1.1 above fails or the first element is undefined, try evaluating the second element of the array.
-    3.  If 1.1 and 1.2 fail or aren't defined, do an import() of the third element of the array.
+    2.  If 1.i above fails or the first element is undefined, try evaluating the second element of the array.
+    3.  If 1.i and 1.ii fail or aren't defined, do an import() of the third element of the array.
 
 
 
 Note that the es-dev-server and most bundlers will resolve this just fine (I think), so if no link tags are present, they will resolve.  The penalty of this approach is, of course, a more complicated import statement, but now we have lazy loading into memory, a backup for running the code on a plain http server like nginx, without bundling. 
+
+## More whittling
+
+JS is expensive, so if anything can be done to reduce the size of JS, while making the api less painful to work with, it's a win-win.
+
+```JavaScript
+// CDN Computed Value For MyScope
+const CVMyScope = name => `https://unpkg.com/@myScope/${name}.js?module`;
+conditionalImport(shadowDOMPeerElement, {
+  'my-element-1':[
+    ['.@myScope', () => import('@myScope/my-element-1.js'), CVMyScope]
+  ],
+  'my-element-2':[
+    ['.@myScope', () => import('@myScope/my-element-2.js'), CVMyScope],
+  ],
+  'your-element':[
+    ['.@yourScope[data-element="your-element"]', () => import('@yourScope/your-element.js')]
+  ] 
+});
+```
+
 
 An extra challenge posed by [shoelace.style](https://shoelace.style/?id=quick-start) and [ionic](https://ionicframework.com/docs/intro/cdn#ionic-framework-cdn) is that their CDN requires not one but two references -- one to a bundled js file, the other to a css file.  I suspect other design libraries built with Stencil will follow suit (and probably has).
 
@@ -196,8 +217,9 @@ I don't think we should feel that bad that there isn't perfect symmetry between 
 
 1.  The early years of the web demonstrate that HTML can be useful by itself without external CSS files.  And clearly JS by itself can be useful -- web components can be built using JS by itself, as can many useful software applications.  But there has yet to be a significant role played by CSS files by themselves.  They exist to serve HTML.  What this means is that while the demand for JS to be able to reference other packages has been proven by the rapid rise of npm, and while the demand for HTML being able to reference third-party HTML demonstrated by the ubiquity of iframes.  This demand goes well beyond any concerns about reducing bandwidth by sharing common code.
 2.  Yes, there can be popular self-contained CSS libraries, like Bootstrap or web fonts, that could be shared via a CDN.
-3.  If CSS/Stylesheet modules allows imports, from JS, via relative paths, then one library could import css packages from another via a JS cross-package reference, which could leverage import maps.
-4.  There is an [interesting proposal](https://discourse.wicg.io/t/proposal-fetch-maps/4259) to make the suggestion in 3. above unnecessary.
+3.  node.css only has a fraction of the download rate as node.js.
+4.  If CSS/Stylesheet modules allows imports from JS, via relative paths, then one library could import css packages from another via a JS cross-package "bridge" reference, which could leverage import maps.
+5.  There is an [interesting proposal](https://discourse.wicg.io/t/proposal-fetch-maps/4259) to make the suggestion in 4. above unnecessary.
 
 
 
