@@ -159,12 +159,12 @@ conditionalImport(shadowDOMPeerElement, {
 });
 ```
 
-## Do we really need two mapping systems
+## Do we really need two mapping systems?
 
 So I'm suggesting no less than two ways of mapping JS files here:
 
 1.  A flat, streamable list of link tags, placed strategically to fit the loading sequence of files as flexibly as possible.
-2.  A hierchical look-up that recognizes sub-scoping, all in one place.
+2.  A hierarchical look-up that recognizes sub-scoping, all in one place.
 
 Having two potentially overlapping lists like this is admittedly [a bit irregular](https://www.youtube.com/watch?v=eOnTnQNNfvg).  I can see ways one of these mapping systems could be used to auto-generate the other.  Or maybe some uber mapping system, not recognized by the browser (like package-lock.json?) could be used to generate both.
 
@@ -177,7 +177,7 @@ An extra challenge posed by [shoelace.style](https://shoelace.style/?id=quick-st
 It's also been my experience that, with web components, [when it comes to fonts](https://github.com/bahrus/scratch-box), referencing a css file that needs to be placed outside any ShadowDOM is a common need.
 
 
-How should we modify the conditionalImport function to accommodate both a js reference and a css reference that needs to be added (say) to document.head?
+How should we modify the conditionalImport function to accommodate both js reference(s) and a css reference(s) that need to be added (say) to document.head?
 
 This is subject to change as the CSS/stylesheet/constructible stylesheet proposals flap in the wind, but I'm thinking:
 
