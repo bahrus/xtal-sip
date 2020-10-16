@@ -24,18 +24,18 @@ The bad:
 
 When it comes to cross package resolution, on the other hand, the only proposal on the table is import maps. But whether import maps are going to be there for the long haul remains an open question, in my mind.  It has been [sitting behind a flag since version 74 in Chrome, and no release date has been announced](https://www.chromestatus.com/feature/5315286962012160).  Part of the reason for its languishing behind the flag, I think, is the lackluster response from other vendor browsers.  It is [well polyfilled](https://github.com/guybedford/es-module-shims), at least.   
 
-Firefox is taking a bit of a [Of course...](https://www.youtube.com/watch?v=VBn8XttrSew)  [approach to the question](https://github.com/mozilla/standards-positions/issues/146).  Relying on bare import resolution still feels much more tenuous than I'd like.  The strongest case for relying on bare import resolution is there is no better competing alternative, for now.  I think, though, without some assurance of the longevity of the specification, it will be an uphill battle building the infrastructure around import maps that it so sorely needs.  VS Code / TypeScript support is quite confusing and inconsistent, as far as supporting bare import specifiers. Ironically, VSCode is more helpful in this regard if one sticks with JS.  I would be motivated to raise bug reports in VS Code / TypeScript's crushing sea of issues, but on what basis can I argue that they are under any obligation to support this "standard" in its current state?
+Firefox is taking a bit of a [Of course...](https://www.youtube.com/watch?v=VBn8XttrSew)  [approach to the question](https://github.com/mozilla/standards-positions/issues/146), which I suppose is more than can be said of Safari.  Relying on bare import resolution still feels much more tenuous than I'd like.  The strongest case for relying on bare import resolution is there is no better competing alternative, for now.  I think, though, without some assurance of the longevity of the specification, it will be an uphill battle building the infrastructure around import maps that it so sorely needs.  VS Code / TypeScript support is quite confusing and inconsistent, as far as supporting bare import specifiers. Ironically, VSCode is more helpful in this regard if one sticks with JS.  I would be motivated to raise bug reports in VS Code / TypeScript's crushing sea of issues, but on what basis can I argue that they are under any obligation to support this "standard" without cross-browser endorsement?
 
 Back to the good:
 
-1.  It seems (by design) that the strict rules that govern bare import specifiers happens to be largely compatible with the considerably more lenient rules that bundling tools like webpack and Parcel support, and which developers have grown used to using, even during development. 
-2.  For those of us who enjoy the lightweight, instantaneous feedback of build-less development, the es-dev-server does a great job of server-side "polyfilling" import maps (or bare import specifiers with package.json serving as a substitute for import maps, to be accurate).  
+1.  It seems (by design) that the strict rules that govern bare import specifiers happens to be largely compatible with the considerably more lenient rules that bundling tools like webpack and Parcel support.  Tools which developers have grown used to using, even during development. 
+2.  For those of us who enjoy the lightweight, instantaneous feedback of build-less development, the es-dev-server does a great job of server-side "polyfilling" import maps (or bare import specifiers with package.json serving as a substitute for import maps, to be accurate).  Other solutions from snowpack are also consistent with bare import specifiers.
 
 Back to the bad:
 
-However, even in the sphere of web component development, not all web component libraries are making themselves compatible with the es-dev-server.  Some of that is due to legacy / backwards compatibility needs, which hopefully will fade with time.  But another looming cause is that a sizable portion of web component libraries are built on stencil (and perhaps other JSX libraries), which tends to work best with a bundling step, even during development.  The fact that the library uses JSX means that some compiling will be necessary anyway, so from that point of view, they may not care much.  But it does mean that there's a bit of a rift there.  I've tried, unsuccessfully, to use Ionic components, and Shoelace components, using bare import specifiers and the es-dev-server.  On the other hand Ionic and shoelace both provide easy CDN url's.  But pointing a library exclusively to a CDN url in the raw code doesn't seem like the right solution.
+However, even in the sphere of web component development, not all web component libraries are making themselves compatible with the es-dev-server.  Some of that is due to legacy / backwards compatibility needs, which hopefully will fade with time.  But another looming cause is that a sizable portion of web component libraries are built on stencil (and perhaps other JSX libraries), which tends to work best with a bundling step, even during development.  The fact that the library uses JSX means that some compiling will be necessary anyway, so from that point of view, they may not care much.  But it does mean that there's a bit of a rift there.  I've tried, unsuccessfully, to use Ionic components, and Shoelace components, using bare import specifiers and the es-dev-server.  On the other hand Ionic and Shoelace both provide easy CDN url's.  But pointing a library exclusively to a (versioned) CDN url in the raw code doesn't seem like the right solution.
 
-Another weakness of import maps, in my mind, is it isn't easy to collapse mappings of multiple bare import endpoints to a single bundled (CDN) url.  Perhaps this will come with bundled exchanges, but my guess is bundled exchanges will land in all browsers by the end of the decade, when the igalium-based browser reaches 99% market share.  It still seems to be only google people spearheading this initiative.  So what to do until then?
+Another weakness of import maps, in my mind, is it isn't easy to collapse mappings of multiple bare import endpoints to a single bundled (CDN) url.  Perhaps this will come with bundled exchanges, but my guess is bundled exchanges will land in all browsers by the end of the decade, when the Igalium-based browser reaches 99% market share.  It still seems to be only Google people spearheading this initiative.  So what to do until then?
 
 Back to the good:
 
@@ -43,7 +43,7 @@ Unlike other types of library references, web components have one nice advantage
 
 Back to the bad:
 
-Without browser support, all of these solutions depend on node.js as the development environment.  That kind of technological, exclusive cultural monoculture should give us pause.  And to take advantage of all modern web component libraries may require a bundling step as well.  Even more exclusive.
+Without browser support, all of these solutions depend on node.js as the development environment.  That kind of technological, exclusive cultural monoculture should give us pause.  And to take advantage of all modern web component libraries, including Ionic and Shoelace may require a bundling step as well if using bare imports only.  Even more exclusive set of technologies.
 
 </details>
 
@@ -66,16 +66,16 @@ A significant pain point has to do with loading all the third-party web componen
 The goals of xtal-sip are:
 
 1.  Provide a declarative way of progressively, dynamically loading web component dependencies into memory, only when needed.
-2.  Do so without introducing another additional listing of dependencies that competes with import maps / package.json.
+2.  Do so without introducing another additional listing of dependencies that competes with import maps / package.json that isn't part of the web ecosystem.
 3.  Provide workarounds for referencing libraries where tooling solutions and browser support for bare import specifiers is inconsistent.
 4.  Be compatible with technologies outside the node.js monoculture.
 
-## dynamicImport
+## conditionalImport
 
-xtal-sip provides a function "dynamicImport" described below.
+xtal-sip provides a function "conditionalImport" described below.
 
-xtal-sip operates on a "strongest to weakest" hierarchy of mappings.  At the strongest level are link tags contained either in the head, or inside a footer tag.  Some of them important functionality
-recognized by web browsers, such as preloading resources ahead of time.  Sticking first to JS references, we can define a slew of easily streamable mappings.  For example:
+xtal-sip operates on a "strongest to weakest" hierarchy of mappings.  At the strongest level are link tags contained either in the head, or inside a xtal-sip tag.  Some of them rest on functionality
+recognized by web browsers, such as preloading resources ahead of time.  Giving preference link references, we can define a slew of easily streamable mappings.  For example:
 
 ```html
 <html>
@@ -89,7 +89,8 @@ recognized by web browsers, such as preloading resources ahead of time.  Stickin
   <body>
   ...
     <xtal-sip>
-      <link rel=lazyloadmapping   href="https://unpkg.com/@yourScope@3.2.1/your-element-1.js?module" class="@yourScope" data-element="your-element" integrity=...>
+      <link rel=lazyloadmapping   href="https://unpkg.com/@yourScope@3.2.1/your-element-1.js?module" class="@yourScope" data-element="your-element-1" integrity=...>
+      <link rel=lazyloadmapping   href="https://unpkg.com/@yourScope@3.2.1/your-element-2.js?module" class="@yourScope" data-element="your-element-2" integrity=...>
     </xtal-sip>
   </body>
 
@@ -97,7 +98,7 @@ recognized by web browsers, such as preloading resources ahead of time.  Stickin
 
 ```
 
-xtal-sip will be able to work with these link tags, without the benefit of import maps or bare import specifiers.  However, import maps can provide a helpful stepping stone if the browser supports it, as we will discuss below.
+xtal-sip will be able to work with these link tags, without the benefit of import maps or bare import specifiers.  However, import maps can provide a helpful stepping stone if the browser supports it, or a polyfill is present, or a bare import specifier web server is in use, as we will discuss below.
 
 Then your library references can look like:
 
