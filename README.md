@@ -9,6 +9,8 @@
 
 Dynamically &#34;water&#34; a custom element tag with the necessary dependencies to sprout the tag from an inert seedling to a thing of beauty.
 
+**NB:** The syntax below breaks significantly with what the current code is doing.
+
 <details>
 <summary>
 Backdrop, the good and the bad.
@@ -236,17 +238,17 @@ https://github.com/WICG/construct-stylesheets/issues/45#issuecomment-577674453
 
 
 
-The concern raised by Firefox is a good one -- ideally there *would* be one solution for everything.  And it's certainly worth bringing up the issue early, to gain a fuzzy idea how this will work.  But I'm reasonably certain that the idea that there should be a single mapping that manages all cross-package mappings, for all types of resources, and for all types of attributes, is a good one to consider, but, like other similar attempts, [seems out of reach of mortals for the time being](https://en.wikipedia.org/wiki/Unified_field_theory).  That ship has sailed, essentially, by the existence of preload tags, in my opinion.
+The concern raised by Firefox is a good one -- ideally there *would* be one solution for everything.  And it's certainly worth bringing up the issue early, to gain a fuzzy idea how this will work.  But I'm reasonably certain that the idea that there should be a single mapping that manages all cross-package mappings, for all types of resources, and for all types of attributes, is a good one to consider, but, like other similar attempts, [seems out of reach of mortals for the time being](https://en.wikipedia.org/wiki/Unified_field_theory).  That ship has sailed, essentially, by the existence of preload tags and existing import syntax for CSS, which differs from JS, in my opinion.
 
 
-I don't think we should feel that bad that there isn't perfect symmetry between JS and CSS mapping.
+I don't think we should feel that bad that there isn't perfect symmetry between JS and CSS mappings.
 
 1.  The early years of the web demonstrate that HTML can be useful by itself without external CSS files.  And clearly JS by itself can be useful -- web components can be built using JS by itself, as can many useful software applications.  But there has yet to be a significant role played by CSS files by themselves.  They exist to serve HTML (or JS, depending).  What this means is that while the demand for JS to be able to reference other packages has been proven by the rapid rise of npm, and while the demand for HTML being able to reference third-party HTML demonstrated by the ubiquity of iframes, these demands go well beyond any concerns about reducing bandwidth by sharing common code.  The demand for sharing css files across packages has certainly proven itself, but one doesn't find many such packages which have the kind of dependency tree we expect all the time with JS.
 2.  Yes, there can be popular self-contained CSS libraries, like Bootstrap or web fonts, that could be shared via a CDN.
 3.  node.css only has a fraction of the download rate as node.js.
-4.  If CSS/Stylesheet modules allows imports from JS, via relative paths, then one library package could import css packages from another via a JS cross-package "bridge" reference, which could leverage import maps.
+4.  If CSS/Stylesheet modules allows imports from JS, via relative paths, then one library package could import css packages from another via a JS cross-package "bridge" reference, which could leverage import maps. 
 5.  CSS has had a language for importing other css files for years.  Perhaps it could be improved, but the case for reinventing the wheel, in order to match what is done for JS, is quite weak.
-6.  There is an [interesting proposal](https://discourse.wicg.io/t/proposal-fetch-maps/4259) to make the suggestion in 4 above unnecessary, backed by one of the foremost experts in all the area.
+6.  There is an [interesting proposal](https://discourse.wicg.io/t/proposal-fetch-maps/4259) to make the suggestion in 4 above unnecessary, backed by one of the foremost experts in the area (imports of various formats / fetch / etc).  This proposal seems to impose little to no adjustments on the way JS import maps work.
 
 
 
