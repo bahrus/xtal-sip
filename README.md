@@ -112,7 +112,7 @@ conditionalImport(shadowDOMPeerElement, {
     ['myScope_my_bundled_elements', () => import('@myScope/my-element-2.js'), 'https://unpkg.com/@myScope/my-element-2.js?module'],
   ],
   'your-element-1':[
-    ['yourScope_your-element_1"]', () => import('@yourScope/your-element.js')]
+    ['yourScope_your-element_1'], () => import('@yourScope/your-element.js')]
   ] 
 });
 ```
@@ -128,20 +128,20 @@ Note that the es-dev-server and most bundlers will resolve this just fine (I thi
 
 ## More whittling
 
-JS is expensive, so if anything that can be done to reduce the size of JS, while making the api less painful to work with, is a win-win.
+JS is expensive, so anything that can be done to reduce the size of JS, while making the api less painful to work with, is a win-win.
 
 ```JavaScript
 // CDN Computed Value For myScope
 const CVMyScope = ({name}) => `https://unpkg.com/@myScope/${name}.js?module`;
 conditionalImport(shadowDOMPeerElement, {
   'my-element-1':[
-    ['.@myScope', () => import('@myScope/my-element-1.js'), CVMyScope]
+    ['myScope_my_bundled_elements', () => import('@myScope/my-element-1.js'), CVMyScope]
   ],
   'my-element-2':[
-    ['.@myScope', () => import('@myScope/my-element-2.js'), CVMyScope],
+    ['myScope_my_bundled_elements', () => import('@myScope/my-element-2.js'), CVMyScope],
   ],
   'your-element':[
-    ['.@yourScope[data-element="your-element"]', () => import('@yourScope/your-element.js')]
+    ['yourScope_your-element_1', () => import('@yourScope/your-element.js')]
   ] 
 });
 ```
