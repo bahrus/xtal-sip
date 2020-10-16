@@ -112,7 +112,7 @@ conditionalImport(shadowDOMPeerElement, {
     ['myScope_my_bundled_elements', () => import('@myScope/my-element-2.js'), 'https://unpkg.com/@myScope/my-element-2.js?module'],
   ],
   'your-element-1':[
-    ['yourScope_your-element_1'], () => import('@yourScope/your-element.js')]
+    ['yourScope_your-element_1', () => import('@yourScope/your-element.js'), 'https://unpkg.com/@yourScope/your-element-1.js?module']
   ] 
 });
 ```
@@ -191,9 +191,9 @@ This is subject to change as the CSS/stylesheet modules / constructible styleshe
     <!-- optional, provides the most specific, and powerful mapping -->
     <!-- Use modulepreload, preload if used during initial presentation, lazyloadmapping if not -->
     <!-- modulepreloads should go in head tag, lazyloadmapping inside a xtal-sip tag somewhere towards the end -->
-    <link rel=modulepreload     href="https://cdn.snowpack.dev/@myScope@1.2.3/dist/my-bundled-elements.js" class="@myScope" integrity=...>
-    <link rel=preload as=style  href="https://cdn.snowpack.dev/@myScope@1.2.3/dist/my-bundled-css-font.css" class="@myScope" integrity=...>
-    <link rel=preload as=style  href="https://www.jsdelivr.com/@someCommonSharedCSSFramework@11.12.13/some-common-css.css" class="@someCommonSharedScope" integrity=...>
+    <link rel=modulepreload     href="https://cdn.snowpack.dev/@myScope@1.2.3/dist/my-bundled-elements.js" id="myScope_my_bundled_elements" integrity=...>
+    <link rel=preload as=style  href="https://cdn.snowpack.dev/@myScope@1.2.3/dist/my-bundled-css-font.css" id="myScope_my_bundled_css_fonts" integrity=...>
+    <link rel=preload as=style  href="https://www.jsdelivr.com/@someCommonSharedCSSFramework@11.12.13/some-common-css.css" id="someCommonSharedScope_some_common_css" integrity=...>
   </head>
   <body>
   ...
@@ -208,16 +208,16 @@ This is subject to change as the CSS/stylesheet modules / constructible styleshe
 ```JavaScript
 conditionalImport(shadowDOMPeerElement, {
   'my-element-1':[
-    ['.@myScope', () => import('@myScope/my-element-1.js'), 'https://unpkg.com/@myScope/my-element-1.js?module'],
-    ['.@myScope', {type: 'css', cssScope: 'global'}, 'https://www.jsdelivr.com/package/npm/@myScope/dist/my-bundled-font.css'],
-    ['.@someCommonSharedCSSFramework', {type: 'css', cssScope: 'shadow'}, 'https://www.jsdelivr.com/@someCommonSharedCSSFramework/some-common-css.css']
+    ['myScope_my_bundled_elements', () => import('@myScope/my-element-1.js'), 'https://unpkg.com/@myScope/my-element-1.js?module'],
+    ['myScope_my_bundled_css_fonts', {type: 'css', cssScope: 'global'}, 'https://www.jsdelivr.com/package/npm/@myScope/dist/my-bundled-font.css'],
+    ['someCommonSharedScope_some_common_css', {type: 'css', cssScope: 'shadow'}, 'https://www.jsdelivr.com/@someCommonSharedCSSFramework/some-common-css.css']
   ],
   'my-element-2':[
-    ['.@myScope', () => import('@myScope/my-element-2.js'), 'https://unpkg.com/@myScope/my-element-2.js?module'],
-    ['.@someCommonSharedCSSFramework', {type: 'css', cssScope: 'shadow'}, 'https://www.jsdelivr.com/@someCommonSharedCSSFramework/some-common-css.css']
+    ['myScope_my_bundled_elements', () => import('@myScope/my-element-2.js'), 'https://unpkg.com/@myScope/my-element-2.js?module'],
+    ['someCommonSharedScope_some_common_css', {type: 'css', cssScope: 'shadow'}, 'https://www.jsdelivr.com/@someCommonSharedCSSFramework/some-common-css.css']
   ],
   'your-element-1':[
-    [,() => import('@yourScope/your-element-1.js'), 'https://unpkg.com/@yourScope/your-element-1.js?module']
+    ['yourScope_your-element_1',() => import('@yourScope/your-element-1.js'), 'https://unpkg.com/@yourScope/your-element-1.js?module']
   ] 
 });
 
