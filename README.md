@@ -181,7 +181,7 @@ It's also been my experience that, with web components, [when it comes to fonts]
 
 How should we modify the conditionalImport function to accommodate both js reference(s) and css reference(s) that need to be added (say) to document.head?
 
-This is subject to change as the CSS/stylesheet/constructible stylesheet proposals flap in the wind, but I'm thinking:
+This is subject to change as the CSS/stylesheet modules / constructible stylesheet proposals flap in the wind, but I'm thinking:
 
 ```html
 <html>
