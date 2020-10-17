@@ -29,7 +29,7 @@ Firefox is taking a bit of an [Of course...](https://www.youtube.com/watch?v=VBn
 
 Back to the good:
 
-1.  It seems (by design) that the strict rules that govern bare import specifiers happens to be largely compatible with the considerably more lenient rules that bundling tools like webpack and Parcel support.  Tools which many, but not all developers have grown used to / fond of using, even during development. 
+1.  It seems (by design) that the strict rules that govern bare import specifiers happens to be largely compatible with the considerably more lenient rules that bundling tools like webpack and Parcel support.  Tools which many -- but not all -- developers have grown used to / fond of using, even during development. 
 2.  For those of us who enjoy the lightweight, quick to load and reload, instantaneous feedback of build-less development, the es-dev-server does a great job of server-side "polyfilling" import maps (or bare import specifiers with package.json serving as a substitute for import maps, to be accurate).  Other solutions from snowpack and unpkg.com are also consistent with bare import specifiers.  Perhaps with HTTP3, the gap between what is convenient to (this class of developers), and what runs best in production, will continue to narrow.
 
 Back to the bad:
@@ -75,7 +75,7 @@ The goals of xtal-sip are:
 
 xtal-sip provides a function "conditionalImport" described below.
 
-xtal-sip operates on a "strongest to weakest" hierarchy of mappings.  At the strongest level are link tags contained either in the head, or prior to a xtal-sip tag as far as document order.  xtal-sip enhances/extends the functionality recognized by web browsers already, such as preloading resources ahead of time.  With link references, we can define a slew of easily streamable mappings.  For example:
+xtal-sip operates on a "strongest to weakest" hierarchy of mappings.  At the strongest level are link tags contained either in the head, or, for lower priority resources, towards the end. prior to a xtal-sip tag as far as document order.  conditionalImport enhances/extends the functionality recognized by web browsers already, such as preloading resources ahead of time.  With link references, we can define a slew of easily streamable mappings.  For example:
 
 ```html
 <html>
@@ -115,7 +115,7 @@ conditionalImport(shadowDOMPeerElement, {
 ```
 
 1.  When element my-element-1 is encountered in the same ShadowDOM realm as shadowDOMPeerElement, then:
-    1.  If the first element of the array is defined, and if a corresponding link tag can be found with matching id (after waiting for an xtal-sip tag to appear somewhere), then the href from the link tag is loaded using import(...).  Note that id's become global constants.
+    1.  If the first element of the array is defined, and if a corresponding link tag can be found with matching id (after waiting for DOMContentLoaded event if required), then the href from the link tag is loaded using import(...).  Note that id's become global constants.
     2.  If 1.i finds no link tag with matching id, or the first element is undefined, try evaluating the second element of the array.
     3.  If 1.i and 1.ii fail or aren't defined, do an import() of the third element of the array.
 
