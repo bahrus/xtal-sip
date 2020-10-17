@@ -31,11 +31,11 @@ Firefox is taking a bit of an [Of course...](https://www.youtube.com/watch?v=VBn
 Back to the good:
 
 1.  It seems (by design) that the strict rules that govern bare import specifiers happens to be largely compatible with the considerably more lenient rules that bundling tools like webpack and Parcel support.  Tools which many, but not all developers have grown used to / fond of using, even during development. 
-2.  For those of us who enjoy the lightweight, instantaneous feedback of build-less development, the es-dev-server does a great job of server-side "polyfilling" import maps (or bare import specifiers with package.json serving as a substitute for import maps, to be accurate).  Other solutions from snowpack and unpkg.com are also consistent with bare import specifiers.  Perhaps with HTTP3, the gap between what is convenient to (this class of developers), and what runs best in production, will continue to narrow.
+2.  For those of us who enjoy the lightweight, quick to load and reload, instantaneous feedback of build-less development, the es-dev-server does a great job of server-side "polyfilling" import maps (or bare import specifiers with package.json serving as a substitute for import maps, to be accurate).  Other solutions from snowpack and unpkg.com are also consistent with bare import specifiers.  Perhaps with HTTP3, the gap between what is convenient to (this class of developers), and what runs best in production, will continue to narrow.
 
 Back to the bad:
 
-However, even in the sphere of web component development, not all web component libraries are making themselves compatible with the es-dev-server.  Some of that is due to legacy / backwards compatibility needs, which hopefully will fade with time.  But another looming cause is that a sizable portion of web component libraries are built on stencil (and perhaps other JSX libraries), which tends to work best with a bundling step, even during development.  The fact that the library uses JSX means that some compiling will be necessary anyway, so from that point of view, they may not care much.  But it does mean that there's a bit of a rift there.  I've tried, unsuccessfully, to use Ionic components, and Shoelace components, using bare import specifiers and the es-dev-server.  On the other hand Ionic and Shoelace both provide easy CDN url's.  But pointing a library exclusively to a (versioned) CDN url in the raw code doesn't seem like the right solution.
+However, even in the sphere of web component development, not all web component libraries are making themselves compatible with the es-dev-server.  Some of that is due to legacy / backwards compatibility needs, which hopefully will fade with time.  But another looming cause is that a sizable portion of web component libraries are built on stencil (and perhaps other JSX libraries), which tend to work best with a bundling step, even during development.  The fact that the library uses JSX means that some compiling will be necessary anyway, so from that point of view, they may not care much.  But it does mean that there's a bit of a rift there.  I've tried, unsuccessfully, to use Ionic components, and Shoelace components, using bare import specifiers and the es-dev-server.  On the other hand Ionic and Shoelace both provide easy CDN url's.  But pointing a library exclusively to a (versioned) CDN url in the raw code doesn't seem like the right solution.
 
 Another weakness of import maps, in my mind, is it isn't easy to collapse mappings of multiple bare import endpoints to a single bundled (CDN) url.  Perhaps this will come with bundled exchanges, but my guess is bundled exchanges will land in all browsers by the end of the decade, when the Igalium-based browser reaches 99% market share.  It still seems to be only Google people spearheading this initiative (bundled exchanges).  So what to do until then?
 
@@ -45,7 +45,7 @@ Unlike other types of library references, web components have one nice advantage
 
 Back to the bad:
 
-Without browser support, all of these solutions depend on node.js as the development environment.  That kind of exclusive technical monoculture should give us pause.  And to take advantage of all modern web component libraries, including Ionic and Shoelace, may require a bundling step as well if using bare imports only.  Even more exclusive set of technologies.
+Without browser support, all of these solutions depend on node.js as the development environment.  That kind of exclusive technical monoculture should give us pause.  And to take advantage of *all* modern web component libraries, including Ionic and Shoelace, may require a bundling step as well if using bare imports only.  Even more exclusive set of technologies.
 
 </details>
 
@@ -76,7 +76,7 @@ The goals of xtal-sip are:
 
 xtal-sip provides a function "conditionalImport" described below.
 
-xtal-sip operates on a "strongest to weakest" hierarchy of mappings.  At the strongest level are link tags contained either in the head, or inside a xtal-sip tag.  xtal-sip enhances/extends the functionality recognized by web browsers already, such as preloading resources ahead of time.  With link references, we can define a slew of easily streamable mappings.  For example:
+xtal-sip operates on a "strongest to weakest" hierarchy of mappings.  At the strongest level are link tags contained either in the head, or prior to a xtal-sip tag as far as document order.  xtal-sip enhances/extends the functionality recognized by web browsers already, such as preloading resources ahead of time.  With link references, we can define a slew of easily streamable mappings.  For example:
 
 ```html
 <html>
@@ -156,14 +156,13 @@ conditionalImport(shadowDOMPeerElement, {
 });
 ```
 
-There's a little big of redundancy above, so as not to break compatibility with bundlers / polyfills.
+There's a little bit of redundancy above, so as not to break compatibility with bundlers / polyfills.
 
-If an element matches the first option (element-1) evaluate the first element of the array.  If an element matches the second option (element-2), evaluate the second element of
-the array.
+If an element matches the first option (element-1), and the first element of the array doesn't match any link tags, then evaluate the first element of the array.  If an element matches the second option (element-2), evaluate the second element of the array.  Etc.
 
 ## Preemptive Loading
 
-If we don't want to wait to discover some custom element, but want to take advantage of the mapping fallback system this library provides:
+If we working on a device with sufficient memory and other resources, perhaps we don't want to wait to discover an active custom element, and want to just load the dependencies ahead of time.  Yet we do want to take advantage of the mapping fallback system this library provides.  You can use the premptiveImport function:
 
 ```JavaScript
 preemptiveImport( ['yourScope_your-element_1', () => import('@yourScope/your-element.js'), '//unpkg.com/@yourScope/your-element-1.js?module'] );
@@ -198,7 +197,7 @@ This is subject to change as the CSS/stylesheet modules / constructible styleshe
     <!-- modulepreloads should go in head tag, lazyloadmapping inside a xtal-sip tag somewhere towards the end -->
     <link integrity=... rel=modulepreload     href="https://cdn.snowpack.dev/@myScope@1.2.3/dist/my-bundled-elements.js" id="myScope_my_bundled_elements">
     <link integrity=... rel=preload as=style  href="https://cdn.snowpack.dev/@myScope@1.2.3/dist/my-bundled-css-font.css" id="myScope_my_bundled_css_fonts">
-    <link integrity=... rel=preload as=style  href="https://www.jsdelivr.com/@someCommonSharedCSSFramework@11.12.13/some-common-css.css" id="someCommonSharedScope_some_common_css">
+    <link integrity=... rel=preload as=style  href="https://www.jsdelivr.com/@someCommonSharedCSSFramework@11.12.13/some-common-css.css" id="someCommonSharedCSSFramework_some_common_css">
   </head>
   <body>
   ...
@@ -216,11 +215,11 @@ conditionalImport(shadowDOMPeerElement, {
   'my-element-1':[
     ['myScope_my_bundled_elements', () => import('@myScope/my-element-1.js'), CVMyScope],
     ['myScope_my_bundled_css_fonts', {type: 'css', cssScope: 'global'}, 'https://www.jsdelivr.com/package/npm/@myScope/dist/my-bundled-font.css'],
-    ['someCommonSharedScope_some_common_css', {type: 'css', cssScope: 'shadow'}, 'https://www.jsdelivr.com/@someCommonSharedCSSFramework/some-common-css.css']
+    ['someCommonSharedCSSFramework_some_common_css', {type: 'css', cssScope: 'shadow'}, 'https://www.jsdelivr.com/@someCommonSharedCSSFramework/some-common-css.css']
   ],
   'my-element-2':[
     ['myScope_my_bundled_elements', () => import('@myScope/my-element-2.js'), CVMyScope],
-    ['someCommonSharedScope_some_common_css', {type: 'css', cssScope: 'shadow'}, 'https://www.jsdelivr.com/@someCommonSharedCSSFramework/some-common-css.css']
+    ['someCommonSharedCSSFramework_some_common_css', {type: 'css', cssScope: 'shadow'}, 'https://www.jsdelivr.com/@someCommonSharedCSSFramework/some-common-css.css']
   ],
   'your-element-1':[
     ['yourScope_your-element_1',() => import('@yourScope/your-element-1.js'), 'https://unpkg.com/@yourScope/your-element-1.js?module']
