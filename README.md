@@ -253,7 +253,7 @@ I don't think we should feel that bad that there isn't perfect symmetry between 
 2.  node.css only has a fraction of the download rate as node.js.
 3.  If CSS/Stylesheet modules allows imports from JS, via relative paths, then one library package could import css packages from another via a JS cross-package "bridge" reference, which could leverage import maps. 
 4.  CSS has had a syntax for importing other css files for years.  Perhaps it could be improved, but the case for reinventing the wheel, in order to match what is done for JS, is quite weak.
-5.  There is an [interesting proposal](https://discourse.wicg.io/t/proposal-fetch-maps/4259) to make the suggestion in 3 above unnecessary, backed by one of the foremost experts in the area (imports of various formats / fetch / etc).  The proposal seems to impose little to no adjustments on the way JS import maps work.
+5.  There is an [interesting proposal](https://discourse.wicg.io/t/proposal-fetch-maps/4259) to may the suggestion in 3 above unnecessary (or maybe it's a competing proposal to using link preload/lazyload mappings?), backed by one of the foremost experts in the area (imports of various formats / fetch / etc).  The proposal seems to impose little to no adjustments on the way JS import maps work.
 
 
 
