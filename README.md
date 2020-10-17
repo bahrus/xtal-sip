@@ -89,7 +89,6 @@ xtal-sip operates on a "strongest to weakest" hierarchy of mappings.  At the str
   ...
     <link integrity=... rel=lazyloadmapping  href="//unpkg.com/@yourScope@3.2.1/your-element-1.js?module" id="yourScope_your_element_1" >
     <link integrity=... rel=lazyloadmapping  href="//unpkg.com/@yourScope@3.2.1/your-element-2.js?module" id="yourScope_your_element_2" >
-    <xtal-sip></xtal-sip>
   </body>
 
 </html>
@@ -165,7 +164,7 @@ If an element matches the first option (element-1), and the first element of the
 
 ## Preemptive Loading
 
-If we working on a device with sufficient memory and other resources, perhaps we don't want to wait to discover an active custom element, and want to just load the dependencies ahead of time.  Yet we do want to take advantage of the mapping fallback system this library provides.  You can use the premptiveImport function:
+If we are working on a device with sufficient memory and other resources, perhaps we don't want to wait to discover an active custom element, and want to just load the dependencies ahead of time.  Yet we do want to take advantage of the mapping fallback system this library provides.  You can use the preemptiveImport function:
 
 ```JavaScript
 preemptiveImport( ['yourScope_your-element_1', () => import('@yourScope/your-element.js'), '//unpkg.com/@yourScope/your-element-1.js?module'] );
@@ -205,7 +204,6 @@ This is subject to change as the CSS/stylesheet modules / constructible styleshe
   <body>
   ...
     <link integrity=... rel=lazyloadmapping   href="//unpkg.com/@yourScope@3.2.1/your-element-1.js?module" id=yourScope_your-element_1>
-    <xtal-sip></xtal-sip>
   </body>
 </html>
 ```

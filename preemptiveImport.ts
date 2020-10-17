@@ -4,7 +4,12 @@ export function preemptiveImport(arg: PreemptiveLoadingTuple){
     if(linkTagId !== undefined){
         const linkTag = self[linkTagId] as HTMLLinkElement | undefined;
         if(linkTag === undefined){
-            //TODO:  add wait for xtal-sip tag.
+            if(document.readyState === 'loading'){
+                document.addEventListener('DOMContentLoaded', e => {
+                    preemptiveImport(arg);
+                });
+                return;
+            }
         }else{
             if(linkTag.localName === 'link'){ //security precaution
                 if(linkTag.dataset.loaded === 'true'){
