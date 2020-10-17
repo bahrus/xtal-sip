@@ -198,12 +198,12 @@ This is subject to change as the CSS/stylesheet modules / constructible styleshe
     <!-- Use modulepreload, preload if used during initial presentation, lazyloadmapping if not -->
     <!-- modulepreloads should go in head tag, lazyloadmapping inside a xtal-sip tag somewhere towards the end -->
     <link integrity=... rel=modulepreload     href="https://cdn.snowpack.dev/@myScope@1.2.3/dist/my-bundled-elements.js" id="myScope_my_bundled_elements">
-    <link integrity=... rel=preload as=style  href="https://cdn.snowpack.dev/@myScope@1.2.3/dist/my-bundled-css-font.css" id="myScope_my_bundled_css_fonts">
     <link integrity=... rel=preload as=style  href="https://www.jsdelivr.com/@someCommonSharedCSSFramework@11.12.13/some-common-css.css" id="someCommonSharedCSSFramework_some_common_css">
   </head>
   <body>
   ...
     <link integrity=... rel=modulelazyload   href="//unpkg.com/@yourScope@3.2.1/your-element-1.js?module" id=yourScope_your-element_1>
+    <link integrity=... rel=lazyload as=style  href="https://cdn.snowpack.dev/@myScope@1.2.3/dist/my-bundled-css-font.css" id="myScope_my_bundled_css_fonts">
   </body>
 </html>
 ```
