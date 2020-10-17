@@ -87,8 +87,8 @@ xtal-sip operates on a "strongest to weakest" hierarchy of mappings.  At the str
   </head>
   <body>
   ...
-    <link integrity=... rel=lazyloadmapping  href="//unpkg.com/@yourScope@3.2.1/your-element-1.js?module" id="yourScope_your_element_1" >
-    <link integrity=... rel=lazyloadmapping  href="//unpkg.com/@yourScope@3.2.1/your-element-2.js?module" id="yourScope_your_element_2" >
+    <link integrity=... rel=modulelazyload  href="//unpkg.com/@yourScope@3.2.1/your-element-1.js?module" id="yourScope_your_element_1" >
+    <link integrity=... rel=modulelazyload  href="//unpkg.com/@yourScope@3.2.1/your-element-2.js?module" id="yourScope_your_element_2" >
   </body>
 
 </html>
@@ -203,7 +203,7 @@ This is subject to change as the CSS/stylesheet modules / constructible styleshe
   </head>
   <body>
   ...
-    <link integrity=... rel=lazyloadmapping   href="//unpkg.com/@yourScope@3.2.1/your-element-1.js?module" id=yourScope_your-element_1>
+    <link integrity=... rel=modulelazyload   href="//unpkg.com/@yourScope@3.2.1/your-element-1.js?module" id=yourScope_your-element_1>
   </body>
 </html>
 ```
