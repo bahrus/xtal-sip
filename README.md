@@ -161,9 +161,13 @@ There's a little big of redundancy above, so as not to break compatibility with 
 If an element matches the first option (element-1) evaluate the first element of the array.  If an element matches the second option (element-2), evaluate the second element of
 the array.
 
-## Preemptive
+## Preemptive Loading
 
+If we don't want to wait to discover some custom element, but want to take advantage of the mapping fallback system this library provides:
 
+```JavaScript
+preemptiveImport( ['yourScope_your-element_1', () => import('@yourScope/your-element.js'), '//unpkg.com/@yourScope/your-element-1.js?module'] );
+```
 
 ## Do we really need two mapping systems?
 
@@ -199,7 +203,7 @@ This is subject to change as the CSS/stylesheet modules / constructible styleshe
   <body>
   ...
     <xtal-sip>
-      <link rel=lazyloadmapping   href="https://unpkg.com/@yourScope@3.2.1/your-element-1.js?module" class="@yourScope" data-element="your-element" integrity=...>
+      <link integrity=... rel=lazyloadmapping   href="//unpkg.com/@yourScope@3.2.1/your-element-1.js?module" id=yourScope_your-element_1>
     </xtal-sip>
   </body>
 </html>
@@ -207,14 +211,15 @@ This is subject to change as the CSS/stylesheet modules / constructible styleshe
 
 
 ```JavaScript
+const CVMyScope = ({tagName}) => `//unpkg.com/@myScope/${tagName}.js?module`;
 conditionalImport(shadowDOMPeerElement, {
   'my-element-1':[
-    ['myScope_my_bundled_elements', () => import('@myScope/my-element-1.js'), 'https://unpkg.com/@myScope/my-element-1.js?module'],
+    ['myScope_my_bundled_elements', () => import('@myScope/my-element-1.js'), CVMyScope],
     ['myScope_my_bundled_css_fonts', {type: 'css', cssScope: 'global'}, 'https://www.jsdelivr.com/package/npm/@myScope/dist/my-bundled-font.css'],
     ['someCommonSharedScope_some_common_css', {type: 'css', cssScope: 'shadow'}, 'https://www.jsdelivr.com/@someCommonSharedCSSFramework/some-common-css.css']
   ],
   'my-element-2':[
-    ['myScope_my_bundled_elements', () => import('@myScope/my-element-2.js'), 'https://unpkg.com/@myScope/my-element-2.js?module'],
+    ['myScope_my_bundled_elements', () => import('@myScope/my-element-2.js'), CVMyScope],
     ['someCommonSharedScope_some_common_css', {type: 'css', cssScope: 'shadow'}, 'https://www.jsdelivr.com/@someCommonSharedCSSFramework/some-common-css.css']
   ],
   'your-element-1':[
@@ -231,7 +236,7 @@ Relative references (relative to the JS file location) would still work with no 
 import('./my-css.css', {type: 'css'})
 ```
 
-in tandem with constructible stylesheets (how is fuzzy in my mind).
+in tandem with constructible stylesheets (*how* is fuzzy in my mind).
 
 https://bugzilla.mozilla.org/show_bug.cgi?id=1520690
 
@@ -240,17 +245,16 @@ https://www.chromestatus.com/features/5394843094220800
 https://github.com/WICG/construct-stylesheets/issues/45#issuecomment-577674453
 
 
-
 The concern raised by Firefox is a good one -- ideally there *would* be one solution for everything.  And it's certainly worth bringing up the issue early, to gain a fuzzy idea how this will work.  But I'm reasonably certain that the idea that there should be a single mapping that manages all cross-package mappings, for all types of resources, and for all types of attributes, is a good one to consider, but, like other similar attempts, [seems out of reach of mortals for the time being](https://en.wikipedia.org/wiki/Unified_field_theory).  That ship has sailed, essentially, by the existence of preload tags and existing import syntax for CSS, which differs from JS.
 
 
 I don't think we should feel that bad that there isn't perfect symmetry between JS and CSS mappings.
 
-1.  The early years of the web demonstrate that HTML can be useful by itself without external CSS files.  And clearly JS by itself can be useful -- web components can be built using JS by itself, as can many useful software applications.  But there has yet to be a significant role played by CSS files by themselves.  They exist to serve HTML (or JS, depending).  What this means is that while the demand for JS to be able to reference other packages has been proven by the rapid rise of npm, and while the demand for HTML being able to reference third-party HTML demonstrated by the ubiquity of iframes and html include libraries like JQuery's load function, these demands go well beyond any concerns about reducing bandwidth by sharing common code.  The demand for sharing css files across packages has certainly proven itself -- take Bootstrap or web fonts, that can be shared via a CDN, for example.  But one doesn't find many such packages which have the kind of dependency tree we expect all the time with JS.
+1.  The early years of the web demonstrate that HTML can be useful by itself without external CSS files.  And clearly JS by itself can be useful -- web components can be built using JS alone, as can many useful software applications.  But there has yet to be a significant role played by standalone CSS files.  They exist to serve HTML (or JS, depending).  What this means is that while the demand for JS to be able to reference other packages has been proven by the rapid rise of npm, and while the demand for HTML being able to reference third-party HTML demonstrated by the ubiquity of iframes and html include libraries like JQuery's load function, these demands go well beyond any concerns about reducing bandwidth by sharing common code.  The demand for sharing css files across packages has certainly proven itself -- take Bootstrap or web fonts, that can be shared via a CDN, for example.  But one doesn't find many such packages which have the kind of dependency tree we expect all the time with JS.
 2.  node.css only has a fraction of the download rate as node.js.
 3.  If CSS/Stylesheet modules allows imports from JS, via relative paths, then one library package could import css packages from another via a JS cross-package "bridge" reference, which could leverage import maps. 
 4.  CSS has had a syntax for importing other css files for years.  Perhaps it could be improved, but the case for reinventing the wheel, in order to match what is done for JS, is quite weak.
-5.  There is an [interesting proposal](https://discourse.wicg.io/t/proposal-fetch-maps/4259) to make the suggestion in 3 above unnecessary, backed by one of the foremost experts in the area (imports of various formats / fetch / etc).  This proposal seems to impose little to no adjustments on the way JS import maps work.
+5.  There is an [interesting proposal](https://discourse.wicg.io/t/proposal-fetch-maps/4259) to make the suggestion in 3 above unnecessary, backed by one of the foremost experts in the area (imports of various formats / fetch / etc).  The proposal seems to impose little to no adjustments on the way JS import maps work.
 
 
 
