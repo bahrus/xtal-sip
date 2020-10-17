@@ -84,15 +84,13 @@ xtal-sip operates on a "strongest to weakest" hierarchy of mappings.  At the str
     <!-- optional, provides the most specific, and powerful mapping -->
     <!-- Use modulepreload if used during initial presentation, lazyloadmapping if not -->
     <!-- modulepreloads should go in head tag, lazyloadmapping inside a xtal-sip tag somewhere towards the end -->
-    <link rel=modulepreload     href="https://cdn.snowpack.dev/@myScope@1.2.3/dist/my-bundled-elements.js" id="myScope_my_bundled_elements" integrity=...>
-    
+    <link integrity=... rel=modulepreload href="//cdn.snowpack.dev/@myScope@1.2.3/dist/my-bundled-elements.js" id="myScope_my_bundled_elements" >
   </head>
   <body>
   ...
-    <xtal-sip>
-      <link rel=lazyloadmapping   href="https://unpkg.com/@yourScope@3.2.1/your-element-1.js?module" id="yourScope_your_element_1" integrity=...>
-      <link rel=lazyloadmapping   href="https://unpkg.com/@yourScope@3.2.1/your-element-2.js?module" id="yourScope_your_element_2" integrity=...>
-    </xtal-sip>
+    <link integrity=... rel=lazyloadmapping  href="//unpkg.com/@yourScope@3.2.1/your-element-1.js?module" id="yourScope_your_element_1" >
+    <link integrity=... rel=lazyloadmapping  href="//unpkg.com/@yourScope@3.2.1/your-element-2.js?module" id="yourScope_your_element_2" >
+    <xtal-sip></xtal-sip>
   </body>
 
 </html>
@@ -106,25 +104,25 @@ Then your library references can look like:
 ```JavaScript
 conditionalImport(shadowDOMPeerElement, {
   'my-element-1':[
-    ['myScope_my_bundled_elements', () => import('@myScope/my-element-1.js'), 'https://unpkg.com/@myScope/my-element-1.js?module']
+    ['myScope_my_bundled_elements', () => import('@myScope/my-element-1.js'), '//unpkg.com/@myScope/my-element-1.js?module']
   ],
   'my-element-2':[
-    ['myScope_my_bundled_elements', () => import('@myScope/my-element-2.js'), 'https://unpkg.com/@myScope/my-element-2.js?module'],
+    ['myScope_my_bundled_elements', () => import('@myScope/my-element-2.js'), '//unpkg.com/@myScope/my-element-2.js?module']
   ],
   'your-element-1':[
-    ['yourScope_your-element_1', () => import('@yourScope/your-element.js'), 'https://unpkg.com/@yourScope/your-element-1.js?module']
+    ['yourScope_your-element_1', () => import('@yourScope/your-element.js'), '//unpkg.com/@yourScope/your-element-1.js?module']
   ] 
 });
 ```
 
 1.  When element my-element-1 is encountered in the same ShadowDOM realm as shadowDOMPeerElement, then:
-    1.  If the first element of the array is defined, and if a corresponding link tag can be found (after waiting for an xtal-sip tag to appear somewhere), then the href from the link tag is loaded using import(...).
-    2.  If 1.i above fails or the first element is undefined, try evaluating the second element of the array.
+    1.  If the first element of the array is defined, and if a corresponding link tag can be found with matching id (after waiting for an xtal-sip tag to appear somewhere), then the href from the link tag is loaded using import(...).  Note that id's become global constants.
+    2.  If 1.i finds no link tag with matching id, or the first element is undefined, try evaluating the second element of the array.
     3.  If 1.i and 1.ii fail or aren't defined, do an import() of the third element of the array.
 
+Note that the es-dev-server and most bundlers will resolve the second element of the array just fine (I think), so if no link tags are present, the second argument will come to the rescue.  The penalty of this approach is, of course, a more complicated import statement, but now we have lazy loading into memory, an optional backup for running the code on a plain http server like nginx, with or without bundling, optional hash integrity checks.
 
-
-Note that the es-dev-server and most bundlers will resolve this just fine (I think), so if no link tags are present, they will resolve.  The penalty of this approach is, of course, a more complicated import statement, but now we have lazy loading into memory, a backup for running the code on a plain http server like nginx, without bundling. 
+Perhaps if such a system took hold, import maps could, in the future, be enhanced, also, to search the link tags for a tag with matching href, and apply whatever integrity attribute it finds in this case.
 
 ## More whittling
 
@@ -132,7 +130,7 @@ JS is expensive, so anything that can be done to reduce the size of JS, while ma
 
 ```JavaScript
 // CDN Computed Value For myScope
-const CVMyScope = ({name}) => `https://unpkg.com/@myScope/${name}.js?module`;
+const CVMyScope = ({localName}) => `https://unpkg.com/@myScope/${localName}.js?module`;
 conditionalImport(shadowDOMPeerElement, {
   'my-element-1':[
     ['myScope_my_bundled_elements', () => import('@myScope/my-element-1.js'), CVMyScope]
@@ -146,22 +144,26 @@ conditionalImport(shadowDOMPeerElement, {
 });
 ```
 
-Extra dry:
+## Extra dry:
 
 ```JavaScript
 // CDN Computed Value For MyScope
-const CVMyScope = name => `https://unpkg.com/@myScope/my-${name}.js?module`;
+const CVMyScope = ({tagName}) => `//unpkg.com/@myScope/${tagName}.js?module`;
 conditionalImport(shadowDOMPeerElement, {
-  'my-{name:element-1|element-2}':[
-    ['.@myScope', ({name}) => import(`@myScope/my-${name}.js`), CVMyScope]
+  'my-{element-1|element-2}':[
+    ['myScope_my_bundled_elements', [() => import(`@myScope/my-element-1.js`), () => import('@myScope/my-element-2.js')], CVMyScope]
   ],
-  'your-element':[
-    ['.@yourScope[data-element="your-element"]', () => import('@yourScope/your-element.js')]
-  ] 
 });
 ```
 
-Unfortunately, this syntax may break bundling solutions.
+There's a little big of redundancy above, so as not to break compatibility with bundlers / polyfills.
+
+If an element matches the first option (element-1) evaluate the first element of the array.  If an element matches the second option (element-2), evaluate the second element of
+the array.
+
+## Preemptive
+
+
 
 ## Do we really need two mapping systems?
 
@@ -170,18 +172,17 @@ So I'm suggesting no less than two ways of mapping JS files here:
 1.  A flat, streamable list of link tags, placed strategically to fit the loading sequence of files as flexibly as possible.
 2.  A hierarchical look-up that recognizes sub-scoping, all in one place, tailored specifically for JS.
 
-Having two potentially overlapping lists like this is admittedly [a bit irregular](https://www.youtube.com/watch?v=eOnTnQNNfvg).  I can see ways one of these mapping systems could be used to auto-generate the other.  Or maybe some uber mapping system, not recognized by the browser (like package-lock.json?) could be used to generate both.
+Having two potentially overlapping lists like this is admittedly [a bit irregular](https://www.youtube.com/watch?v=eOnTnQNNfvg).  Maybe some uber mapping system, not recognized by the browser (like package-lock.json?) could be used to generate both. Bundlers could probably be trained to look at the code at generate, at build time, the optimal link / importmap combination.
 
-But I don't see a way around acknowledging the existence of both of these, as far as the browser runtime.
+But I don't see a way around acknowledging the existence of both of these mappings, as far as the browser runtime.
 
 ## Language of the middle
 
-An extra challenge posed by [shoelace.style](https://shoelace.style/?id=quick-start) and [ionic](https://ionicframework.com/docs/intro/cdn#ionic-framework-cdn) is that their CDN requires not one but two references -- one to a bundled js file, the other to a css file.  I suspect other design libraries built with Stencil will follow suit (and probably have).
+An extra challenge posed by [shoelace.style](https://shoelace.style/?id=quick-start) and [ionic](https://ionicframework.com/docs/intro/cdn#ionic-framework-cdn) is that their CDN requires not one but two references -- one to a bundled js file, the other to a bundled css file.  I suspect other design libraries built with Stencil will follow suit (and probably have).
 
 It's also been my experience that, with web components, [when it comes to fonts](https://github.com/bahrus/scratch-box), referencing a css file that needs to be placed outside any ShadowDOM is a common need.
 
-
-How should we modify the conditionalImport function to accommodate both js reference(s) and css reference(s) that need to be added (say) to document.head?
+How should we modify the conditionalImport function to accommodate both js reference(s) and css reference(s), some of them needing to be added (say) to document.head?
 
 This is subject to change as the CSS/stylesheet modules / constructible stylesheet proposals flap in the wind, but I'm thinking:
 
@@ -191,9 +192,9 @@ This is subject to change as the CSS/stylesheet modules / constructible styleshe
     <!-- optional, provides the most specific, and powerful mapping -->
     <!-- Use modulepreload, preload if used during initial presentation, lazyloadmapping if not -->
     <!-- modulepreloads should go in head tag, lazyloadmapping inside a xtal-sip tag somewhere towards the end -->
-    <link rel=modulepreload     href="https://cdn.snowpack.dev/@myScope@1.2.3/dist/my-bundled-elements.js" id="myScope_my_bundled_elements" integrity=...>
-    <link rel=preload as=style  href="https://cdn.snowpack.dev/@myScope@1.2.3/dist/my-bundled-css-font.css" id="myScope_my_bundled_css_fonts" integrity=...>
-    <link rel=preload as=style  href="https://www.jsdelivr.com/@someCommonSharedCSSFramework@11.12.13/some-common-css.css" id="someCommonSharedScope_some_common_css" integrity=...>
+    <link integrity=... rel=modulepreload     href="https://cdn.snowpack.dev/@myScope@1.2.3/dist/my-bundled-elements.js" id="myScope_my_bundled_elements">
+    <link integrity=... rel=preload as=style  href="https://cdn.snowpack.dev/@myScope@1.2.3/dist/my-bundled-css-font.css" id="myScope_my_bundled_css_fonts">
+    <link integrity=... rel=preload as=style  href="https://www.jsdelivr.com/@someCommonSharedCSSFramework@11.12.13/some-common-css.css" id="someCommonSharedScope_some_common_css">
   </head>
   <body>
   ...
