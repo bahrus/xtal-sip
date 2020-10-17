@@ -6,7 +6,6 @@
 
 <img src="https://badgen.net/bundlephobia/minzip/xtal-sip">
 
-
 Dynamically &#34;water&#34; a custom element tag with the necessary dependencies to sprout the tag from an inert seedling to a thing of beauty.
 
 **NB:** The syntax below breaks significantly with what the current code is doing.
@@ -124,6 +123,10 @@ Note that the es-dev-server and most bundlers will resolve the second element of
 
 Perhaps if such a system took hold, import maps could, in the future, be enhanced, also, to search the link tags for a tag with matching href, and apply whatever integrity attribute it finds in this case.
 
+## Security Implications
+
+Note that link tags are going to be causing script to load.  Most lists of "dangerous tags" to filter out [includes](https://stackoverflow.com/questions/17369559/html-dangerous-tags-to-avoid-while-developing-a-chat-application) the link tag, but do make sure that is the case for your server.
+
 ## More whittling
 
 JS is expensive, so anything that can be done to reduce the size of JS, while making the api less painful to work with, is a win-win.
@@ -175,7 +178,7 @@ So I'm suggesting no less than two ways of mapping JS files here:
 1.  A flat, streamable list of link tags, placed strategically to fit the loading sequence of files as flexibly as possible.
 2.  A hierarchical look-up that recognizes sub-scoping, all in one place, tailored specifically for JS.
 
-Having two potentially overlapping lists like this is admittedly [a bit irregular](https://www.youtube.com/watch?v=eOnTnQNNfvg).  Maybe some uber mapping system, not recognized by the browser (like package-lock.json?) could be used to generate both. Bundlers could probably be trained to look at the code aand generate, at build time, the optimal link / importmap combination.
+Having two potentially overlapping lists like this is admittedly [a bit irregular](https://www.youtube.com/watch?v=eOnTnQNNfvg).  Maybe some uber mapping system, not recognized by the browser (like package-lock.json?) could be used to generate both. Bundlers could probably be trained to look at the code and generate, at build time, the optimal link / importmap combination.
 
 But I don't see a way around acknowledging the existence of both of these mappings, as far as the browser runtime.
 
@@ -201,9 +204,8 @@ This is subject to change as the CSS/stylesheet modules / constructible styleshe
   </head>
   <body>
   ...
-    <xtal-sip>
-      <link integrity=... rel=lazyloadmapping   href="//unpkg.com/@yourScope@3.2.1/your-element-1.js?module" id=yourScope_your-element_1>
-    </xtal-sip>
+    <link integrity=... rel=lazyloadmapping   href="//unpkg.com/@yourScope@3.2.1/your-element-1.js?module" id=yourScope_your-element_1>
+    <xtal-sip></xtal-sip>
   </body>
 </html>
 ```

@@ -1,0 +1,1 @@
+export type PreemptiveLoadingTuple = [linkTagId: string | undefined, dynamicImport: Function | undefined, CDNFallback: string | undefined];
