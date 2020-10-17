@@ -228,7 +228,6 @@ conditionalImport(shadowDOMPeerElement, {
 
 ```
 
-
 Relative references (relative to the JS file location) would still work with no mapping, should CSS Stylesheet / Modules become a thing:
 
 ```JavaScript
