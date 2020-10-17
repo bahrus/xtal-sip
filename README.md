@@ -176,7 +176,7 @@ So I'm suggesting no less than two ways of mapping JS files here:
 1.  A flat, streamable list of link tags, placed strategically to fit the loading sequence of files as flexibly as possible.
 2.  A hierarchical look-up that recognizes sub-scoping, all in one place, tailored specifically for JS.
 
-Having two potentially overlapping lists like this is admittedly [a bit irregular](https://www.youtube.com/watch?v=eOnTnQNNfvg).  Maybe some uber mapping system, not recognized by the browser (like package-lock.json?) could be used to generate both. Bundlers could probably be trained to look at the code at generate, at build time, the optimal link / importmap combination.
+Having two potentially overlapping lists like this is admittedly [a bit irregular](https://www.youtube.com/watch?v=eOnTnQNNfvg).  Maybe some uber mapping system, not recognized by the browser (like package-lock.json?) could be used to generate both. Bundlers could probably be trained to look at the code aand generate, at build time, the optimal link / importmap combination.
 
 But I don't see a way around acknowledging the existence of both of these mappings, as far as the browser runtime.
 
