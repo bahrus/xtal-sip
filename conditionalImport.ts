@@ -1,4 +1,5 @@
 import {preemptiveImport} from './preemptiveImport.js';
+import {ICssObserve} from 'css-observe/types.d.js';
 
 import {ConditionalLoadingLookup, PreemptiveLoadingArgument} from './types.d.js';
 
@@ -11,6 +12,23 @@ export function conditionalImport(shadowPeer: HTMLElement, lookup: ConditionalLo
             doManualCheck(shadowPeer, lookup);
         });
     }
+    import('css-observe/css-observe.js');//TODO eat your own dogfood
+    const unloadedTags = [];
+    for(const tagName in lookup){
+        if(!loadedTags.has(tagName)) unloadedTags.push(tagName);
+        loadedTags.add(tagName);
+    }
+    const cssObserve = document.createElement('css-observe') as ICssObserve;
+    cssObserve.observe = true;
+    cssObserve.selector = unloadedTags.join(',');
+    cssObserve.addEventListener('latest-match-changed', (e: CustomEvent) => {
+        const tag = e.detail.value as HTMLElement;
+        const loadingInstructions = lookup[tag.localName];
+        loadingInstructions.forEach(instruction =>{
+            preemptiveImport(instruction as PreemptiveLoadingArgument);
+        });
+    });
+    shadowPeer.insertAdjacentElement('afterend', cssObserve);
 }
 
 function doManualCheck(shadowPeer: HTMLElement, lookup: ConditionalLoadingLookup){
@@ -18,7 +36,7 @@ function doManualCheck(shadowPeer: HTMLElement, lookup: ConditionalLoadingLookup
     if(host.nodeType === 9){
         host = document.firstElementChild;
     }
-    for(var tagName in lookup){
+    for(const tagName in lookup){
         if(loadedTags.has(tagName)) continue;
         if(host.querySelector(tagName) !== null){
             loadedTags.add(tagName);
@@ -27,7 +45,6 @@ function doManualCheck(shadowPeer: HTMLElement, lookup: ConditionalLoadingLookup
                 preemptiveImport(loadingInstruction as PreemptiveLoadingArgument);
             });
         }
-
     }
 }
 

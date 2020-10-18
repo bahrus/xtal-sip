@@ -1,46 +1,45 @@
+import { preemptiveImport } from './preemptiveImport.js';
+const loadedTags = new Set();
 export function conditionalImport(shadowPeer, lookup) {
-}
-const eventNames = ["animationstart", "MSAnimationStart", "webkitAnimationStart"];
-export function addCSSListener(id, self, targetSelector, insertListener, customStyles = '') {
-    // See https://davidwalsh.name/detect-node-insertion
-    if (self._boundInsertListeners === undefined) {
-        self._boundInsertListeners = {};
+    doManualCheck(shadowPeer, lookup);
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', e => {
+            doManualCheck(shadowPeer, lookup);
+        });
     }
-    const boundInsertListeners = self._boundInsertListeners;
-    if (boundInsertListeners[targetSelector] !== undefined)
-        return;
-    const styleInner = /* css */ `
-    @keyframes ${id} {
-        from {
-            opacity: 0.99;
-        }
-        to {
-            opacity: 1;
-        }
+    import('css-observe/css-observe.js'); //TODO eat your own dogfood
+    const unloadedTags = [];
+    for (const tagName in lookup) {
+        if (!loadedTags.has(tagName))
+            unloadedTags.push(tagName);
+        loadedTags.add(tagName);
     }
-
-    ${targetSelector}{
-        animation-duration: 0.001s;
-        animation-name: ${id};
-    }
-
-    ${customStyles}`;
-    const style = document.createElement('style');
-    style.innerHTML = styleInner;
-    self._host = self.getRootNode(); //experimental  <any>getShadowContainer((<any>this as HTMLElement));
-    if (self._host.nodeType === 9) {
-        self._host = document.firstElementChild;
-    }
-    const hostIsShadow = self._host.localName !== 'html';
-    if (hostIsShadow) {
-        self._host.appendChild(style);
-    }
-    else {
-        document.head.appendChild(style);
-    }
-    boundInsertListeners[targetSelector] = insertListener.bind(self);
-    const container = hostIsShadow ? self._host : document;
-    eventNames.forEach(name => {
-        container.addEventListener(name, boundInsertListeners[targetSelector], false);
+    const cssObserve = document.createElement('css-observe');
+    cssObserve.observe = true;
+    cssObserve.selector = unloadedTags.join(',');
+    cssObserve.addEventListener('latest-match-changed', (e) => {
+        const tag = e.detail.value;
+        const loadingInstructions = lookup[tag.localName];
+        loadingInstructions.forEach(instruction => {
+            preemptiveImport(instruction);
+        });
     });
+    shadowPeer.insertAdjacentElement('afterend', cssObserve);
+}
+function doManualCheck(shadowPeer, lookup) {
+    let host = shadowPeer.getRootNode();
+    if (host.nodeType === 9) {
+        host = document.firstElementChild;
+    }
+    for (const tagName in lookup) {
+        if (loadedTags.has(tagName))
+            continue;
+        if (host.querySelector(tagName) !== null) {
+            loadedTags.add(tagName);
+            const loadingInstructions = lookup[tagName];
+            loadingInstructions.forEach(loadingInstruction => {
+                preemptiveImport(loadingInstruction);
+            });
+        }
+    }
 }
