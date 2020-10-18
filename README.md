@@ -171,7 +171,7 @@ conditionalImport(shadowDOMPeerElement, {
 
 There's a little bit of redundancy above, so as not to break compatibility with bundlers / polyfills.
 
-If an element matches the first option (element-1), and the first element of the array doesn't match any link tags, then move on to the second element of the array, that only that builds on import maps:
+If an element matches the first option (element-1), and the first element of the array doesn't match any link tags, then move on to the second element of the array, that focuses on import maps.
 
 Since we matched on my-element-1, evaluate the first element of the dynamic import array.  If an element matches the second option (my-element-2), evaluate the second element of the array.  Etc.
 
@@ -268,7 +268,7 @@ I don't think we should feel that bad that there isn't perfect symmetry between 
 3.  CSS has had a syntax for importing other css files for years.  Perhaps it could be improved, but the case for reinventing the wheel, in order to match what is done for JS, is quite weak.
 
 
-**NB:** There is an [interesting proposal](https://discourse.wicg.io/t/proposal-fetch-maps/4259), backed by one of the foremost experts in the area (imports of various formats / fetch / etc). that might be considered a competing proposal to using link preload/lazyload mappings suggested  here.  What that proposal and this one share is the view that import maps would help the platform, just that it might not be the last step to cross-package (and other concerns) issues.  Baby steps!
+**NB:** There is an [interesting proposal](https://discourse.wicg.io/t/proposal-fetch-maps/4259), backed by one of the foremost experts in the area (imports of various formats / fetch / etc). that might be considered a competing proposal to using link preload/lazyload mappings suggested  here.  What that proposal and this one share is the view that import maps would help the platform, just that it might not be the last step to cross-package dependencies, and other concerns.  Baby steps!
 
 
 
