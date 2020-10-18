@@ -23,14 +23,14 @@ Dynamic imports are shipping in every modern browser, which also support relativ
 
 The bad:
 
-When it comes to cross package resolution, on the other hand, the only proposal on the table is import maps. But whether import maps are going to be there for the long haul remains an open question, in my mind.  It has been [sitting behind a flag since version 74 in Chrome, and no release date has been announced](https://www.chromestatus.com/feature/5315286962012160).  Part of the reason for its languishing behind the flag, I think, is the lackluster response from other vendor browsers.  It is [well polyfilled](https://github.com/guybedford/es-module-shims), at least.   
+When it comes to cross-package resolution, on the other hand, the only proposal on the table is import maps. But whether import maps are going to be there for the long haul remains an open question, in my mind.  It has been [sitting behind a flag since version 74 in Chrome, and no release date has been announced](https://www.chromestatus.com/feature/5315286962012160).  Part of the reason for its languishing behind the flag, I think, is the lackluster response from other browser vendors.  It is [well-polyfilled](https://github.com/guybedford/es-module-shims), at least.   
 
 Firefox is taking a bit of an [Of course...](https://www.youtube.com/watch?v=VBn8XttrSew)  [approach to the question](https://github.com/mozilla/standards-positions/issues/146), which I suppose is more than can be said of Safari.  Relying on bare import resolution still feels much more tenuous than I'd like.  The strongest case for relying on bare import resolution is there is no better competing alternative, for now.  I think, though, without some assurance of the longevity of the specification via cross-browser positive gestures, it will be an uphill battle building the infrastructure around import maps that it so sorely needs.  VS Code / TypeScript support is quite confusing and inconsistent, as far as supporting bare import specifiers. Ironically, VSCode is more helpful in this regard if one sticks with JS.  I would be motivated to raise bug reports in VS Code / TypeScript's crushing sea of issues, but on what basis can I argue that they are under any obligation to support this "standard" without cross-browser endorsement?
 
 Back to the good:
 
 1.  It seems (by design) that the strict rules that govern bare import specifiers happens to be largely compatible with the considerably more lenient rules that bundling tools like webpack and Parcel support.  Tools which many -- but not all -- developers have grown used to / fond of using, even during development. 
-2.  For those of us who enjoy the lightweight, quick to load and reload, instantaneous feedback of build-less development, the es-dev-server does a great job of server-side "polyfilling" import maps (or bare import specifiers with package.json serving as a substitute for import maps, to be accurate).  Other solutions from snowpack and unpkg.com are also consistent with bare import specifiers.  Perhaps with HTTP3, the gap between what is convenient to (this class of developers), and what runs best in production, will continue to narrow.
+2.  For those of us who enjoy the lightweight, quick to load and reload, instantaneous, abstraction-free feedback of build-less development, the es-dev-server does a great job of server-side "polyfilling" import maps (or bare import specifiers with package.json serving as a substitute for import maps, to be accurate).  Other solutions from snowpack and unpkg.com are also consistent with bare import specifiers.  Perhaps with HTTP3, the gap between what is convenient to (this class of developers), and what runs best in production, will continue to narrow.
 
 Back to the bad:
 
@@ -75,7 +75,16 @@ The goals of xtal-sip are:
 
 xtal-sip provides a function "conditionalImport" described below.
 
-xtal-sip operates on a "strongest to weakest" hierarchy of mappings.  At the strongest level are link tags contained either in the head, or, for lower priority resources, towards the end. prior to a xtal-sip tag as far as document order.  conditionalImport enhances/extends the functionality recognized by web browsers already, such as preloading resources ahead of time.  With link references, we can define a slew of easily streamable mappings.  For example:
+xtal-sip operates on a "strongest to weakest" hierarchy of mappings.  At the strongest level are link tags contained either in the head, or, for lower priority resources, towards the end.  
+
+The browser already does some useful things with link tags, such as preloading resources ahead of time.  conditionalImport enhances/extends the functionality building a mapping system around it, with very specific versions and integrity hashes.
+
+At the middle specificity level, we have bare import specifiers / import maps, which can also serve the purpose of mapping to specific versions.  In some ways, it is more powerful than the link tag mappings (supporting scoped resolutions, for example), but it is less powerful in other ways (for example, providing hash integrity tests).  I could see standards evolving to link these two more closely together, however.
+
+At the lowest specificity level, our final fallback is to just load a CDN URL.  This probably shouldn't hard-code the specific version in it, for a variety of good-practice reasons.  It relies a bit on backwards compatibility, but it can always adopt slow moving versioning to reduce this risk.
+
+
+With link references, we can define a slew of easily streamable mappings.  For example:
 
 ```html
 <html>
@@ -83,12 +92,12 @@ xtal-sip operates on a "strongest to weakest" hierarchy of mappings.  At the str
     <!-- optional, provides the most specific, and powerful mapping -->
     <!-- Use modulepreload if used during initial presentation, lazyloadmapping if not -->
     <!-- modulepreloads should go in head tag, lazyloadmapping inside a xtal-sip tag somewhere towards the end -->
-    <link integrity=... rel=modulepreload href="//cdn.snowpack.dev/@myScope@1.2.3/dist/my-bundled-elements.js" id="myScope_my_bundled_elements" >
+    <link integrity=... rel=modulepreload href="//cdn.snowpack.dev/@myScope@1.2.3/dist/my-bundled-elements.js" id="myScope/dist/my-bundled-elements.js" >
   </head>
   <body>
   ...
-    <link integrity=... rel=modulelazyload  href="//unpkg.com/@yourScope@3.2.1/your-element-1.js?module" id="yourScope_your_element_1" >
-    <link integrity=... rel=modulelazyload  href="//unpkg.com/@yourScope@3.2.1/your-element-2.js?module" id="yourScope_your_element_2" >
+    <link integrity=... rel=modulelazyload  href="//unpkg.com/@yourScope@3.2.1/your-element-1.js?module" id="yourScope/your-element-1.js" >
+    <link integrity=... rel=modulelazyload  href="//unpkg.com/@yourScope@3.2.1/your-element-2.js?module" id="yourScope/your-element-2.js" >
   </body>
 
 </html>
@@ -102,25 +111,27 @@ Then your library references can look like:
 ```JavaScript
 conditionalImport(shadowDOMPeerElement, {
   'my-element-1':[
-    ['myScope_my_bundled_elements', () => import('@myScope/my-element-1.js'), '//unpkg.com/@myScope/my-element-1.js?module']
+    ['myScope/dist/my-bundled-elements.js', () => import('@myScope/my-element-1.js'), '//unpkg.com/@myScope/my-element-1.js?module']
   ],
   'my-element-2':[
-    ['myScope_my_bundled_elements', () => import('@myScope/my-element-2.js'), '//unpkg.com/@myScope/my-element-2.js?module']
+    ['myScope/dist/my-bundled-elements.js', () => import('@myScope/my-element-2.js'), '//unpkg.com/@myScope/my-element-2.js?module']
   ],
   'your-element-1':[
-    ['yourScope_your-element_1', () => import('@yourScope/your-element.js'), '//unpkg.com/@yourScope/your-element-1.js?module']
+    ['yourScope/your-element-1.js', () => import('@yourScope/your-element-1.js'), '//unpkg.com/@yourScope/your-element-1.js?module']
   ] 
 });
 ```
 
 1.  When element my-element-1 is encountered in the same ShadowDOM realm as shadowDOMPeerElement, then:
     1.  If the first element of the array is defined, and if a corresponding link tag can be found with matching id (after waiting for DOMContentLoaded event if required), then the href from the link tag is loaded using import(...).  Note that id's become global constants.
-    2.  If 1.i finds no link tag with matching id, or the first element is undefined, try evaluating the second element of the array.
-    3.  If 1.i and 1.ii fail or aren't defined, do an import() of the third element of the array.
+    2.  If 1.i finds no link tag with matching id, or the first element is undefined, try evaluating the second element of the array, which is where import maps can shine.
+    3.  If 1.i and 1.ii fail or aren't defined, do an import() of the third element of the array, an (evergreen) link to a CDN.
 
-Note that the es-dev-server and most bundlers will resolve the second element of the array just fine (I think), so if no link tags are present, the second argument will come to the rescue.  The penalty of this approach is, of course, a more complicated import statement, but now we have lazy loading into memory, an optional backup for running the code on a plain http server like nginx, with or without bundling, optional hash integrity checks.
+Note that the es-dev-server and most bundlers will resolve the second element of the array just fine (I think), so if no link tags are present, the second argument will come to the rescue.  The penalty of this approach is, of course, a more complicated import statement, but now we have lazy loading into memory, an optional backup for running the code on a plain http server like nginx, with or without bundling, and optional hash integrity checks.
 
-Perhaps if such a system took hold, import maps could, in the future, be enhanced, also, to search the link tags for a tag with matching href, and apply whatever integrity attribute it finds in this case.
+As mentioned earlier, perhaps if such a system took hold, import maps could, in the future, be enhanced, also, to search the link tags for a tag with matching href, and apply whatever integrity attribute it finds in this case.
+
+Hard-coding hash integrity attributes in raw code would be a maintenance nightmare.
 
 ## Security Implications
 
@@ -135,10 +146,10 @@ JS is expensive, so anything that can be done to reduce the size of JS, while ma
 const CVMyScope = ({localName}) => `https://unpkg.com/@myScope/${localName}.js?module`;
 conditionalImport(shadowDOMPeerElement, {
   'my-element-1':[
-    ['myScope_my_bundled_elements', () => import('@myScope/my-element-1.js'), CVMyScope]
+    ['myScope/dist/my-bundled-elements.js', () => import('@myScope/my-element-1.js'), CVMyScope]
   ],
   'my-element-2':[
-    ['myScope_my_bundled_elements', () => import('@myScope/my-element-2.js'), CVMyScope],
+    ['myScope/dist/my-bundled-elements.js', () => import('@myScope/my-element-2.js'), CVMyScope],
   ],
   'your-element':[
     ['yourScope_your-element_1', () => import('@yourScope/your-element.js')]
@@ -167,7 +178,7 @@ If an element matches the first option (element-1), and the first element of the
 If we are working on a device with sufficient memory and other resources, perhaps we don't want to wait to discover an active custom element, and want to just load the dependencies ahead of time.  Yet we do want to take advantage of the mapping fallback system this library provides.  You can use the preemptiveImport function:
 
 ```JavaScript
-preemptiveImport( ['yourScope_your-element_1', () => import('@yourScope/your-element.js'), '//unpkg.com/@yourScope/your-element-1.js?module'] );
+preemptiveImport( ['yourScope/your-element-1.js', () => import('@yourScope/your-element-1.js'), '//unpkg.com/@yourScope/your-element-1.js?module'] );
 ```
 
 ## Do we really need two mapping systems?
@@ -197,13 +208,13 @@ This is subject to change as the CSS/stylesheet modules / constructible styleshe
     <!-- optional, provides the most specific, and powerful mapping -->
     <!-- Use modulepreload, preload if used during initial presentation, lazyloadmapping if not -->
     <!-- modulepreloads should go in head tag, lazyloadmapping inside a xtal-sip tag somewhere towards the end -->
-    <link integrity=... rel=modulepreload     href="https://cdn.snowpack.dev/@myScope@1.2.3/dist/my-bundled-elements.js" id="myScope_my_bundled_elements">
-    <link integrity=... rel=preload as=style  href="https://www.jsdelivr.com/@someCommonSharedCSSFramework@11.12.13/some-common-css.css" id="someCommonSharedCSSFramework_some_common_css">
+    <link integrity=... rel=modulepreload     href="//cdn.snowpack.dev/@myScope@1.2.3/dist/my-bundled-elements.js" id="myScope_my_bundled_elements">
+    <link integrity=... rel=preload as=style  href="//www.jsdelivr.com/@someCommonSharedCSSFramework@11.12.13/some-common-css.css" id="someCommonSharedCSSFramework_some_common_css">
   </head>
   <body>
   ...
     <link integrity=... rel=modulelazyload   href="//unpkg.com/@yourScope@3.2.1/your-element-1.js?module" id=yourScope_your-element_1>
-    <link integrity=... rel=lazyload as=style  href="https://cdn.snowpack.dev/@myScope@1.2.3/dist/my-bundled-css-font.css" id="myScope_my_bundled_css_fonts">
+    <link integrity=... rel=lazyload as=style  href="//cdn.snowpack.dev/@myScope@1.2.3/dist/my-bundled-css-font.css" id="myScope_my_bundled_css_fonts">
   </body>
 </html>
 ```
@@ -252,7 +263,7 @@ I don't think we should feel that bad that there isn't perfect symmetry between 
 2.  node.css only has a fraction of the download rate as node.js.
 3.  If CSS/Stylesheet modules allows imports from JS, via relative paths, then one library package could import css packages from another via a JS cross-package "bridge" reference, which could leverage import maps. 
 4.  CSS has had a syntax for importing other css files for years.  Perhaps it could be improved, but the case for reinventing the wheel, in order to match what is done for JS, is quite weak.
-5.  There is an [interesting proposal](https://discourse.wicg.io/t/proposal-fetch-maps/4259) that may make the suggestion in 3 above unnecessary (or maybe it's a competing proposal to using link preload/lazyload mappings?), backed by one of the foremost experts in the area (imports of various formats / fetch / etc).  The proposal seems to impose little to no adjustments on the way JS import maps work.
+5.  There is an [interesting proposal](https://discourse.wicg.io/t/proposal-fetch-maps/4259) that may make the suggestion in 3 above unnecessary (or maybe it's a competing proposal to using link preload/lazyload mappings a discussed here?), backed by one of the foremost experts in the area (imports of various formats / fetch / etc).  The proposal seems to impose little to no adjustments on the way JS import maps work.
 
 
 

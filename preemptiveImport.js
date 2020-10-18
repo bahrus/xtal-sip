@@ -64,7 +64,7 @@ export function preemptiveImport(arg) {
         }
         catch (e) { }
     }
-    //No luck with dynamic import, try CDN
+    //No luck with importMap, try CDN
     const CDNPath = arg[2];
     if (CDNPath !== undefined) {
         import(CDNPath);

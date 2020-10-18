@@ -1,5 +1,5 @@
-import {PreemptiveLoadingTuple} from './types.d.js';
-export function preemptiveImport(arg: PreemptiveLoadingTuple){
+import {PreemptiveLoadingArgument} from './types.d.js';
+export function preemptiveImport(arg: PreemptiveLoadingArgument){
     const linkTagId = arg[0];
     if(linkTagId !== undefined){
         const linkTag = self[linkTagId] as HTMLLinkElement | undefined;
@@ -64,7 +64,7 @@ export function preemptiveImport(arg: PreemptiveLoadingTuple){
             return;
         }catch(e){}
     }
-    //No luck with dynamic import, try CDN
+    //No luck with importMap, try CDN
     const CDNPath = arg[2];
     if(CDNPath !== undefined){
         import(CDNPath);
