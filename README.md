@@ -77,11 +77,11 @@ xtal-sip provides a function "conditionalImport" described below.
 
 xtal-sip operates on a "strongest to weakest" hierarchy of mappings.  At the strongest level are link tags contained either in the head, or, for lower priority resources, towards the end.  
 
-The browser already does some useful things with link tags, such as preloading resources ahead of time.  conditionalImport enhances/extends the functionality building a mapping system around it, with very specific versions and integrity hashes.
+The browser already does some useful things with link tags, such as preloading resources ahead of time.  conditionalImport enhances/extends the functionality, building a mapping system around it, with very specific versions and integrity hashes.
 
 At the middle specificity level, we have bare import specifiers / import maps, which can also serve the purpose of mapping to specific versions.  In some ways, it is more powerful than the link tag mappings (supporting scoped resolutions, for example), but it is less powerful in other ways (for example, providing hash integrity tests).  I could see standards evolving to link these two more closely together, however.
 
-At the lowest specificity level, our final fallback is to just load a CDN URL.  This probably shouldn't hard-code the specific version in it, for a variety of good-practice reasons.  It relies a bit on backwards compatibility, but it can always adopt slow moving versioning to reduce this risk.
+At the lowest specificity level, our final fallback is to just load an evergreen CDN URL.  This probably shouldn't hard-code the specific version in it, for a variety of good-practice reasons.  It relies a bit on backwards compatibility, but it can always adopt slow moving versioning to reduce this risk.
 
 
 With link references, we can define a slew of easily streamable mappings.  For example:
@@ -104,7 +104,7 @@ With link references, we can define a slew of easily streamable mappings.  For e
 
 ```
 
-xtal-sip will be able to work with these link tags, without the benefit of import maps or bare import specifiers.  However, import maps can provide a helpful stepping stone if the browser supports it, or a polyfill is present, or a bare import specifier web server is in use, as we will discuss below.
+xtal-sip will be able to work with these link tags, without the benefit of import maps or bare import specifiers.  
 
 Then your library references can look like:
 
@@ -135,7 +135,7 @@ Hard-coding hash integrity attributes in raw code would be a maintenance nightma
 
 ## Security Implications
 
-Note that link tags are going to be causing script to load.  Most lists of "dangerous tags" to filter out [includes](https://stackoverflow.com/questions/17369559/html-dangerous-tags-to-avoid-while-developing-a-chat-application) the link tag, but do make sure that is the case for your server.
+Note that link tags are going to be causing script to load.  Most lists of "dangerous tags" to filter out [include](https://stackoverflow.com/questions/17369559/html-dangerous-tags-to-avoid-while-developing-a-chat-application) the link tag, but do make sure that is the case for your server.
 
 ## More whittling
 
