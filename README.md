@@ -259,7 +259,6 @@ in tandem [with](https://github.com/WICG/construct-stylesheets/issues/45#issueco
 
 If CSS/Stylesheet modules allows imports from JS, via relative paths, then one library package could import css packages from another via a JS cross-package "bridge" reference, which could leverage import maps. 
 
-
 The concern raised by Firefox is a good one -- ideally there *would* be one solution for everything.  And it's certainly worth bringing up the issue early, to gain a fuzzy idea how this will work.  But I'm reasonably certain that the idea that there should be a single mapping that manages all cross-package mappings, for all types of resources, and for all types of attributes, is a good one to consider, but, like other similar attempts, [seems out of reach of mortals for the time being](https://en.wikipedia.org/wiki/Unified_field_theory).  That ship has sailed, essentially, by the existence of preload tags and existing import syntax for CSS, which differs from JS.
 
 I don't think we should feel that bad that there isn't perfect symmetry between JS and CSS mappings.
@@ -269,7 +268,7 @@ I don't think we should feel that bad that there isn't perfect symmetry between 
 3.  CSS has had a syntax for importing other css files for years.  Perhaps it could be improved, but the case for reinventing the wheel, in order to match what is done for JS, is quite weak.
 
 
-**NB:** There is an [interesting proposal](https://discourse.wicg.io/t/proposal-fetch-maps/4259), backed by one of the foremost experts in the area (imports of various formats / fetch / etc). that might be considered a competing proposal to using link preload/lazyload mappings suggested  here.  What that proposal and this one share is the view that import maps would help the platform, just that it might not be complete.  Baby steps!
+**NB:** There is an [interesting proposal](https://discourse.wicg.io/t/proposal-fetch-maps/4259), backed by one of the foremost experts in the area (imports of various formats / fetch / etc). that might be considered a competing proposal to using link preload/lazyload mappings suggested  here.  What that proposal and this one share is the view that import maps would help the platform, just that it might not be the last step to cross-package (and other concerns) issues.  Baby steps!
 
 
 
