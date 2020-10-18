@@ -1,5 +1,5 @@
 import {PreemptiveLoadingArgument} from './types.d.js';
-export function preemptiveImport(arg: PreemptiveLoadingArgument){
+export async function preemptiveImport(arg: PreemptiveLoadingArgument){
     const linkTagId = arg[0];
     if(linkTagId !== undefined){
         const linkTag = self[linkTagId] as HTMLLinkElement | undefined;
@@ -61,7 +61,7 @@ export function preemptiveImport(arg: PreemptiveLoadingArgument){
     switch(typeof dynamicImport){
         case 'function':{
             try{
-                dynamicImport();
+                await dynamicImport();
                 return;
             }catch(e){}
         }

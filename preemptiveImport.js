@@ -1,4 +1,4 @@
-export function preemptiveImport(arg) {
+export async function preemptiveImport(arg) {
     const linkTagId = arg[0];
     if (linkTagId !== undefined) {
         const linkTag = self[linkTagId];
@@ -60,7 +60,7 @@ export function preemptiveImport(arg) {
     switch (typeof dynamicImport) {
         case 'function': {
             try {
-                dynamicImport();
+                await dynamicImport();
                 return;
             }
             catch (e) { }

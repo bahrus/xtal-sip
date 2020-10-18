@@ -12,14 +12,7 @@ export function conditionalImport(shadowPeer: HTMLElement, lookup: ConditionalLo
             doManualCheck(shadowPeer, lookup);
         });
     }
-    if(!addedCssObserveImport){
-        addedCssObserveImport = true;
-        conditionalImport(shadowPeer, {
-            'css-observe':[
-                ['css-observe.js', () => import('css-observe/css-observe.js'), '//unpkg.com/css-observe@0.0.27/css-observe.js?module']
-            ]
-        });
-    }
+
 
     const unloadedTags = [];
     for(const tagName in lookup){
@@ -37,6 +30,14 @@ export function conditionalImport(shadowPeer: HTMLElement, lookup: ConditionalLo
         });
     });
     shadowPeer.insertAdjacentElement('afterend', cssObserve);
+    if(!addedCssObserveImport){
+        addedCssObserveImport = true;
+        conditionalImport(shadowPeer, {
+            'css-observe':[
+                ['css-observe.js', () => import('css-observe/css-observe.js'), '//unpkg.com/css-observe@0.0.27/css-observe.js?module']
+            ]
+        });
+    }
 }
 
 function doManualCheck(shadowPeer: HTMLElement, lookup: ConditionalLoadingLookup){

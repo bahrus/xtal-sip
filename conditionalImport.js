@@ -8,14 +8,6 @@ export function conditionalImport(shadowPeer, lookup) {
             doManualCheck(shadowPeer, lookup);
         });
     }
-    if (!addedCssObserveImport) {
-        addedCssObserveImport = true;
-        conditionalImport(shadowPeer, {
-            'css-observe': [
-                ['css-observe.js', () => import('css-observe/css-observe.js'), '//unpkg.com/css-observe@0.0.27/css-observe.js?module']
-            ]
-        });
-    }
     const unloadedTags = [];
     for (const tagName in lookup) {
         if (!loadedTags.has(tagName))
@@ -33,6 +25,14 @@ export function conditionalImport(shadowPeer, lookup) {
         });
     });
     shadowPeer.insertAdjacentElement('afterend', cssObserve);
+    if (!addedCssObserveImport) {
+        addedCssObserveImport = true;
+        conditionalImport(shadowPeer, {
+            'css-observe': [
+                ['css-observe.js', () => import('css-observe/css-observe.js'), '//unpkg.com/css-observe@0.0.27/css-observe.js?module']
+            ]
+        });
+    }
 }
 function doManualCheck(shadowPeer, lookup) {
     let host = shadowPeer.getRootNode();
