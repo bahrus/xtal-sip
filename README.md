@@ -157,7 +157,7 @@ conditionalImport(shadowDOMPeerElement, {
 });
 ```
 
-## Extra dry:
+## Extra dry [TODO:  only partly implemented]:
 
 ```JavaScript
 // CDN Computed Value For MyScope
@@ -171,7 +171,9 @@ conditionalImport(shadowDOMPeerElement, {
 
 There's a little bit of redundancy above, so as not to break compatibility with bundlers / polyfills.
 
-If an element matches the first option (element-1), and the first element of the array doesn't match any link tags, then evaluate the first element of the array.  If an element matches the second option (element-2), evaluate the second element of the array.  Etc.
+If an element matches the first option (element-1), and the first element of the array doesn't match any link tags, then move on to the second element of the array, that only that builds on import maps:
+
+Since we matched on my-element-1, evaluate the first element of the dynamic import array.  If an element matches the second option (my-element-2), evaluate the second element of the array.  Etc.
 
 ## Preemptive Loading
 

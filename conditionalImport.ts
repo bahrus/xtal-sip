@@ -39,7 +39,6 @@ function doManualCheck(shadowPeer: HTMLElement, lookup: ConditionalLoadingLookup
     for(const tagName in lookup){
         const loadingInstructions = lookup[tagName];
         const tags = parseTag(tagName);
-        console.log(tags);
         for(const tagName2 of tags){
             if(loadedTags.has(tagName2)) continue;
             if(host.querySelector(tagName2) !== null){
