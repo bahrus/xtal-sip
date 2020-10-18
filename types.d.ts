@@ -11,6 +11,10 @@ export interface ImportOptions {
 
 export type PathFromContext = (ctx: IContext) => string;
 
-export type ConditionalLoadingTuple = [linkTagId: string | undefined, dynamicImport: Function | undefined, CDNFallback:  string | PathFromContext | undefined];
+export type LinkTagRef = [linkTagId: string | undefined];
+export type LinkTagDynamicImport = [linkTagId: string | undefined, dynamicImport: Function | undefined];
+export type LinkTagDynamicImportCDN = [linkTagId: string | undefined, dynamicImport: Function | undefined, CDNFallback:  string | PathFromContext | undefined]
+
+export type ConditionalLoadingTuple = LinkTagRef | LinkTagDynamicImport | LinkTagDynamicImportCDN ;
 
 export type ConditionalLoadingLookup = {[tagName: string]: ConditionalLoadingTuple[]};

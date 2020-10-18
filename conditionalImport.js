@@ -1,5 +1,6 @@
 import { preemptiveImport } from './preemptiveImport.js';
 const loadedTags = new Set();
+let addedCssObserveImport = false;
 export function conditionalImport(shadowPeer, lookup) {
     doManualCheck(shadowPeer, lookup);
     if (document.readyState === 'loading') {
@@ -7,7 +8,14 @@ export function conditionalImport(shadowPeer, lookup) {
             doManualCheck(shadowPeer, lookup);
         });
     }
-    import('css-observe/css-observe.js'); //TODO eat your own dogfood
+    if (!addedCssObserveImport) {
+        addedCssObserveImport = true;
+        conditionalImport(shadowPeer, {
+            'css-observe': [
+                ['css-observe.js', () => import('css-observe/css-observe.js'), '//unpkg.com/css-observe@0.0.27/css-observe.js?module']
+            ]
+        });
+    }
     const unloadedTags = [];
     for (const tagName in lookup) {
         if (!loadedTags.has(tagName))
