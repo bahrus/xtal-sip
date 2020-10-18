@@ -32,14 +32,30 @@ function doManualCheck(shadowPeer, lookup) {
         host = document.firstElementChild;
     }
     for (const tagName in lookup) {
-        if (loadedTags.has(tagName))
-            continue;
-        if (host.querySelector(tagName) !== null) {
-            loadedTags.add(tagName);
-            const loadingInstructions = lookup[tagName];
-            loadingInstructions.forEach(loadingInstruction => {
-                preemptiveImport(loadingInstruction);
-            });
+        const loadingInstructions = lookup[tagName];
+        const tags = parseTag(tagName);
+        console.log(tags);
+        for (const tagName2 of tags) {
+            if (loadedTags.has(tagName2))
+                continue;
+            if (host.querySelector(tagName2) !== null) {
+                loadedTags.add(tagName2);
+                loadingInstructions.forEach(loadingInstruction => {
+                    preemptiveImport(loadingInstruction);
+                });
+            }
         }
     }
+}
+const re = /\{([^)]+)\}/g;
+function parseTag(tag) {
+    const braceSplit = tag.split(re);
+    if (braceSplit.length === 1)
+        return [tag];
+    if (braceSplit.length === 3) {
+        const returnArr = [];
+        const names = braceSplit[1].split('|');
+        return names.map(name => `${braceSplit[0]}${name}${braceSplit[2]}`);
+    }
+    console.error(braceSplit);
 }

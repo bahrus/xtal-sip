@@ -10,10 +10,11 @@
 <body>
     
     <sl-button>Click me</sl-button>
+    <sl-checkbox>Checkbox</sl-checkbox>
     <script type=module>
         import {conditionalImport} from '../conditionalImport.js';
         conditionalImport(document.body, {
-            'sl-button': [
+            'sl-{button|checkbox}': [
                 ['shoelace.css'],
                 ['shoelace.js']
             ]
