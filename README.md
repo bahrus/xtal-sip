@@ -17,9 +17,9 @@ Backdrop, the good and the bad.
 
 The good:
 
-Browsers now support modules, including relative references between files.  Hip hip hooray!
+Browsers now support ES modules, including relative references between files.  Hip hip hooray!
 
-Dynamic imports are shipping in every modern browser, which also support relative references.  Hip hip hooray!
+Dynamic imports of ES modules are shipping in every modern browser, which also support relative references.  Hip hip hooray!
 
 The bad:
 
