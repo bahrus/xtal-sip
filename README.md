@@ -137,7 +137,7 @@ Hard-coding hash integrity attributes in raw code would be a maintenance nightma
 
 Note that link tags are going to be causing script to load.  Most lists of "dangerous tags" to filter out [include](https://stackoverflow.com/questions/17369559/html-dangerous-tags-to-avoid-while-developing-a-chat-application) the link tag, but do make sure that is the case for your server.
 
-## More whittling
+## More whittling [TODO]
 
 JS is expensive, so anything that can be done to reduce the size of JS, while making the api less painful to work with, is a win-win.
 
@@ -240,6 +240,8 @@ conditionalImport(shadowDOMPeerElement, {
 });
 
 ```
+
+**NB:** There are some known kinks to be worked out with the syntax above [TODO].
 
 ## Are we being unfair to CSS?
 
