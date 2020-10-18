@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <sl-button>Click me</sl-button>
+    <script type=module>
+        import {conditionalImport} from '../conditionalImport.js';
+        conditionalImport(document.body, {
+            'sl-button': [
+                [,{type: 'css', cssScope: 'global'},'//cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.21/dist/shoelace/shoelace.css'],
+                [,,'//cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.21/dist/shoelace/shoelace.esm.js']
+            ]
+        })
+    </script>
+</body>
+</html>

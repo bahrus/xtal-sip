@@ -57,16 +57,28 @@ export function preemptiveImport(arg) {
     }
     //No go for linkTag, try importmap.
     const dynamicImport = arg[1];
-    if (dynamicImport !== undefined) {
-        try {
-            dynamicImport();
-            return;
+    switch (typeof dynamicImport) {
+        case 'function': {
+            try {
+                dynamicImport();
+                return;
+            }
+            catch (e) { }
         }
-        catch (e) { }
     }
     //No luck with importMap, try CDN
     const CDNPath = arg[2];
     if (CDNPath !== undefined) {
-        import(CDNPath);
+        if (typeof dynamicImport === 'object') {
+            if (dynamicImport.type === 'css') {
+                const styleTag = document.createElement('link');
+                styleTag.rel = 'stylesheet';
+                styleTag.href = CDNPath;
+                document.head.appendChild(styleTag);
+            }
+        }
+        else {
+            import(CDNPath);
+        }
     }
 }
