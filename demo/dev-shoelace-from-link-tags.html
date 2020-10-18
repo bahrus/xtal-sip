@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link id="shoelace.css" rel=preload as=style href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.21/dist/shoelace/shoelace.css">
+    <link id="shoelace.js" rel=modulepreload href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.21/dist/shoelace/shoelace.esm.js">
+</head>
+<body>
+    
+    <sl-button>Click me</sl-button>
+    <script type=module>
+        import {conditionalImport} from '../conditionalImport.js';
+        conditionalImport(document.body, {
+            'sl-button': [
+                ['shoelace.css'],
+                ['shoelace.js']
+            ]
+        })
+    </script>
+</body>
+</html>
