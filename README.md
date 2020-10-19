@@ -281,7 +281,7 @@ But none of this invalidates going forward with import maps for JS. Just add sup
 
 On the other hand, if some other data structure is best suited to complement cross-package referencing for CSS, I don't see how import maps interferes with adding that data structure, side-by-side with JS import mapping.
 
-This debate reminds me a bit over the debate about [DRY](https://www.madetech.com/blog/when-to-avoid-the-dry-principle).  Is the possible elimination of a little redundancy between JS and CSS matching worth the risk of getting locked into an unsustainable abstraction?  I honestly don't know.
+This debate reminds me a bit over the debate about [DRY](https://www.madetech.com/blog/when-to-avoid-the-dry-principle).  Is the possible elimination of a little redundancy between JS and CSS mapping worth the risk of getting locked into an unsustainable abstraction?  I honestly don't know.
 
 </details>
 
