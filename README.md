@@ -247,7 +247,7 @@ conditionalImport(shadowDOMPeerElement, {
 
 Does the import map proposal impose an unfair advantage to JS over CSS?  This important question raised by Firefox really hits home to me.
 
-The fact that we've been able to import JS now for a number of years, and not HTML, strikes me as *extremely* unfair.  Are we doing the same thing here?  I don't think so...
+The fact that we've been able to import JS now for a number of years, and not HTML, strikes me as *extremely* unfair.  Are we doing the same thing here?  I'm not sure...
 
 Relative references (relative to the JS file location) would still work with no mapping, should CSS Stylesheet / Modules become a thing:
 
@@ -259,9 +259,32 @@ in tandem [with](https://github.com/WICG/construct-stylesheets/issues/45#issueco
 
 If CSS/Stylesheet modules allows imports from JS, via relative paths, then one library package could import css packages from another via a JS cross-package "bridge" reference, which could leverage import maps. 
 
-The concern raised by Firefox is a good one -- ideally there *would* be one solution for everything.  And it's certainly worth bringing up the issue early, to gain a fuzzy idea how this will work.  But I'm reasonably certain that the idea that there should be a single mapping that manages all cross-package mappings, for all types of resources, and for all types of attributes, is a good one to consider, but, like other similar attempts, [seems out of reach of mortals for the time being](https://en.wikipedia.org/wiki/Unified_field_theory).  That ship has sailed, essentially, by the existence of preload tags and existing import syntax for CSS, which differs from JS.
+<details>
+  <summary>Is a unifying cross-package syntax across JS / HTML / CSS / WASM really possible?</summary>
 
-I don't think we should feel that bad that there isn't perfect symmetry between JS and CSS mappings.
+Yes, it seems it would be nice for a CSS file to reference JS files directly (following importmap rules), especially because Houdini.  So that would appear to be a next step in order to achieve symmetry and universality.
+
+It is interesting to note that Webpack provides a node resolver for [Less](https://www.npmjs.com/package/less-loader#webpack-resolver) and SASS, using the tilda operator.
+
+CSS imports are quite closely tied to media queries, which certainly isn't often a criteria with JS, but I can see scenarios where it might be nice to specify different JS dependencies based on media queries.  
+
+The concern raised by Firefox is a good one -- ideally there *would* be one solution for everything.  And it's certainly worth bringing up the issue early, to gain a fuzzy idea how this will work.  But my first instinct is that the idea that there should be a single mapping that manages all cross-package mappings, for all types of resources, and for all types of attributes, is a good one to consider, but, like other similar attempts, [seems out of reach of mortals for the time being](https://en.wikipedia.org/wiki/Unified_field_theory).  That ship has sailed, essentially, by the existence of preload tags and existing import syntax for CSS, which differs from JS.
+
+Maybe my first instinct is wrong, and it isn't that out of reach.  Let's assume, after careful analysis, that:
+
+1.  The analysis presented here, that imports for JS is best served by a combination of flat mappings, combined with a [hierarchical JSON to represent scoping](https://github.com/WICG/import-maps#multiple-versions-of-the-same-module) is correct.
+2.  The right solution for CSS is also, like JS, a combination of flat mappings, combined with a hierarchy to represent CSS Scoping.
+3.  The scoping rules for JS would never conflict with the scoping rules for CSS.
+
+We would then have a strong case that in fact it is useful to combine the two mappings into one system.  We could then expand the role of import maps, with scoping for both JS and CSS, and perhaps other hierarchies that are only applicable to JS, and other hierarchies only applicable to CSS, as additional keys in the JSON schema.
+
+But none of this invalidates going forward with import maps for JS. Just add support for CSS when it's ready.
+
+On the other hand, if some other data structure is best suited to complement cross-package referencing for CSS, I don't see how import maps interferes with adding that data structure, side-by-side with JS import mapping.
+
+</details>
+
+I don't think we should feel that bad if there isn't perfect symmetry between JS and CSS mappings.
 
 1.  The early years of the web demonstrate that HTML can be useful by itself without external CSS files.  And clearly JS by itself can be useful -- web components can be built using JS alone, as can many useful software applications.  But there has yet to be a significant role played by standalone CSS files.  They exist to serve HTML (or JS, depending).  What this means is that while the demand for JS to be able to reference other packages has been proven by the rapid rise of npm, and while the demand for HTML being able to reference third-party HTML demonstrated by the ubiquity of iframes and html include libraries like JQuery's load function, these demands go well beyond any concerns about reducing bandwidth by sharing common code.  The demand for sharing css files across packages has certainly proven itself -- take Bootstrap or web fonts, that can be shared via a CDN, for example.  But one doesn't find many such packages which have the kind of dependency tree we expect all the time with JS.
 2.  node.css only has a fraction of the download rate as node.js. 
