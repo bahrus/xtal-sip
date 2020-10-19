@@ -263,7 +263,7 @@ If CSS/Stylesheet modules allows imports from JS, via relative paths, then one l
 
 Yes, it seems it would be nice for a CSS file to reference JS files directly (following importmap rules), especially because Houdini.  So that would appear to be a next step in order to achieve symmetry and universality.
 
-It is interesting to note that Webpack provides a node resolver for [Less](https://www.npmjs.com/package/less-loader#webpack-resolver) and SASS, using the tilda operator.
+It is interesting to note that Webpack provides a node resolver for [Less](https://www.npmjs.com/package/less-loader#webpack-resolver) and SASS, using the tilda operator.  That would appear to be another prerequisite, in order to achieve universality.
 
 CSS imports are quite closely tied to media queries, which certainly isn't often a criteria with JS, but I can see scenarios where it might be nice to specify different JS dependencies based on media queries.  
 
