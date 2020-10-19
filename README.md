@@ -8,7 +8,12 @@
 
 Dynamically &#34;water&#34; a custom element tag with the necessary dependencies to sprout the tag from an inert seedling to a thing of beauty.
 
-**NB:** The syntax below breaks significantly with what the current code is doing.
+<details>
+  <summary>Whither xtal-sip, the web component?</summary
+  >
+**NB:** xtal-sip, the web component, has decided to part ways with Middle-earth, and reminds its protégés, described below, that "The road goes ever on and on". 
+
+xtal-sip's spirit lingers on in the hearts and minds of the functions contained in this package.  These functions are determined to carry out xtal-sip's mission.  They claim right of abode, and wish xtal-sip's next adventure will be filled with peace and tranquility.
 
 <details>
 <summary>
@@ -34,7 +39,7 @@ Back to the good:
 
 Back to the bad:
 
-However, even in the sphere of web component development, not all web component libraries are making themselves compatible with the es-dev-server.  Some of that is due to legacy / backwards compatibility needs, which hopefully will fade with time.  But another looming cause is that a sizable portion of web component libraries are built on stencil (and perhaps other JSX libraries), which tend to work best with a bundling step, even during development.  The fact that the library uses JSX means that some compiling will be necessary anyway, so from that point of view, they may not care much.  But it does mean that there's a bit of a rift there.  I've tried, unsuccessfully, to use Ionic components, and Shoelace components, using bare import specifiers and the es-dev-server.  On the other hand Ionic and Shoelace both provide easy CDN url's.  But pointing a library exclusively to a (versioned) CDN url in the raw code doesn't seem like the right solution.
+However, even in the sphere of web component development, not all web component libraries are making themselves compatible with the es-dev-server.  Some of that is due to legacy / backwards compatibility needs, which hopefully will fade with time.  But another looming cause is that a sizable portion of web component libraries are built on stencil (and perhaps other JSX libraries), which tend to work best with a bundling step, even during development.  The fact that the library uses JSX means that some compiling will be necessary anyway, so from that point of view, developers may not care much what else happens during a save.  But it does mean that there's a bit of a rift there.  I've tried, unsuccessfully, to use Ionic components, and Shoelace components, using bare import specifiers and the es-dev-server.  On the other hand Ionic and Shoelace both provide easy CDN url's.  But pointing a library exclusively to a (versioned) CDN url in the raw code doesn't seem like the right solution.
 
 Another weakness of import maps, in my mind, is it isn't easy to collapse mappings of multiple bare import endpoints to a single bundled (CDN) url.  Perhaps this will come with bundled exchanges, but my guess is bundled exchanges will land in all browsers by the end of the decade, when the Igalium-based browser reaches 99% market share.  It still seems to be only Google people spearheading this initiative (bundled exchanges).  So what to do until then?
 
@@ -44,7 +49,7 @@ Unlike other types of library references, web components have one nice advantage
 
 Back to the bad:
 
-Without browser support, all of these solutions depend on node.js as the development environment.  That kind of exclusive technical monoculture should give us pause.  And to take advantage of *all* modern web component libraries, including Ionic and Shoelace, may require a bundling step as well if using bare imports only.  Even more exclusive set of technologies.
+Without browser support, all of these solutions depend on node.js as the development environment.  That kind of exclusive technical monoculture should give us pause.  And to take advantage of *all* modern web component libraries, including Ionic and Shoelace, it may require a bundling step as well if using bare imports only.  Even more of an exclusive set of technologies.
 
 </details>
 
@@ -52,7 +57,7 @@ In addition to the problems discussed in detail in the "Backdrop" section above,
 
 Most every web application can be recursively broken down into logical regions, building blocks which are assembled together to form the whole site.
 
-xtal-sip takes the philosophical stance that at the most micro level, utilizing highly reusable, generic custom elements -- elements that can extend the HTML vocabulary, elements that could be incorporated into the browser, even -- form a great foundation to build on.
+xtal-sip promulgated the philosophical stance that at the most micro level, utilizing highly reusable, generic custom elements -- elements that can extend the HTML vocabulary, elements that could be incorporated into the browser, even -- form a great foundation to build on.
 
 But as one zooms out from the micro to the macro, the nature of the components changes in significant ways.  
 
@@ -64,18 +69,32 @@ ES module based web components may or may not be the best fit for these applicat
 
 A significant pain point has to do with loading all the third-party web components these macro components / compositions require, and loading them into memory only when needed.  
 
-The goals of xtal-sip are:
+xtal-sip wishes to leave behind a world where:
 
-1.  Provide a declarative way of progressively, dynamically loading web component dependencies into memory, only when needed.
-2.  Do so without introducing another additional listing of dependencies that competes with import maps / package.json that isn't part of the web ecosystem.
-3.  Provide workarounds for referencing libraries where tooling solutions and browser support for bare import specifiers is inconsistent.
-4.  Be compatible with technologies outside the node.js monoculture.
+1.  A declarative way of progressively, dynamically loading web component dependencies into memory on demand is provided.
+2.  Do so without introducing another additional listing of dependencies that competes with import maps / package.json, or that isn't part of the web ecosystem.
+3.  Workarounds for referencing libraries is possible, even when those libraries aren't consistent with bare import specifiers. 
+4.  Productive development is possible, even outside the node.js monoculture.
 
 ## conditionalImport
 
-xtal-sip provides a function "conditionalImport" described below.
+xtal-sip's first protégé, conditionalImport, operates on a "strongest to weakest" ordering of mappings.  At the strongest level are link tags contained either in the head, or, for lower priority resources, towards the end.  For example:
 
-xtal-sip operates on a "strongest to weakest" hierarchy of mappings.  At the strongest level are link tags contained either in the head, or, for lower priority resources, towards the end.  
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link id="shoelace.css" rel=preload as=style href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.21/dist/shoelace/shoelace.css">
+    <link id="shoelace.js" rel=modulepreload href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.21/dist/shoelace/shoelace.esm.js">
+</head>
+<body>
+  ...
+</body>
+</html>
+```
 
 The browser already does some useful things with link tags, such as preloading resources ahead of time.  conditionalImport enhances/extends the functionality, building a mapping system around it, with very specific versions and integrity hashes.
 
