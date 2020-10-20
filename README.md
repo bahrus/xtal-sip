@@ -34,7 +34,7 @@ Firefox is taking a bit of an [Of course...](https://www.youtube.com/watch?v=VBn
 
 Back to the good:
 
-1.  It seems (by design) that the strict rules that govern bare import specifiers happens to be largely compatible with the considerably more lenient rules that bundling tools like webpack and Parcel support.  Tools which many -- but not all -- developers have grown used to / fond of using, even during development. 
+1.  It seems (by design) that the strict rules that govern bare import specifiers happen to be largely compatible with the considerably more lenient rules that bundling tools like webpack and Parcel support.  Tools which many -- but not all -- developers have grown used to / fond of using, even during development. 
 2.  For those of us who enjoy the lightweight, quick to load and reload, instantaneous, abstraction-free feedback of build-less development, the es-dev-server does a great job of server-side "polyfilling" import maps (or bare import specifiers with package.json serving as a substitute for import maps, to be accurate).  Other solutions from snowpack and unpkg.com are also consistent with bare import specifiers.  Perhaps with HTTP3, the gap between what is convenient to (this class of developers), and what runs best in production, will continue to narrow.
 
 Back to the bad:
@@ -122,7 +122,7 @@ With link references, we can define a slew of easily streamable mappings.  For e
 
 ```
 
-xtal-sip will be able to work with these link tags, without the benefit of import maps or bare import specifiers.  
+xtal-sip's apprentices  will be able to work with these link tags, without the benefit of import maps or bare import specifiers.  
 
 Then your library references can look like:
 
@@ -226,8 +226,8 @@ This is subject to change as the CSS/stylesheet modules / constructible styleshe
 <html>
   <head>
     <!-- optional, provides the most specific, and powerful mapping -->
-    <!-- Use modulepreload, preload if used during initial presentation, lazyloadmapping if not -->
-    <!-- modulepreloads should go in head tag, lazyloadmapping inside a xtal-sip tag somewhere towards the end -->
+    <!-- Use modulepreload, preload if used during initial presentation, lazyload, modulelazyload if not -->
+    <!-- preloads should go in head tag,  lazyload's  somewhere towards the end of the document -->
     <link integrity=... rel=modulepreload     href="//cdn.snowpack.dev/@myScope@1.2.3/dist/my-bundled-elements.js" id="myScope_my_bundled_elements">
     <link integrity=... rel=preload as=style  href="//www.jsdelivr.com/@someCommonSharedCSSFramework@11.12.13/some-common-css.css" id="someCommonSharedCSSFramework_some_common_css">
   </head>
@@ -282,7 +282,7 @@ If CSS/Stylesheet modules allows imports from JS, via relative paths, then one l
 
 Yes, it seems it would be nice for a CSS file to reference JS files directly (following importmap rules), especially because Houdini.  So that would appear to be a next step in order to achieve symmetry and universality.
 
-It is interesting to note that Webpack provides a node resolver for [Less](https://www.npmjs.com/package/less-loader#webpack-resolver) and SASS, using the tilda operator.  That would appear to be another prerequisite, in order to achieve universality.
+It is interesting to note that Webpack provides a node resolver for [Less](https://www.npmjs.com/package/less-loader#webpack-resolver) and SASS, using the tilda operator.  That would appear to be another prerequisite for native CSS, in order to achieve universality.
 
 CSS imports are quite closely tied to media queries, which certainly isn't often a criteria with JS, but I can see scenarios where it might be nice to specify different JS dependencies based on media queries.  
 
@@ -294,11 +294,11 @@ Maybe my first instinct is wrong, and it isn't that out of reach.  Let's assume,
 2.  The right solution for CSS is also, like JS, a combination of flat mappings, combined with a hierarchy to represent CSS Scoping.
 3.  The scoping rules for JS would never conflict with the scoping rules for CSS.
 
-We would then have a strong case that in fact it is useful to combine the two mappings into one system.  We could then expand the role of import maps, with scoping for both JS and CSS, and perhaps other hierarchies that are only applicable to JS, and other hierarchies only applicable to CSS, as additional keys in the JSON schema.
+We would then have a strong case that in fact it is useful to combine the two mappings into one JSON blob.  We could then expand the role of import maps, with scoping for both JS and CSS, and perhaps other hierarchies that are only applicable to JS, and other hierarchies only applicable to CSS, as additional keys in the JSON schema.
 
 But none of this invalidates going forward with import maps for JS. Just add support for CSS when it's ready.
 
-On the other hand, if some other data structure is best suited to complement cross-package referencing for CSS, I don't see how import maps interferes with adding that data structure, side-by-side with JS import mapping.
+On the other hand, if some other data structure is best suited to complement cross-package referencing for CSS, I don't see how JS import maps would interfere with adding that TBD data structure, side-by-side with JS import mapping.
 
 This debate reminds me a bit over the debate about [DRY](https://www.madetech.com/blog/when-to-avoid-the-dry-principle).  Is the possible elimination of a little redundancy between JS and CSS mapping worth the risk of getting locked into an unsustainable abstraction?  I honestly don't know.
 
