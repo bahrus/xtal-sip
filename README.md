@@ -9,11 +9,12 @@
 Dynamically &#34;water&#34; a custom element tag with the necessary dependencies to sprout the tag from an inert seedling to a thing of beauty.
 
 <details>
-  <summary>Whither xtal-sip, the web component?</summary
-  >
+  <summary>Whither xtal-sip, the web component?</summary>
 **NB:** xtal-sip, the web component, has decided to part ways with Middle-earth, and reminds its protégés, described below, that "The road goes ever on and on". 
 
 xtal-sip's spirit lingers on in the hearts and minds of the functions contained in this package.  These functions are determined to carry out xtal-sip's mission.  They claim right of abode, and wish xtal-sip's next adventure will be filled with peace and tranquility.
+
+</details>
 
 <details>
 <summary>
@@ -35,7 +36,7 @@ Firefox is taking a bit of an [Of course...](https://www.youtube.com/watch?v=VBn
 Back to the good:
 
 1.  It seems (by design) that the strict rules that govern bare import specifiers happen to be largely compatible with the considerably more lenient rules that bundling tools like webpack and Parcel support.  Tools which many -- but not all -- developers have grown used to / fond of using, even during development. 
-2.  For those of us who enjoy the lightweight, quick to load and reload, instantaneous, abstraction-free feedback of build-less development, the es-dev-server does a great job of server-side "polyfilling" import maps (or bare import specifiers with package.json serving as a substitute for import maps, to be accurate).  Other solutions from snowpack and unpkg.com are also consistent with bare import specifiers.  Perhaps with HTTP3, the gap between what is convenient to (this class of developers), and what runs best in production, will continue to narrow.
+2.  For those of us who enjoy the lightweight, quick to load and reload, instantaneous, abstraction-free feedback of build-less development, the es-dev-server does a great job of server-side "polyfilling" import maps (or bare import specifiers with package.json serving as a substitute for import maps, to be accurate).  Other solutions from snowpack and unpkg.com are also consistent with bare import specifiers.  Perhaps with HTTP3, the gap between what is convenient to this class of developers, and what runs best in production, will continue to narrow.
 
 Back to the bad:
 
@@ -98,7 +99,7 @@ xtal-sip's first protégé, conditionalImport, operates on a "strongest to weake
 
 The browser already does some useful things with link tags, such as preloading resources ahead of time.  conditionalImport enhances/extends the functionality, building a mapping system around it, with very specific versions and integrity hashes.
 
-At the middle specificity level, we have bare import specifiers / import maps, which can also serve the purpose of mapping to specific versions.  In some ways, it is more powerful than the link tag mappings (supporting scoped resolutions, for example), but it is less powerful in other ways (for example, providing hash integrity tests).  I could see standards evolving to link these two more closely together, however.
+At the middle specificity level, we have bare import specifiers / import maps, which can also serve the purpose of mapping to specific versions.  In some ways, it is more powerful than the link tag mappings (supporting scoped resolutions, for example), but it is less powerful in other ways (for example, inability to provide hash integrity tests).  I could see standards evolving to link these two more closely together, however.
 
 At the lowest specificity level, our final fallback is to just load an evergreen CDN URL.  Code which makes use of this last fallback probably shouldn't hard-code the specific version in it, for a variety of good-practice reasons.  It relies a bit on backwards compatibility, but it can always adopt slow moving versioning to mitigate the risk.
 
@@ -108,8 +109,8 @@ With link references, we can define a slew of easily streamable mappings.  For e
 <html>
   <head>
     <!-- optional, provides the most specific, and powerful mapping -->
-    <!-- Use modulepreload if used during initial presentation, lazyloadmapping if not -->
-    <!-- modulepreloads should go in head tag, lazyloadmapping inside a xtal-sip tag somewhere towards the end -->
+    <!-- Use modulepreload if used during initial presentation, modulelazyload if not -->
+    <!-- modulepreloads should go in head tag, modulelazyload inside a xtal-sip tag somewhere towards the end -->
     <link integrity=... rel=modulepreload href="//cdn.snowpack.dev/@myScope@1.2.3/dist/my-bundled-elements.js" id="myScope/dist/my-bundled-elements.js" >
   </head>
   <body>
@@ -245,8 +246,8 @@ const CVMyScope = ({tagName}) => `//unpkg.com/@myScope/${tagName}.js?module`;
 conditionalImport(shadowDOMPeerElement, {
   'my-element-1':[
     ['myScope_my_bundled_elements', () => import('@myScope/my-element-1.js'), CVMyScope],
-    ['myScope_my_bundled_css_fonts', {type: 'css', cssScope: 'global'}, '//www.jsdelivr.com/package/npm/@myScope/dist/my-bundled-font.css'],
-    ['someCommonSharedCSSFramework_some_common_css', {type: 'css', cssScope: 'shadow'}, '//www.jsdelivr.com/@someCommonSharedCSSFramework/some-common-css.css']
+    [{type: 'css', cssScope: 'global'}, 'myScope_my_bundled_css_fonts', ({asserts}), '//www.jsdelivr.com/package/npm/@myScope/dist/my-bundled-font.css'],
+    [{type: 'css', cssScope: 'shadow'}, 'someCommonSharedCSSFramework_some_common_css', , '//www.jsdelivr.com/@someCommonSharedCSSFramework/some-common-css.css']
   ],
   'my-element-2':[
     ['myScope_my_bundled_elements', () => import('@myScope/my-element-2.js'), CVMyScope],
