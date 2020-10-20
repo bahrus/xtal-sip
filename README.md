@@ -10,6 +10,7 @@ Dynamically &#34;water&#34; a custom element tag with the necessary dependencies
 
 <details>
   <summary>Whither xtal-sip, the web component?</summary>
+  
 **NB:** xtal-sip, the web component, has decided to part ways with Middle-earth, and reminds its protégés, described below, that "The road goes ever on and on". 
 
 xtal-sip's spirit lingers on in the hearts and minds of the functions contained in this package.  These functions are determined to carry out xtal-sip's mission.  They claim right of abode, and wish xtal-sip's next adventure will be filled with peace and tranquility.
