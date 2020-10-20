@@ -10,10 +10,10 @@ Dynamically &#34;water&#34; a custom element tag with the necessary dependencies
 
 <details>
   <summary>Whither xtal-sip, the web component?</summary>
-  
+
 **NB:** xtal-sip, the web component, has decided to part ways with Middle-earth, and reminds its protégés, described below, that "The road goes ever on and on". 
 
-xtal-sip's spirit lingers on in the hearts and minds of the functions contained in this package.  These functions are determined to carry out xtal-sip's mission.  They claim right of abode, and wish xtal-sip's next adventure will be filled with peace and tranquility.
+xtal-sip's spirit lingers on in the hearts and minds of the functions contained in this package.  These functions are determined to carry out xtal-sip's mission.  They claim right of abode, and wish xtal-sip's next adventure be filled with peace and tranquility.
 
 </details>
 
@@ -222,7 +222,7 @@ It's also been my experience that, with web components, [when it comes to fonts]
 
 How should we modify the conditionalImport function to accommodate both js reference(s) and css reference(s), some of them needing to be added (say) to document.head?
 
-This is subject to change as the CSS/stylesheet modules / constructible stylesheet proposals flap in the wind, but I'm thinking:
+This is subject to change as the CSS/stylesheet modules / constructible stylesheet proposals flap in the wind, but I'm thinking [TODO]:
 
 ```html
 <html>
@@ -247,12 +247,27 @@ const CVMyScope = ({tagName}) => `//unpkg.com/@myScope/${tagName}.js?module`;
 conditionalImport(shadowDOMPeerElement, {
   'my-element-1':[
     ['myScope_my_bundled_elements', () => import('@myScope/my-element-1.js'), CVMyScope],
-    [{type: 'css', cssScope: 'global'}, 'myScope_my_bundled_css_fonts', ({asserts}), '//www.jsdelivr.com/package/npm/@myScope/dist/my-bundled-font.css'],
-    [{type: 'css', cssScope: 'shadow'}, 'someCommonSharedCSSFramework_some_common_css', , '//www.jsdelivr.com/@someCommonSharedCSSFramework/some-common-css.css']
+    [
+      {type: 'css', cssScope: 'global'}, 
+      'myScope_my_bundled_css_fonts', 
+      ({assert}) => import('@myScope/my-css-font.css', assert), 
+      '//www.jsdelivr.com/package/npm/@myScope/dist/my-bundled-font.css'
+    ],
+    [
+      {type: 'css', cssScope: 'shadow'}, 
+      'someCommonSharedCSSFramework_some_common_css',
+      ({assert}) => import('@someCommonSharedCSSFramework/my-css-font.css', assert),
+      '//www.jsdelivr.com/@someCommonSharedCSSFramework/some-common-css.css'
+    ]
   ],
   'my-element-2':[
     ['myScope_my_bundled_elements', () => import('@myScope/my-element-2.js'), CVMyScope],
-    ['someCommonSharedCSSFramework_some_common_css', {type: 'css', cssScope: 'shadow'}, '//www.jsdelivr.com/@someCommonSharedCSSFramework/some-common-css.css']
+    [ 
+      {type: 'css', cssScope: 'shadow'},
+      'someCommonSharedCSSFramework_some_common_css',
+      ({assert}) => import('@someCommonSharedCSSFramework/my-css-font.css', assert), 
+      '//www.jsdelivr.com/@someCommonSharedCSSFramework/some-common-css.css'
+    ]
   ],
   'your-element-1':[
     ['yourScope_your-element_1',() => import('@yourScope/your-element-1.js'), '//unpkg.com/@yourScope/your-element-1.js?module']
@@ -261,7 +276,10 @@ conditionalImport(shadowDOMPeerElement, {
 
 ```
 
-**NB:** There are some known kinks to be worked out with the syntax above [TODO].
+So if the first element of the import tuple is of type object, then we are not importing JS, but something else (specified by the type).
+
+All the other elements are shifted to the right by one.
+
 
 ## Are we being unfair to CSS?
 
