@@ -102,7 +102,7 @@ The browser already does some useful things with link tags, such as preloading r
 
 At the middle specificity level, we have bare import specifiers / import maps, which can also serve the purpose of mapping to specific versions.  In some ways, it is more powerful than the link tag mappings (supporting scoped resolutions, for example), but it is less powerful in other ways (for example, inability to provide hash integrity tests).  I could see standards evolving to link these two more closely together, however.
 
-At the lowest specificity level, our final fallback is to just load an evergreen CDN URL.  Code which makes use of this last fallback probably shouldn't hard-code the specific version in it, for a variety of good-practice reasons.  It relies a bit on backwards compatibility, but it can always adopt slow moving versioning to mitigate the risk.
+At the lowest specificity level, our final fallback is to just load an evergreen CDN URL.  Code which makes use of this last fallback probably shouldn't hard-code the specific version in it, with the expectation of keeping up-to-date with the latest, for a variety of good-practice reasons.  It relies a bit on backwards compatibility, but it can always adopt slow moving versioning to mitigate the risk.
 
 With link references, we can define a slew of easily streamable mappings.  For example:
 
@@ -283,7 +283,7 @@ All the other elements are shifted to the right by one.
 
 ## Are we being unfair to CSS?
 
-Does the import map proposal impose an unfair advantage to JS over CSS?  This important question raised by Firefox really hits home to me.
+Does the import map proposal impose an unfair advantage to JS over CSS?  This important question raised by Firefox really hits home with me.
 
 The fact that we've been able to import JS now for a number of years, and not HTML, strikes me as *extremely* unfair.  Are we doing the same thing here?  I'm not sure...
 
