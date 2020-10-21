@@ -7,7 +7,8 @@ export interface IContext {
 }
 
 export interface ImportOptions {
-    cssScope: 'global' | 'shadow'
+    cssScope: 'global' | 'shadow',
+    host: HTMLElement | DocumentFragment;
 }
 
 export interface IDynamicImportArg {
