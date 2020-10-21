@@ -231,7 +231,7 @@ This is subject to change as the CSS/stylesheet modules / constructible styleshe
     <!-- Use modulepreload, preload if used during initial presentation, lazyload, modulelazyload if not -->
     <!-- preloads should go in head tag,  lazyload's  somewhere towards the end of the document -->
     <link integrity=... rel=modulepreload     href="//cdn.snowpack.dev/@myScope@1.2.3/dist/my-bundled-elements.js" id="myScope_my_bundled_elements">
-    <link integrity=... rel=preload as=style  href="//www.jsdelivr.com/@someCommonSharedCSSFramework@11.12.13/some-common-css.css" id="someCommonSharedCSSFramework_some_common_css">
+    <link integrity=... rel=preload as=style  href="//www.jsdelivr.com/@someCommonSharedCSSFramework@11.12.13/some-common-css.css" id="@someCommonSharedCSSFramework_some_common_css">
   </head>
   <body>
   ...

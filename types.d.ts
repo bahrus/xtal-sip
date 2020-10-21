@@ -1,18 +1,17 @@
-export type PreemptiveLoadingArgumentJS = [linkTagId: string | undefined, dynamicImport: Function | ImportAsserts| undefined, CDNFallback: string | undefined];
-export type PreemptiveLoadingArgumentWithAsserts = [linkTagId: string | undefined, dynamicImport: Function | ImportAsserts| undefined, CDNFallback: string | undefined, asserts: ImportAsserts];
+export type PreemptiveLoadingArgumentJS = [linkTagId: string | undefined, dynamicImport: Function | ImportOptions| undefined, CDNFallback: string | undefined];
+export type PreemptiveLoadingArgumentWithAsserts = [linkTagId: string | undefined, dynamicImport: Function | ImportOptions| undefined, CDNFallback: string | undefined, options: ImportOptions];
 export type PreemptiveLoadingArgument = PreemptiveLoadingArgumentJS | PreemptiveLoadingArgumentWithAsserts;
 
 export interface IContext {
     tagName: string;
 }
 
-export interface ImportAsserts {
-    type: 'css',
+export interface ImportOptions {
     cssScope: 'global' | 'shadow'
 }
 
 export interface IDynamicImportArg {
-    asserts: ImportAsserts,
+    options: ImportOptions,
     localName: string
 }
 
@@ -23,10 +22,8 @@ export type PathFromContext = (ctx: IContext) => string;
 export type LinkTagRef = [linkTagId: string | undefined];
 export type LinkTagDynamicImport = [linkTagId: string | undefined, dynamicImport: Function | undefined];
 export type LinkTagDynamicImportCDN = [linkTagId: string | undefined, dynamicImport: Function | undefined, CDNFallback:  string | PathFromContext | undefined];
-export type AssertsLinkTagRef = [asserts: ImportAsserts, linkTagId: string | undefined];
-export type AssertsDynamicImport = [asserts: ImportAsserts, linkTagId: string | undefined, dynamicImport: DynamicImportType | undefined];
-export type AssertsDynamicImportCDN = [asserts: ImportAsserts, linkTagId: string | undefined, dynamicImport: DynamicImportType | undefined, CDNFallback: string | PathFromContext | undefined];
+export type LinkTagDynamicImportCDNOptions = [linkTagId: string | undefined, dynamicImport: Function | undefined, CDNFallback:  string | PathFromContext | undefined, options: ImportOptions | undefined];
 
-export type ConditionalLoadingTuple = LinkTagRef | LinkTagDynamicImport | LinkTagDynamicImportCDN | AssertsLinkTagRef | AssertsDynamicImport | AssertsDynamicImportCDN ;
+export type ConditionalLoadingTuple = LinkTagRef | LinkTagDynamicImport | LinkTagDynamicImportCDN | LinkTagDynamicImportCDNOptions ;
 
 export type ConditionalLoadingLookup = {[tagName: string]: ConditionalLoadingTuple[]};

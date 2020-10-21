@@ -1,5 +1,7 @@
-import {PreemptiveLoadingArgumentJS} from './types.d.js';
-export async function preemptiveImport(arg: PreemptiveLoadingArgumentJS){
+import {PreemptiveLoadingArgument} from './types.d.js';
+
+//TODO:  return import when available?
+export async function preemptiveImport(arg: PreemptiveLoadingArgument){
     const linkTagId = arg[0];
     if(linkTagId !== undefined){
         const linkTag = self[linkTagId] as HTMLLinkElement | undefined;
@@ -68,17 +70,28 @@ export async function preemptiveImport(arg: PreemptiveLoadingArgumentJS){
     }
     //No luck with importMap, try CDN
     const CDNPath = arg[2];
+    const options = arg[3];
     if(CDNPath !== undefined){
-        if(typeof dynamicImport === 'object'){
-            if(dynamicImport.type === 'css'){
-                const styleTag = document.createElement('link');
-                styleTag.rel = 'stylesheet';
-                styleTag.href = CDNPath;
-                document.head.appendChild(styleTag);                
+        if(options !== undefined){
+            const cssScope = options.cssScope;
+            if(cssScope !== undefined){
+                switch(cssScope){
+                    case 'global':
+                        const styleTag = document.createElement('link');
+                        styleTag.rel = 'stylesheet';
+                        styleTag.href = CDNPath;
+                        document.head.appendChild(styleTag);
+                        break;
+                    case 'shadow':
+                        throw 'No idea how to implement'
+                }
+            }else{
+                import(CDNPath);
             }
         }else{
             import(CDNPath);
         }
-        
+    }else{
+        throw `Unable to resolve ${linkTagId} and ${dynamicImport.toString()}`; 
     }
 }
