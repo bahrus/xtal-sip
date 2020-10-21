@@ -9,7 +9,7 @@
 Dynamically &#34;water&#34; a custom element tag with the necessary dependencies to sprout the tag from an inert seedling to a thing of beauty.
 
 <details>
-  <summary>Whither xtal-sip, the web component?</summary>
+  <summary>Whither xtal-sip?</summary>
 
 **NB:** xtal-sip, the web component, has decided to part ways with Middle-earth, and reminds its protégés, described below, that "The road goes ever on and on". 
 
@@ -131,13 +131,13 @@ Then your library references can look like:
 ```JavaScript
 conditionalImport(shadowDOMPeerElement, {
   'my-element-1':[
-    ['myScope/dist/my-bundled-elements.js', () => import('@myScope/my-element-1.js'), '//unpkg.com/@myScope/my-element-1.js?module']
+    ['@myScope/dist/my-bundled-elements.js', () => import('@myScope/my-element-1.js'), '//unpkg.com/@myScope/my-element-1.js?module']
   ],
   'my-element-2':[
-    ['myScope/dist/my-bundled-elements.js', () => import('@myScope/my-element-2.js'), '//unpkg.com/@myScope/my-element-2.js?module']
+    ['@myScope/dist/my-bundled-elements.js', () => import('@myScope/my-element-2.js'), '//unpkg.com/@myScope/my-element-2.js?module']
   ],
   'your-element-1':[
-    ['yourScope/your-element-1.js', () => import('@yourScope/your-element-1.js'), '//unpkg.com/@yourScope/your-element-1.js?module']
+    ['@yourScope/your-element-1.js', () => import('@yourScope/your-element-1.js'), '//unpkg.com/@yourScope/your-element-1.js?module']
   ] 
 });
 ```
@@ -248,25 +248,25 @@ conditionalImport(shadowDOMPeerElement, {
   'my-element-1':[
     ['myScope_my_bundled_elements', () => import('@myScope/my-element-1.js'), CVMyScope],
     [
-      {type: 'css', cssScope: 'global'}, 
       'myScope_my_bundled_css_fonts', 
-      ({assert}) => import('@myScope/my-css-font.css', assert), 
-      '//www.jsdelivr.com/package/npm/@myScope/dist/my-bundled-font.css'
+      () => import('@myScope/my-css-font.css', {assert: {type: 'css'}}), 
+      '//www.jsdelivr.com/package/npm/@myScope/dist/my-bundled-font.css',
+      {cssScope: 'global'}, 
     ],
     [
-      {type: 'css', cssScope: 'shadow'}, 
       'someCommonSharedCSSFramework_some_common_css',
-      ({assert}) => import('@someCommonSharedCSSFramework/my-css-font.css', assert),
-      '//www.jsdelivr.com/@someCommonSharedCSSFramework/some-common-css.css'
+      () => import('@someCommonSharedCSSFramework/my-css-font.css', {assert: {type: 'css'}}),
+      '//www.jsdelivr.com/@someCommonSharedCSSFramework/some-common-css.css',
+      {cssScope: 'shadow'}
     ]
   ],
   'my-element-2':[
     ['myScope_my_bundled_elements', () => import('@myScope/my-element-2.js'), CVMyScope],
     [ 
-      {type: 'css', cssScope: 'shadow'},
       'someCommonSharedCSSFramework_some_common_css',
-      ({assert}) => import('@someCommonSharedCSSFramework/my-css-font.css', assert), 
-      '//www.jsdelivr.com/@someCommonSharedCSSFramework/some-common-css.css'
+      () => import('@someCommonSharedCSSFramework/my-css-font.css', {assert: {type: 'css'}}), 
+      '//www.jsdelivr.com/@someCommonSharedCSSFramework/some-common-css.css',
+      {cssScope: 'shadow'}
     ]
   ],
   'your-element-1':[

@@ -1,4 +1,6 @@
-export type PreemptiveLoadingArgument = [linkTagId: string | undefined, dynamicImport: Function | ImportAsserts| undefined, CDNFallback: string | undefined];
+export type PreemptiveLoadingArgumentJS = [linkTagId: string | undefined, dynamicImport: Function | ImportAsserts| undefined, CDNFallback: string | undefined];
+export type PreemptiveLoadingArgumentWithAsserts = [linkTagId: string | undefined, dynamicImport: Function | ImportAsserts| undefined, CDNFallback: string | undefined, asserts: ImportAsserts];
+export type PreemptiveLoadingArgument = PreemptiveLoadingArgumentJS | PreemptiveLoadingArgumentWithAsserts;
 
 export interface IContext {
     tagName: string;

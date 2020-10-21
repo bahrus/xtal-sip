@@ -1,5 +1,5 @@
-import {PreemptiveLoadingArgument} from './types.d.js';
-export async function preemptiveImport(arg: PreemptiveLoadingArgument){
+import {PreemptiveLoadingArgumentJS} from './types.d.js';
+export async function preemptiveImport(arg: PreemptiveLoadingArgumentJS){
     const linkTagId = arg[0];
     if(linkTagId !== undefined){
         const linkTag = self[linkTagId] as HTMLLinkElement | undefined;

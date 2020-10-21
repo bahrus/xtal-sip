@@ -1,7 +1,7 @@
 import {preemptiveImport} from './preemptiveImport.js';
 import {ICssObserve} from 'css-observe/types.d.js';
 
-import {ConditionalLoadingLookup, PreemptiveLoadingArgument} from './types.d.js';
+import {ConditionalLoadingLookup, PreemptiveLoadingArgumentJS} from './types.d.js';
 
 const loadedTags = new Set<string>();
 let addedCssObserveImport = false;
@@ -26,7 +26,7 @@ export function conditionalImport(shadowPeer: HTMLElement, lookup: ConditionalLo
         const tag = e.detail.value as HTMLElement;
         const loadingInstructions = lookup[tag.localName];
         loadingInstructions.forEach(instruction =>{
-            preemptiveImport(instruction as PreemptiveLoadingArgument);
+            preemptiveImport(instruction as PreemptiveLoadingArgumentJS);
         });
     });
     shadowPeer.insertAdjacentElement('afterend', cssObserve);
@@ -53,7 +53,7 @@ function doManualCheck(shadowPeer: HTMLElement, lookup: ConditionalLoadingLookup
             if(host.querySelector(tagName2) !== null){
                 loadedTags.add(tagName2);
                 loadingInstructions.forEach(loadingInstruction =>{
-                    preemptiveImport(loadingInstruction as PreemptiveLoadingArgument);
+                    preemptiveImport(loadingInstruction as PreemptiveLoadingArgumentJS);
                 });
             }
         }
