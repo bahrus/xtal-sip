@@ -75,15 +75,20 @@ export async function preemptiveImport(arg: PreemptiveLoadingArgument){
         if(options !== undefined){
             const cssScope = options.cssScope;
             if(cssScope !== undefined){
-                const styleTag = document.createElement('link');
-                styleTag.rel = 'stylesheet';
-                styleTag.href = CDNPath;
                 switch(cssScope){
-                    case 'global':
-                        document.head.appendChild(styleTag);
+                    case 'global':{
+                            const styleTag = document.createElement('link');
+                            styleTag.rel = 'stylesheet';
+                            styleTag.href = CDNPath;
+                            document.head.appendChild(styleTag);
+                        }
                         break;
                     case 'shadow':
                         //TODO:  Constructible Stylesheets.
+                        const styleTag = document.createElement('style');
+                        const resp = await fetch(CDNPath);
+                        const txt = await resp.text();
+                        styleTag.innerHTML = txt;
                         options.host.appendChild(styleTag);
                         break;
                 }
