@@ -19,35 +19,37 @@ xtal-sip's spirit lingers on in the hearts and minds of the functions contained 
 
 <details>
 <summary>
-Backdrop, the good and the bad.
+Down the rabbit hole
 </summary>
 
-The good:
+### Frabjous
 
-Browsers now support ES modules, including relative references between files.  Hip hip hooray!
+Browsers now support ES modules, including relative imports between files.  Hip hip hooray!
 
 Dynamic imports of ES modules are shipping in every modern browser, which also support relative references.  Hip hip hooray!
 
-The bad:
+### Mad Hatter Snark
 
 When it comes to cross-package resolution, on the other hand, the only proposal on the table is import maps. But whether import maps are going to be there for the long haul remains an open question, in my mind.  It has been [sitting behind a flag since version 74 in Chrome, and no release date has been announced](https://www.chromestatus.com/feature/5315286962012160).  Part of the reason for its languishing behind the flag, I think, is the lackluster response from other browser vendors.  It is [well-polyfilled](https://github.com/guybedford/es-module-shims), at least.  Firefox is taking a bit of an [Of course...](https://www.youtube.com/watch?v=VBn8XttrSew)  [approach to the question](https://github.com/mozilla/standards-positions/issues/146), which I suppose is more than can be said of Safari.  Relying on bare import resolution still feels much more tenuous than I'd like.  The strongest case for relying on bare import resolution is there is no better competing alternative, for now.  I think, though, without some assurance of the longevity of the specification via cross-browser positive gestures, it will be an uphill battle building the infrastructure around import maps that it so sorely needs.  VS Code / TypeScript support is quite confusing and inconsistent, as far as supporting bare import specifiers. Ironically, VSCode is more helpful in this regard if one sticks with JS.  I would be motivated to raise bug reports in VS Code / TypeScript's crushing sea of issues, but on what basis can I argue that they are under any obligation to support this "standard" without cross-browser endorsement?
 
-Back to the good:
+### Beamish Polyfills
 
 1.  It seems (by design) that the strict rules that govern import maps happen to be largely compatible with the considerably more lenient rules that bundling tools like webpack and Parcel support.  Tools which many -- but not all -- developers have grown used to / fond of using, even during development. 
 2.  For those of us who enjoy the lightweight, quick to load and reload, instantaneous, abstraction-free feedback of bundle-less development, the @web/dev-server does a great job of server-side "polyfilling" import maps (or bare import specifiers with package.json serving as a substitute for import maps, to be accurate).  Other solutions from snowpack and unpkg.com are also consistent with bare import specifiers.  Perhaps with HTTP3, the gap between what is convenient to this class of developers, and what runs best in production, will continue to narrow.
 
-Back to the bad:
+### JSX Bandersnatch
 
 However, even in the sphere of web component development, not all web component libraries are making themselves compatible with the @web/dev-server.  Some of that is due to legacy / backwards compatibility needs, which hopefully will fade with time.  But another looming cause is that a sizable portion of web component libraries are built on stencil (and perhaps other JSX libraries), which tend to work best with a bundling step, even during development.  The fact that the library uses JSX means that some compiling will be necessary anyway, so from that point of view, developers may not care much what else happens during a save.  But it does mean that there's a bit of a rift there.  I've tried, unsuccessfully, to use Ionic components, and Shoelace components, using bare import specifiers and the @web/dev-server.  On the other hand Ionic and Shoelace both provide easy CDN url's.  But pointing a library exclusively to a (versioned) CDN url in the raw code doesn't seem like the right solution.
 
+### Slithy Standards
+
 Another weakness of import maps, in my mind, is it isn't easy to collapse mappings of multiple bare import endpoints to a single bundled (CDN) url.  Perhaps this will come with bundled exchanges, but my guess is bundled exchanges will land in all browsers by the end of the decade, when the Igalium-based browser reaches 99% market share.  It still seems to be only Google people spearheading this initiative (bundled exchanges).  So what to do until then?
 
-Back to the good:
+### import-manteau 
 
 Unlike other types of library references, web components have one nice advantage when it comes to imports:  They register global tag names, hence the only thing that matters is loading the library.  This, combined with the problem statement below is the impetus (currently) for xtal-sip.
 
-Back to the bad:
+### Monodule Mimsy
 
 Without browser support, all of these solutions depend on node.js as the development environment.  That kind of exclusive technical monoculture should give us pause.  And to take advantage of *all* modern web component libraries, including Ionic and Shoelace, it may require a bundling step as well if using bare imports only.  Even more of an exclusive set of technologies.
 
@@ -155,7 +157,7 @@ Hard-coding hash integrity attributes in raw code would be a maintenance nightma
 
 Note that link tags are going to be causing script to load.  Most lists of "dangerous tags" to filter out [include](https://stackoverflow.com/questions/17369559/html-dangerous-tags-to-avoid-while-developing-a-chat-application) the link tag, but do make sure that is the case for your server.
 
-## Drynk [TODO]
+## Drynk Me [TODO]
 
 This seems pretty redundant:
 
