@@ -30,18 +30,16 @@ Dynamic imports of ES modules are shipping in every modern browser, which also s
 
 The bad:
 
-When it comes to cross-package resolution, on the other hand, the only proposal on the table is import maps. But whether import maps are going to be there for the long haul remains an open question, in my mind.  It has been [sitting behind a flag since version 74 in Chrome, and no release date has been announced](https://www.chromestatus.com/feature/5315286962012160).  Part of the reason for its languishing behind the flag, I think, is the lackluster response from other browser vendors.  It is [well-polyfilled](https://github.com/guybedford/es-module-shims), at least.   
-
-Firefox is taking a bit of an [Of course...](https://www.youtube.com/watch?v=VBn8XttrSew)  [approach to the question](https://github.com/mozilla/standards-positions/issues/146), which I suppose is more than can be said of Safari.  Relying on bare import resolution still feels much more tenuous than I'd like.  The strongest case for relying on bare import resolution is there is no better competing alternative, for now.  I think, though, without some assurance of the longevity of the specification via cross-browser positive gestures, it will be an uphill battle building the infrastructure around import maps that it so sorely needs.  VS Code / TypeScript support is quite confusing and inconsistent, as far as supporting bare import specifiers. Ironically, VSCode is more helpful in this regard if one sticks with JS.  I would be motivated to raise bug reports in VS Code / TypeScript's crushing sea of issues, but on what basis can I argue that they are under any obligation to support this "standard" without cross-browser endorsement?
+When it comes to cross-package resolution, on the other hand, the only proposal on the table is import maps. But whether import maps are going to be there for the long haul remains an open question, in my mind.  It has been [sitting behind a flag since version 74 in Chrome, and no release date has been announced](https://www.chromestatus.com/feature/5315286962012160).  Part of the reason for its languishing behind the flag, I think, is the lackluster response from other browser vendors.  It is [well-polyfilled](https://github.com/guybedford/es-module-shims), at least.  Firefox is taking a bit of an [Of course...](https://www.youtube.com/watch?v=VBn8XttrSew)  [approach to the question](https://github.com/mozilla/standards-positions/issues/146), which I suppose is more than can be said of Safari.  Relying on bare import resolution still feels much more tenuous than I'd like.  The strongest case for relying on bare import resolution is there is no better competing alternative, for now.  I think, though, without some assurance of the longevity of the specification via cross-browser positive gestures, it will be an uphill battle building the infrastructure around import maps that it so sorely needs.  VS Code / TypeScript support is quite confusing and inconsistent, as far as supporting bare import specifiers. Ironically, VSCode is more helpful in this regard if one sticks with JS.  I would be motivated to raise bug reports in VS Code / TypeScript's crushing sea of issues, but on what basis can I argue that they are under any obligation to support this "standard" without cross-browser endorsement?
 
 Back to the good:
 
-1.  It seems (by design) that the strict rules that govern bare import specifiers happen to be largely compatible with the considerably more lenient rules that bundling tools like webpack and Parcel support.  Tools which many -- but not all -- developers have grown used to / fond of using, even during development. 
-2.  For those of us who enjoy the lightweight, quick to load and reload, instantaneous, abstraction-free feedback of build-less development, the es-dev-server does a great job of server-side "polyfilling" import maps (or bare import specifiers with package.json serving as a substitute for import maps, to be accurate).  Other solutions from snowpack and unpkg.com are also consistent with bare import specifiers.  Perhaps with HTTP3, the gap between what is convenient to this class of developers, and what runs best in production, will continue to narrow.
+1.  It seems (by design) that the strict rules that govern import maps happen to be largely compatible with the considerably more lenient rules that bundling tools like webpack and Parcel support.  Tools which many -- but not all -- developers have grown used to / fond of using, even during development. 
+2.  For those of us who enjoy the lightweight, quick to load and reload, instantaneous, abstraction-free feedback of bundle-less development, the @web/dev-server does a great job of server-side "polyfilling" import maps (or bare import specifiers with package.json serving as a substitute for import maps, to be accurate).  Other solutions from snowpack and unpkg.com are also consistent with bare import specifiers.  Perhaps with HTTP3, the gap between what is convenient to this class of developers, and what runs best in production, will continue to narrow.
 
 Back to the bad:
 
-However, even in the sphere of web component development, not all web component libraries are making themselves compatible with the es-dev-server.  Some of that is due to legacy / backwards compatibility needs, which hopefully will fade with time.  But another looming cause is that a sizable portion of web component libraries are built on stencil (and perhaps other JSX libraries), which tend to work best with a bundling step, even during development.  The fact that the library uses JSX means that some compiling will be necessary anyway, so from that point of view, developers may not care much what else happens during a save.  But it does mean that there's a bit of a rift there.  I've tried, unsuccessfully, to use Ionic components, and Shoelace components, using bare import specifiers and the es-dev-server.  On the other hand Ionic and Shoelace both provide easy CDN url's.  But pointing a library exclusively to a (versioned) CDN url in the raw code doesn't seem like the right solution.
+However, even in the sphere of web component development, not all web component libraries are making themselves compatible with the @web/dev-server.  Some of that is due to legacy / backwards compatibility needs, which hopefully will fade with time.  But another looming cause is that a sizable portion of web component libraries are built on stencil (and perhaps other JSX libraries), which tend to work best with a bundling step, even during development.  The fact that the library uses JSX means that some compiling will be necessary anyway, so from that point of view, developers may not care much what else happens during a save.  But it does mean that there's a bit of a rift there.  I've tried, unsuccessfully, to use Ionic components, and Shoelace components, using bare import specifiers and the @web/dev-server.  On the other hand Ionic and Shoelace both provide easy CDN url's.  But pointing a library exclusively to a (versioned) CDN url in the raw code doesn't seem like the right solution.
 
 Another weakness of import maps, in my mind, is it isn't easy to collapse mappings of multiple bare import endpoints to a single bundled (CDN) url.  Perhaps this will come with bundled exchanges, but my guess is bundled exchanges will land in all browsers by the end of the decade, when the Igalium-based browser reaches 99% market share.  It still seems to be only Google people spearheading this initiative (bundled exchanges).  So what to do until then?
 
@@ -147,7 +145,7 @@ conditionalImport(shadowDOMPeerElement, {
     2.  If 1.i finds no link tag with matching id, or the first element is undefined, if the second element of the array is defined, try evaluating it.  This is where import maps can shine.
     3.  If 1.i and 1.ii fail or aren't defined, do an import() of the third element of the array, an (evergreen) link to a CDN.
 
-Note that the es-dev-server and most bundlers will resolve the second element of the array just fine (I think), so if no link tags are present, the second argument will come to the rescue.  The penalty of this approach is, of course, a more complicated import statement, but now we have lazy loading into memory, an optional backup for running the code on a plain http server like nginx, with or without bundling, and optional hash integrity checks.
+Note that the @web/dev-server and most bundlers will resolve the second element of the array just fine (I think), so if no link tags are present, the second argument will come to the rescue.  The penalty of this approach is, of course, a more complicated import statement, but now we have lazy loading into memory, an optional backup for running the code on a plain http server like nginx, with or without bundling, and optional hash integrity checks.
 
 As mentioned earlier, perhaps if such a system took hold, import maps could, in the future, be enhanced, also, to search the link tags for a tag with matching href, and apply whatever integrity attribute it finds in this case.
 
@@ -156,6 +154,59 @@ Hard-coding hash integrity attributes in raw code would be a maintenance nightma
 ## Security Implications
 
 Note that link tags are going to be causing script to load.  Most lists of "dangerous tags" to filter out [include](https://stackoverflow.com/questions/17369559/html-dangerous-tags-to-avoid-while-developing-a-chat-application) the link tag, but do make sure that is the case for your server.
+
+## Drynk [TODO]
+
+This seems pretty redundant:
+
+```JavaScript
+['@yourScope/your-element-1.js', () => import('@yourScope/your-element-1.js'), '//unpkg.com/@yourScope/your-element-1.js?module']
+```
+
+Here we see the path '@yourScope/your-element-1.js' appear three times.  We can reduce this overhead via the following notation:
+
+```JavaScript
+['@yourScope/your-element-1.js', ({path}) => import(path), ({path}) => `//unpkg.com/${path}?module`]
+```
+
+And of course if have a lot of these, the savings can be even bigger:
+
+```JavaScript
+const importFromPath = ({path}) => import(path);
+const unpkgFromPath = ({path}) => `//unpkg.com/${path}?module`
+
+...
+
+['@myScope/my-element-1.js',      importFromPath,   ({path}) => unpkgFromPath ],
+['@myScope/my-element-2.js',      '"',              '"'                       ],
+['@myScope/my-element-3.js',      '"',              '"'                       ],
+['@yourScope/your-element-1.js',  '"',              '"'                       ],
+['@yourScope/your-element-1.js',  '"',              '"'                       ],
+
+
+```
+
+In other words, the first element of the array gets put into a context object, which can then be passed in to the remaining items of the array.
+
+**However, there's a big problem with the above shortcut**.  In particular, the middle element of the array won't resolve correctly, if using the most common dev tools today, 
+including @web/dev-server, and (I'm guessing) snowpack, unpkg, rollup, Parcel, webpack, etc.
+
+Eventually, when import maps are ubiquitous, yes(!!), but for now, the best we can do safely is:
+
+```JavaScript
+const importFromPath = ({path}) => import(path);
+const unpkgFromPath = ({path}) => `//unpkg.com/${path}?module`
+
+...
+
+['@myScope/my-element-1.js',      () => import('@myScope/my-element-1.js'),       ({path}) => unpkgFromPath ],
+['@myScope/my-element-2.js',      () => import('@myScope/my-element-2.js'),       '"'                       ],
+['@myScope/my-element-3.js',      () => import('@myScope/my-element-3.js'),       '"'                       ],
+['@yourScope/your-element-1.js',  () => import('@myScope/your-element-1.js'),     '"'                       ],
+['@yourScope/your-element-1.js',  () => import('@myScope/your-element-1.js'),     '"'                       ],
+
+
+```
 
 ## More whittling [TODO]
 
