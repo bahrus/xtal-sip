@@ -1,22 +1,37 @@
-export type PreemptiveLoadingArgumentJS = [linkTagId: string | undefined, dynamicImport: Function | ImportOptions| undefined, CDNFallback: string | undefined];
-export type PreemptiveLoadingArgumentWithAsserts = [linkTagId: string | undefined, dynamicImport: Function | ImportOptions| undefined, CDNFallback: string | undefined, options: ImportOptions];
+export type PreemptiveLoadingArgumentJS = [
+    linkTagId: string | DynamicImportType | undefined, 
+    dynamicImport: DynamicImportType | undefined, 
+    CDNFallback: DynamicImportType | string | undefined, 
+    ctx: IContext | undefined
+];
+export type PreemptiveLoadingArgumentWithAsserts = [
+    linkTagId: string | DynamicImportType | undefined, 
+    dynamicImport: DynamicImportType | undefined, 
+    CDNFallback: DynamicImportType | string | undefined, 
+    ctx: IContext | undefined, 
+    options: ImportOptions
+];
 export type PreemptiveLoadingArgument = PreemptiveLoadingArgumentJS | PreemptiveLoadingArgumentWithAsserts;
 
 export interface IContext {
-    tagName: string;
+    localName?: string;
+    previousLoadingArgument?: PreemptiveLoadingArgument;
+    host?: HTMLElement | DocumentFragment;
+    importOptions?: ImportOptions;
+    path?: string;
 }
 
-export interface ImportOptions {
-    cssScope: 'global' | 'shadow',
-    host: HTMLElement | DocumentFragment;
+export interface ImportOptions extends IContext {
+    cssScope?: 'global' | 'shadow' | 'na',
+    
 }
 
-export interface IDynamicImportArg {
-    options: ImportOptions,
-    localName: string
-}
+// export interface IDynamicImportArg {
+//     options: ImportOptions,
+//     localName: string
+// }
 
-export type DynamicImportType = (importArg: IDynamicImportArg) => void;
+export type DynamicImportType = (context: IContext) => string;
 
 export type PathFromContext = (ctx: IContext) => string;
 

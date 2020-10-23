@@ -1,9 +1,15 @@
-import {PreemptiveLoadingArgument} from './types.d.js';
+import {PreemptiveLoadingArgument, IContext} from './types.d.js';
 
 //TODO:  return import when available?
 export async function preemptiveImport(arg: PreemptiveLoadingArgument){
-    const linkTagId = arg[0];
+    const ctx = arg[3] || {} as IContext;
+    arg[3] = ctx;
+    let linkTagId = arg[0];
     if(linkTagId !== undefined){
+        if(typeof(linkTagId) === 'function'){
+            linkTagId = linkTagId(ctx);
+        }
+        ctx.path = linkTagId;
         const linkTag = self[linkTagId] as HTMLLinkElement | undefined;
         if(linkTag === undefined){
             if(document.readyState === 'loading'){
@@ -63,16 +69,22 @@ export async function preemptiveImport(arg: PreemptiveLoadingArgument){
     switch(typeof dynamicImport){
         case 'function':{
             try{
-                await dynamicImport();
+                const actualPath = await dynamicImport(ctx);
+                if(typeof actualPath === 'string'){
+                    await import(actualPath);
+                }
                 return;
             }catch(e){}
         }
     }
     //No luck with importMap, try CDN
-    const CDNPath = arg[2];
-    const options = arg[3];
+    let CDNPath = arg[2];
+    const options = arg[4] || {cssScope: 'na'};
     if(CDNPath !== undefined){
-        if(options !== undefined){
+        if(typeof CDNPath === 'function'){
+            CDNPath = CDNPath(ctx);
+        }
+        if(options !== undefined && options.cssScope !== 'na'){
             const cssScope = options.cssScope;
             if(cssScope !== undefined){
                 const styleTag = document.createElement('link');

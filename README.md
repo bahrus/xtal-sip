@@ -157,7 +157,7 @@ Hard-coding hash integrity attributes in raw code would be a maintenance nightma
 
 Note that link tags are going to be causing script to load.  Most lists of "dangerous tags" to filter out [include](https://stackoverflow.com/questions/17369559/html-dangerous-tags-to-avoid-while-developing-a-chat-application) the link tag, but do make sure that is the case for your server.
 
-## Drynk Me [TODO]
+## Drynk Me [WIP]
 
 This seems pretty redundant:
 
@@ -198,8 +198,7 @@ In other words, the first element of the array gets put into a context object, w
 
 "Ditto" allows references to previous arrays in the same position.
 
-**However, there's a big problem with the above shortcut**.  In particular, the middle element of the array won't resolve correctly, if using the most common dev tools today, 
-including @web/dev-server, and (I'm guessing) snowpack, unpkg, rollup, Parcel, webpack, etc.
+**However, there's a big problem with the above shortcut**.  In particular, the middle element of the array won't resolve correctly, if using the most common dev tools today, including @web/dev-server, and (I'm guessing) snowpack, unpkg, rollup, Parcel, webpack, etc.
 
 Eventually, when import maps are ubiquitous, yes(!!), but for now, the best we can do safely is:
 
