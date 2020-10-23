@@ -55,7 +55,7 @@ Without browser support, all of these solutions depend on node.js as the develop
 
 </details>
 
-In addition to the problems discussed in detail in the "Backdrop" section above, consider this problem:
+In addition to the problems discussed in detail in the "Down the rabbit hole" adventure above, consider this problem:
 
 Most every web application can be recursively broken down into logical regions, building blocks which are assembled together to form the whole site.
 
@@ -176,19 +176,27 @@ And of course if have a lot of these, the savings can be even bigger:
 ```JavaScript
 const importFromPath = ({path}) => import(path);
 const unpkgFromPath = ({path}) => `//unpkg.com/${path}?module`
-
-...
-
-['@myScope/my-element-1.js',      importFromPath,   ({path}) => unpkgFromPath ],
-['@myScope/my-element-2.js',      '"',              '"'                       ],
-['@myScope/my-element-3.js',      '"',              '"'                       ],
-['@yourScope/your-element-1.js',  '"',              '"'                       ],
-['@yourScope/your-element-1.js',  '"',              '"'                       ],
-
-
+const pathFromName = ({localName}) => {
+  if(localName.startsWith('my-')){
+    return `@myScope/${localName}.js`;
+  }
+  if(localName.startsWith('your-')){
+    return `@yourScope/${localName}.js`;
+  }
+}
+conditionalImport(shadowDOMPeerElement, {
+  'my-element-{1|2|3}':[
+    [pathFromName,  importFromPath,   unpkgFromPath ],
+  ],
+  'your-element-{1|2}':[
+    ['"',           '"',              '"'           ]
+  ]
+});
 ```
 
 In other words, the first element of the array gets put into a context object, which can then be passed in to the remaining items of the array.
+
+"Ditto" allows references to previous arrays in the same position.
 
 **However, there's a big problem with the above shortcut**.  In particular, the middle element of the array won't resolve correctly, if using the most common dev tools today, 
 including @web/dev-server, and (I'm guessing) snowpack, unpkg, rollup, Parcel, webpack, etc.
@@ -198,49 +206,24 @@ Eventually, when import maps are ubiquitous, yes(!!), but for now, the best we c
 ```JavaScript
 const importFromPath = ({path}) => import(path);
 const unpkgFromPath = ({path}) => `//unpkg.com/${path}?module`
-
-...
-
-['@myScope/my-element-1.js',      () => import('@myScope/my-element-1.js'),       ({path}) => unpkgFromPath ],
-['@myScope/my-element-2.js',      () => import('@myScope/my-element-2.js'),       '"'                       ],
-['@myScope/my-element-3.js',      () => import('@myScope/my-element-3.js'),       '"'                       ],
-['@yourScope/your-element-1.js',  () => import('@myScope/your-element-1.js'),     '"'                       ],
-['@yourScope/your-element-1.js',  () => import('@myScope/your-element-1.js'),     '"'                       ],
-
-
-```
-
-## More whittling [TODO]
-
-JS is expensive, so anything that can be done to reduce the size of JS, while making the api less painful to work with, is a win-win.
-
-```JavaScript
-// CDN Computed Value For myScope
-const CVMyScope = ({localName}) => `https://unpkg.com/@myScope/${localName}.js?module`;
+const pathFromName = ({localName}) => {
+  if(localName.startsWith('my-')){
+    return `@myScope/${localName}.js`;
+  }
+  if(localName.startsWith('your-')){
+    return `@yourScope/${localName}.js`;
+  }
+}
 conditionalImport(shadowDOMPeerElement, {
-  'my-element-1':[
-    ['myScope/dist/my-bundled-elements.js', () => import('@myScope/my-element-1.js'), CVMyScope]
+  'my-element-{1|2|3}':[
+    [pathFromName, [() => import('@myScope/my-element-1.js'), () => import('@myScope/my-element-2.js'), () => import('@myScope/my-element-3.js')],   unpkgFromPath ],
   ],
-  'my-element-2':[
-    ['myScope/dist/my-bundled-elements.js', () => import('@myScope/my-element-2.js'), CVMyScope],
-  ],
-  'your-element':[
-    ['yourScope_your-element_1', () => import('@yourScope/your-element.js')]
-  ] 
+  'your-element-{1|2}':[
+    ['"',          [() => import('@yourScope/your-element-1.js'), () => import('@yourScope/your-element-2.js'),              '"'           ],
+  ]
 });
 ```
 
-## Extra dry [TODO:  only partly implemented]:
-
-```JavaScript
-// CDN Computed Value For MyScope
-const CVMyScope = ({tagName}) => `//unpkg.com/@myScope/${tagName}.js?module`;
-conditionalImport(shadowDOMPeerElement, {
-  'my-{element-1|element-2}':[
-    ['myScope_my_bundled_elements', [() => import(`@myScope/my-element-1.js`), () => import('@myScope/my-element-2.js')], CVMyScope]
-  ],
-});
-```
 
 There's a little bit of redundancy above, so as not to break compatibility with bundlers / polyfills.
 
