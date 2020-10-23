@@ -1,6 +1,5 @@
 import {preemptiveImport} from './preemptiveImport.js';
 import {ICssObserve} from 'css-observe/types.d.js';
-
 import {ConditionalLoadingLookup, PreemptiveLoadingArgumentJS} from './types.d.js';
 
 const loadedTags = new Set<string>();

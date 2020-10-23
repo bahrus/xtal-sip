@@ -1,11 +1,16 @@
 {
   "name": "xtal-sip",
+  "keywords": ["Web Components", "Custom Elements", "LazyLoad"],
   "version": "0.0.96",
   "description": "Dynamically &#34;water&#34; a custom element tag with the necessary dependencies to sprout the tag from an inert seedling to a thing of beauty.",
   "main": "conditionalImport.js",
   "module": "conditionalImport.js",
-  "repository": "https://github.com/bahrus/xtal-sip",
+  "repository": {
+    "type": "git",
+    "url":"https://github.com/bahrus/xtal-sip"
+  },
   "author": "bahrus <anderson.bruce.b@gmail.com>",
+  "types": "types.d.ts",
   "license": "MIT",
   "dependencies": {
     "trans-render": "0.0.265",
@@ -15,10 +20,20 @@
   "devDependencies": {
     "@webcomponents/webcomponentsjs": "2.4.4",
     "xtal-test": "0.0.48",
-    "es-dev-server": "1.57.5"
+    "es-dev-server": "1.57.5",
+    "@skypack/package-check": "0.1.0"
   },
   "scripts": {
     "serve": "node node_modules/xtal-test/serve.js",
-    "start": "es-dev-server --app-index demo/dev.html --node-resolve --watch --open"
-  }
+    "start": "es-dev-server --app-index demo/dev.html --node-resolve --watch --open",
+    "package-check": "package-check"
+  },
+  "exports":{
+    ".":{
+      "import":"./conditionalImport.js"
+    }
+  },
+  "files":[
+    "*"
+  ]
 }
