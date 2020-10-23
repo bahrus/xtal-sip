@@ -144,7 +144,7 @@ conditionalImport(shadowDOMPeerElement, {
 
 1.  When element my-element-1 is encountered in the same ShadowDOM realm as shadowDOMPeerElement, then:
     1.  If the first element of the array is defined, and if a corresponding link tag can be found with matching id (after waiting for DOMContentLoaded event if required), then the href from the link tag is loaded using import(...).  Note that id's become global constants.
-    2.  If 1.i finds no link tag with matching id, or the first element is undefined, try evaluating the second element of the array, which is where import maps can shine.
+    2.  If 1.i finds no link tag with matching id, or the first element is undefined, if the second element of the array is defined, try evaluating it.  This is where import maps can shine.
     3.  If 1.i and 1.ii fail or aren't defined, do an import() of the third element of the array, an (evergreen) link to a CDN.
 
 Note that the es-dev-server and most bundlers will resolve the second element of the array just fine (I think), so if no link tags are present, the second argument will come to the rescue.  The penalty of this approach is, of course, a more complicated import statement, but now we have lazy loading into memory, an optional backup for running the code on a plain http server like nginx, with or without bundling, and optional hash integrity checks.
