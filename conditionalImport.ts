@@ -34,6 +34,7 @@ export function conditionalImport(shadowOrShadowPeer: HTMLElement | DocumentFrag
         case 9:
         case 11:{
             shadowOrShadowPeer.appendChild(cssObserve);
+            break;
         }
         default:{
             (shadowOrShadowPeer as HTMLElement).insertAdjacentElement('afterend', cssObserve);

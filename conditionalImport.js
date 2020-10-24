@@ -31,6 +31,7 @@ export function conditionalImport(shadowOrShadowPeer, lookup) {
         case 9:
         case 11: {
             shadowOrShadowPeer.appendChild(cssObserve);
+            break;
         }
         default: {
             shadowOrShadowPeer.insertAdjacentElement('afterend', cssObserve);
