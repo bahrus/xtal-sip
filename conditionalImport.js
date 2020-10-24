@@ -12,7 +12,7 @@ export function conditionalImport(shadowOrShadowPeer, lookup) {
     for (const tagName in lookup) {
         if (!loadedTags.has(tagName))
             unloadedTags.push(tagName);
-        loadedTags.add(tagName);
+        //loadedTags.add(tagName);
     }
     if (unloadedTags.length === 0)
         return;
