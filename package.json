@@ -17,9 +17,9 @@
   "types": "types.d.ts",
   "license": "MIT",
   "dependencies": {
-    "trans-render": "0.0.265",
-    "xtal-element": "0.0.305",
-    "css-observe": "0.0.25"
+    "trans-render": "0.0.267",
+    "xtal-element": "0.0.310",
+    "css-observe": "0.0.27"
   },
   "devDependencies": {
     "@webcomponents/webcomponentsjs": "2.4.4",
