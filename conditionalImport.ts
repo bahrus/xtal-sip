@@ -82,7 +82,7 @@ function doManualCheck(shadowOrShadowPeer: HTMLElement | DocumentFragment, looku
                     }
                     const importOptions = getContext(clonedLoadingInstruction);
                     importOptions.localName = tagName2;
-                    preemptiveImport(loadingInstruction as PreemptiveLoadingArgumentJS);
+                    preemptiveImport(clonedLoadingInstruction as PreemptiveLoadingArgumentJS);
                 });
             }
             count++;

@@ -76,7 +76,7 @@ function doManualCheck(shadowOrShadowPeer, lookup) {
                     }
                     const importOptions = getContext(clonedLoadingInstruction);
                     importOptions.localName = tagName2;
-                    preemptiveImport(loadingInstruction);
+                    preemptiveImport(clonedLoadingInstruction);
                 });
             }
             count++;
