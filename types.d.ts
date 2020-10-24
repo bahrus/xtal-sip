@@ -35,10 +35,10 @@ export type DynamicImportType = (context: IContext) => string | Promise<any>;
 
 export type PathFromContext = (ctx: IContext) => string;
 
-export type LinkTagRef = [linkTagId: string | undefined];
-export type LinkTagDynamicImport = [linkTagId: string | undefined, dynamicImport: Function | undefined];
-export type LinkTagDynamicImportCDN = [linkTagId: string | undefined, dynamicImport: Function | undefined, CDNFallback:  string | PathFromContext | undefined];
-export type LinkTagDynamicImportCDNOptions = [linkTagId: string | undefined, dynamicImport: Function | undefined, CDNFallback:  string | PathFromContext | undefined, options: ImportOptions | undefined];
+export type LinkTagRef = [linkTagId: DynamicImportType | string | undefined];
+export type LinkTagDynamicImport = [linkTagId: DynamicImportType | string | undefined, dynamicImport: DynamicImportType | DynamicImportType[] | undefined];
+export type LinkTagDynamicImportCDN = [linkTagId: DynamicImportType | string | undefined, dynamicImport: DynamicImportType | DynamicImportType[] | undefined, CDNFallback:  string | PathFromContext | undefined];
+export type LinkTagDynamicImportCDNOptions = [linkTagId: DynamicImportType | string | undefined, dynamicImport: DynamicImportType | DynamicImportType[] | undefined, CDNFallback:  string | PathFromContext | undefined, options: ImportOptions | undefined];
 
 export type ConditionalLoadingTuple = LinkTagRef | LinkTagDynamicImport | LinkTagDynamicImportCDN | LinkTagDynamicImportCDNOptions ;
 

@@ -27,11 +27,14 @@ export function conditionalImport(shadowOrShadowPeer, lookup) {
             preemptiveImport(instruction);
         });
     });
-    if (shadowOrShadowPeer.nodeType === 9) {
-        shadowOrShadowPeer.appendChild(cssObserve);
-    }
-    else {
-        shadowOrShadowPeer.insertAdjacentElement('afterend', cssObserve);
+    switch (shadowOrShadowPeer.nodeType) {
+        case 9:
+        case 11: {
+            shadowOrShadowPeer.appendChild(cssObserve);
+        }
+        default: {
+            shadowOrShadowPeer.insertAdjacentElement('afterend', cssObserve);
+        }
     }
     if (!addedCssObserveImport) {
         addedCssObserveImport = true;

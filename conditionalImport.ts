@@ -30,10 +30,14 @@ export function conditionalImport(shadowOrShadowPeer: HTMLElement | DocumentFrag
             preemptiveImport(instruction as PreemptiveLoadingArgumentJS);
         });
     });
-    if(shadowOrShadowPeer.nodeType === 9){
-        shadowOrShadowPeer.appendChild(cssObserve);
-    }else{
-        (shadowOrShadowPeer as HTMLElement).insertAdjacentElement('afterend', cssObserve);
+    switch(shadowOrShadowPeer.nodeType){
+        case 9:
+        case 11:{
+            shadowOrShadowPeer.appendChild(cssObserve);
+        }
+        default:{
+            (shadowOrShadowPeer as HTMLElement).insertAdjacentElement('afterend', cssObserve);
+        }
     }
     
     if(!addedCssObserveImport){
