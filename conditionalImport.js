@@ -44,7 +44,7 @@ export function conditionalImport(shadowOrShadowPeer, lookup) {
     }
 }
 function doManualCheck(shadowOrShadowPeer, lookup) {
-    let host = shadowOrShadowPeer.nodeType === 1 ? shadowOrShadowPeer : shadowOrShadowPeer.getRootNode();
+    let host = shadowOrShadowPeer.nodeType === 11 ? shadowOrShadowPeer : shadowOrShadowPeer.getRootNode();
     if (host.nodeType === 9) {
         host = document.firstElementChild;
     }

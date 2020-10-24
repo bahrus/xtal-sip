@@ -49,7 +49,7 @@ export function conditionalImport(shadowOrShadowPeer: HTMLElement | DocumentFrag
 
 function doManualCheck(shadowOrShadowPeer: HTMLElement | DocumentFragment, lookup: ConditionalLoadingLookup){
 
-    let host = shadowOrShadowPeer.nodeType === 1 ? shadowOrShadowPeer : shadowOrShadowPeer.getRootNode() as Element;
+    let host = shadowOrShadowPeer.nodeType === 11 ? shadowOrShadowPeer : shadowOrShadowPeer.getRootNode() as Element;
     if(host.nodeType === 9){
         host = document.firstElementChild;
     }
