@@ -55,15 +55,21 @@ function doManualCheck(shadowOrShadowPeer, lookup) {
     for (const tagName in lookup) {
         const loadingInstructions = lookup[tagName];
         const tags = parseTag(tagName);
+        let count = 0;
         for (const tagName2 of tags) {
             if (loadedTags.has(tagName2))
                 continue;
             if (host.querySelector(tagName2) !== null) {
                 loadedTags.add(tagName2);
                 loadingInstructions.forEach(loadingInstruction => {
+                    const clonedLoadingInstruction = { ...loadingInstruction };
+                    if (Array.isArray(clonedLoadingInstruction[1])) {
+                        clonedLoadingInstruction[1] = clonedLoadingInstruction[1][count];
+                    }
                     preemptiveImport(loadingInstruction);
                 });
             }
+            count++;
         }
     }
 }
