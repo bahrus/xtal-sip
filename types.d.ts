@@ -31,7 +31,7 @@ export interface ImportOptions extends IContext {
 //     localName: string
 // }
 
-export type DynamicImportType = (context: IContext) => string;
+export type DynamicImportType = (context: IContext) => string | Promise<any>;
 
 export type PathFromContext = (ctx: IContext) => string;
 

@@ -14,9 +14,12 @@ export function conditionalImport(shadowPeer, lookup) {
             unloadedTags.push(tagName);
         loadedTags.add(tagName);
     }
+    if (unloadedTags.length === 0)
+        return;
+    const cssSelector = unloadedTags.join(',');
     const cssObserve = document.createElement('css-observe');
     cssObserve.observe = true;
-    cssObserve.selector = unloadedTags.join(',');
+    cssObserve.selector = cssSelector;
     cssObserve.addEventListener('latest-match-changed', (e) => {
         const tag = e.detail.value;
         const loadingInstructions = lookup[tag.localName];

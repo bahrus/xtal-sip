@@ -78,9 +78,9 @@ xtal-sip wishes to leave behind a world where:
 3.  Workarounds for referencing libraries is possible, even when those libraries aren't consistent with bare import specifiers. 
 4.  Productive development is possible, even outside the node.js monoculture.
 
-## conditionalImport
+## Mazeyloarping
 
-xtal-sip's first protégé, conditionalImport, operates on a "strongest to weakest" ordering of mappings.  At the strongest level are link tags contained either in the head, or, for lower priority resources, towards the end.  For example:
+xtal-sip's first protégé, conditionalImport, operates on a "strongest to weakest" ordering of lazy load mappings.  At the strongest level are link tags contained either in the head, or, for lower priority resources, towards the end.  For example:
 
 ```html
 <!DOCTYPE html>
@@ -153,7 +153,7 @@ As mentioned earlier, perhaps if such a system took hold, import maps could, in 
 
 Hard-coding hash integrity attributes in raw code would be a maintenance nightmare.
 
-## Security Implications
+## Securitations
 
 Note that link tags are going to be causing script to load.  Most lists of "dangerous tags" to filter out [include](https://stackoverflow.com/questions/17369559/html-dangerous-tags-to-avoid-while-developing-a-chat-application) the link tag, but do make sure that is the case for your server.
 
@@ -198,6 +198,8 @@ In other words, the first element of the array gets put into a context object, w
 
 "Ditto" allows references to previous arrays in the same position.
 
+## Loosecurl
+
 **However, there's a big problem with the above shortcut**.  In particular, the middle element of the array won't resolve correctly, if using the most common dev tools today, including @web/dev-server, and (I'm guessing) snowpack, unpkg, rollup, Parcel, webpack, etc.
 
 Eventually, when import maps are ubiquitous, yes(!!), but for now, the best we can do safely is:
@@ -230,7 +232,7 @@ If an element matches the first option (element-1), and the first element of the
 
 Since we matched on my-element-1, evaluate the first element of the dynamic import array.  If an element matches the second option (my-element-2), evaluate the second element of the array.  Etc.
 
-## Preemptive Loading
+## Preemptuality
 
 If we are working on a device with sufficient memory and other resources, perhaps we don't want to wait to discover an active custom element, and want to just load the dependencies ahead of time.  Yet we do want to take advantage of the mapping fallback system this library provides.  You can use the preemptiveImport function:
 
@@ -238,7 +240,7 @@ If we are working on a device with sufficient memory and other resources, perhap
 preemptiveImport( ['yourScope/your-element-1.js', () => import('@yourScope/your-element-1.js'), '//unpkg.com/@yourScope/your-element-1.js?module'] );
 ```
 
-## Do we really need two mapping systems?
+## Do we really need to work with bimapricity?
 
 So I'm suggesting no less than two ways of mapping JS files here:
 
@@ -249,7 +251,7 @@ Having two potentially overlapping lists like this is admittedly [a bit irregula
 
 But I don't see a way around acknowledging the existence of both of these mappings, as far as the browser runtime.
 
-## Language of the middle
+## Middlelangue
 
 An extra challenge posed by [shoelace.style](https://shoelace.style/?id=quick-start) and [ionic](https://ionicframework.com/docs/intro/cdn#ionic-framework-cdn) is that their CDN requires not one but two references -- one to a bundled js file, the other to a bundled css file.  I suspect other design libraries built with Stencil will follow suit (and probably have).
 
