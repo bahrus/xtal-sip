@@ -1,11 +1,11 @@
 import { preemptiveImport } from './preemptiveImport.js';
 const loadedTags = new Set();
 let addedCssObserveImport = false;
-export function conditionalImport(shadowPeer, lookup) {
-    doManualCheck(shadowPeer, lookup);
+export function conditionalImport(shadowOrShadowPeer, lookup) {
+    doManualCheck(shadowOrShadowPeer, lookup);
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', e => {
-            doManualCheck(shadowPeer, lookup);
+            doManualCheck(shadowOrShadowPeer, lookup);
         });
     }
     const unloadedTags = [];
@@ -27,18 +27,23 @@ export function conditionalImport(shadowPeer, lookup) {
             preemptiveImport(instruction);
         });
     });
-    shadowPeer.insertAdjacentElement('afterend', cssObserve);
+    if (shadowOrShadowPeer.nodeType === 9) {
+        shadowOrShadowPeer.appendChild(cssObserve);
+    }
+    else {
+        shadowOrShadowPeer.insertAdjacentElement('afterend', cssObserve);
+    }
     if (!addedCssObserveImport) {
         addedCssObserveImport = true;
-        conditionalImport(shadowPeer, {
+        conditionalImport(shadowOrShadowPeer, {
             'css-observe': [
                 ['css-observe/css-observe.js', () => import('css-observe/css-observe.js'), ({ path }) => `//unpkg.com/${path}?module`]
             ]
         });
     }
 }
-function doManualCheck(shadowPeer, lookup) {
-    let host = shadowPeer.getRootNode();
+function doManualCheck(shadowOrShadowPeer, lookup) {
+    let host = shadowOrShadowPeer.nodeType === 1 ? shadowOrShadowPeer : shadowOrShadowPeer.getRootNode();
     if (host.nodeType === 9) {
         host = document.firstElementChild;
     }

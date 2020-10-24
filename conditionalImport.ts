@@ -4,11 +4,11 @@ import {ConditionalLoadingLookup, PreemptiveLoadingArgumentJS} from './types.d.j
 
 const loadedTags = new Set<string>();
 let addedCssObserveImport = false;
-export function conditionalImport(shadowPeer: HTMLElement, lookup: ConditionalLoadingLookup){
-    doManualCheck(shadowPeer, lookup);
+export function conditionalImport(shadowOrShadowPeer: HTMLElement | DocumentFragment, lookup: ConditionalLoadingLookup){
+    doManualCheck(shadowOrShadowPeer, lookup);
     if(document.readyState === 'loading'){
         document.addEventListener('DOMContentLoaded', e => {
-            doManualCheck(shadowPeer, lookup);
+            doManualCheck(shadowOrShadowPeer, lookup);
         });
     }
 
@@ -30,10 +30,15 @@ export function conditionalImport(shadowPeer: HTMLElement, lookup: ConditionalLo
             preemptiveImport(instruction as PreemptiveLoadingArgumentJS);
         });
     });
-    shadowPeer.insertAdjacentElement('afterend', cssObserve);
+    if(shadowOrShadowPeer.nodeType === 9){
+        shadowOrShadowPeer.appendChild(cssObserve);
+    }else{
+        (shadowOrShadowPeer as HTMLElement).insertAdjacentElement('afterend', cssObserve);
+    }
+    
     if(!addedCssObserveImport){
         addedCssObserveImport = true;
-        conditionalImport(shadowPeer, {
+        conditionalImport(shadowOrShadowPeer, {
             'css-observe':[
                 ['css-observe/css-observe.js', () => import('css-observe/css-observe.js'), ({path}) => `//unpkg.com/${path}?module`]
             ]
@@ -41,8 +46,9 @@ export function conditionalImport(shadowPeer: HTMLElement, lookup: ConditionalLo
     }
 }
 
-function doManualCheck(shadowPeer: HTMLElement, lookup: ConditionalLoadingLookup){
-    let host = shadowPeer.getRootNode() as Element;
+function doManualCheck(shadowOrShadowPeer: HTMLElement | DocumentFragment, lookup: ConditionalLoadingLookup){
+
+    let host = shadowOrShadowPeer.nodeType === 1 ? shadowOrShadowPeer : shadowOrShadowPeer.getRootNode() as Element;
     if(host.nodeType === 9){
         host = document.firstElementChild;
     }
