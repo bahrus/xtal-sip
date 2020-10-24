@@ -35,11 +35,12 @@ export function conditionalImport(shadowOrShadowPeer, lookup) {
     }
     if (!addedCssObserveImport) {
         addedCssObserveImport = true;
-        conditionalImport(shadowOrShadowPeer, {
-            'css-observe': [
-                ['css-observe/css-observe.js', () => import('css-observe/css-observe.js'), ({ path }) => `//unpkg.com/${path}?module`]
-            ]
-        });
+        // conditionalImport(shadowOrShadowPeer, {
+        //     'css-observe':[
+        //         ['css-observe/css-observe.js', () => import('css-observe/css-observe.js'), ({path}) => `//unpkg.com/${path}?module`]
+        //     ]
+        // });
+        preemptiveImport(['css-observe/css-observe.js', () => import('css-observe/css-observe.js'), ({ path }) => `//unpkg.com/${path}?module`, ,]);
     }
 }
 function doManualCheck(shadowOrShadowPeer, lookup) {
