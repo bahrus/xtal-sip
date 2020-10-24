@@ -1,6 +1,6 @@
 import {preemptiveImport} from './preemptiveImport.js';
 import {ICssObserve} from 'css-observe/types.d.js';
-import {ConditionalLoadingLookup, PreemptiveLoadingArgumentJS} from './types.d.js';
+import {ConditionalLoadingLookup, PreemptiveLoadingArgumentJS, ConditionalLoadingTuple} from './types.d.js';
 
 const loadedTags = new Set<string>();
 let addedCssObserveImport = false;
@@ -52,6 +52,15 @@ export function conditionalImport(shadowOrShadowPeer: HTMLElement | DocumentFrag
     }
 }
 
+function getContext(loadingInstruction: ConditionalLoadingTuple){
+    let importOptions = loadingInstruction[3];
+    if(importOptions === undefined){
+        importOptions = {};
+        loadingInstruction[3] = importOptions;
+    }
+    return importOptions;
+}
+
 function doManualCheck(shadowOrShadowPeer: HTMLElement | DocumentFragment, lookup: ConditionalLoadingLookup){
 
     let host = shadowOrShadowPeer.nodeType === 11 ? shadowOrShadowPeer : shadowOrShadowPeer.getRootNode() as Element;
@@ -71,6 +80,8 @@ function doManualCheck(shadowOrShadowPeer: HTMLElement | DocumentFragment, looku
                     if(Array.isArray(clonedLoadingInstruction[1])){
                         clonedLoadingInstruction[1] = clonedLoadingInstruction[1][count];
                     }
+                    const importOptions = getContext(clonedLoadingInstruction);
+                    importOptions.localName = tagName2;
                     preemptiveImport(loadingInstruction as PreemptiveLoadingArgumentJS);
                 });
             }

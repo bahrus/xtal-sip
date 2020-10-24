@@ -47,6 +47,14 @@ export function conditionalImport(shadowOrShadowPeer, lookup) {
         preemptiveImport(['css-observe/css-observe.js', () => import('css-observe/css-observe.js'), ({ path }) => `//unpkg.com/${path}?module`, ,]);
     }
 }
+function getContext(loadingInstruction) {
+    let importOptions = loadingInstruction[3];
+    if (importOptions === undefined) {
+        importOptions = {};
+        loadingInstruction[3] = importOptions;
+    }
+    return importOptions;
+}
 function doManualCheck(shadowOrShadowPeer, lookup) {
     let host = shadowOrShadowPeer.nodeType === 11 ? shadowOrShadowPeer : shadowOrShadowPeer.getRootNode();
     if (host.nodeType === 9) {
@@ -66,6 +74,8 @@ function doManualCheck(shadowOrShadowPeer, lookup) {
                     if (Array.isArray(clonedLoadingInstruction[1])) {
                         clonedLoadingInstruction[1] = clonedLoadingInstruction[1][count];
                     }
+                    const importOptions = getContext(clonedLoadingInstruction);
+                    importOptions.localName = tagName2;
                     preemptiveImport(loadingInstruction);
                 });
             }
