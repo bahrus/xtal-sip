@@ -35,7 +35,7 @@ export function conditionalImport(shadowPeer: HTMLElement, lookup: ConditionalLo
         addedCssObserveImport = true;
         conditionalImport(shadowPeer, {
             'css-observe':[
-                ['css-observe.js', () => import('css-observe/css-observe.js'), '//unpkg.com/css-observe@0.0.27/css-observe.js?module']
+                ['css-observe/css-observe.js', () => import('css-observe/css-observe.js'), ({path}) => `//unpkg.com/${path}?module`]
             ]
         });
     }
