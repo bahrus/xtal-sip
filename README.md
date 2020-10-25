@@ -165,7 +165,7 @@ Here we see the path '@yourScope/your-element-1.js' appear three times.  We can 
 ['@yourScope/your-element-1.js', ({path}) => import(path), ({path}) => `//unpkg.com/${path}?module`]
 ```
 
-And of course if have a lot of these, the savings can be even bigger [Ditto notation is still TODO]:
+And of course if have a lot of these, the savings can be even bigger:
 
 ```JavaScript
 const importFromPath = ({path}) => import(path);
@@ -190,13 +190,15 @@ conditionalImport(shadowDOMPeerElement, {
 
 In other words, the first element of the array gets put into a context object, which can then be passed in to the remaining items of the array.
 
-"Ditto" allows references to previous arrays in the same position.
+The context object also contains the matching element name (localName), which can be used to auto generate the bare import specifier and CDN.
+
+"Ditto" allows references to previous arrays in the same position [TODO]
 
 ## Not yet
 
 **However, there's a big problem with the above shortcut**.  In particular, the middle element of the array won't resolve correctly, if using the most common dev tools today, including @web/dev-server, and (I'm guessing) snowpack, unpkg, rollup, Parcel, webpack, etc.
 
-Eventually, when import maps are ubiquitous, yes(!!), but for now, the best we can do safely is:
+Eventually, should import maps become ubiquitous, the import statement could be fully collapsed, as shown above.  But for now, the best we can do safely is:
 
 ```JavaScript
 const importFromPath = ({path}) => import(path);
@@ -219,20 +221,19 @@ conditionalImport(shadowDOMPeerElement, {
 });
 ```
 
-
-There's a little bit of redundancy above, so as not to break compatibility with bundlers / polyfills.
-
-If an element matches the first option (element-1), and the first element of the array doesn't match any link tags, then move on to the second element of the array, that focuses on import maps.
+If an element matches the first option (element-1), and the first element of the array doesn't match any link tags, then move on to the second element of the array, that relies on import maps / bare import specifiers.
 
 Since we matched on my-element-1, evaluate the first element of the dynamic import array.  If an element matches the second option (my-element-2), evaluate the second element of the array.  Etc.
 
 ## preemptiveImport
 
-If we are working on a device with sufficient memory and other resources, perhaps we don't want to wait to discover an active custom element, and want to just load the dependencies ahead of time.  Yet we do want to take advantage of the mapping fallback system this library provides.  You can use the preemptiveImport function:
+There are some scenarios where we don't need/want to wait for custom elements to be spotted in the DOM:  If we are working on a device with sufficient memory and other resources, perhaps we don't want to wait to discover an active custom element, and want to just load the dependencies ahead of time.  Or maybe the component will also need the references loaded immediately.  But let's suppose we still do want to take advantage of the mapping fallback system this library provides, including support for integrity hashes and CDN's.  Then it's best to bypass conditionalImport, and use the simpler preemptiveImport function:
 
 ```JavaScript
 preemptiveImport( ['yourScope/your-element-1.js', () => import('@yourScope/your-element-1.js'), '//unpkg.com/@yourScope/your-element-1.js?module'] );
 ```
+
+Once again, each of the three parameters / array elements is optional, although the second element (index = 1) is almost certainly a good one to have, if available.
 
 ## Do we really need to work with two mapping systems?
 
@@ -249,11 +250,11 @@ But I don't see a way around acknowledging the existence of both of these mappin
 
 An extra challenge posed by [shoelace.style](https://shoelace.style/?id=quick-start) and [ionic](https://ionicframework.com/docs/intro/cdn#ionic-framework-cdn) is that their CDN requires not one but two references -- one to a bundled js file, the other to a bundled css file.  I suspect other design libraries built with Stencil will follow suit (and probably have).
 
-It's also been my experience that, with web components, [when it comes to fonts](https://github.com/bahrus/scratch-box), referencing a css file that needs to be placed outside any ShadowDOM is a common need.
+It's also been my experience that, with web components, [when it comes to fonts](https://github.com/bahrus/scratch-box), referencing a css file that needs to be placed outside any ShadowDOM is a common need.  [Material web components](https://github.com/material-components/material-components-web-components#2-write-html-and-javascript) also require loading fonts outside of the web components themselves.
 
 How should we modify the conditionalImport function to accommodate both js reference(s) and css reference(s), some of them needing to be added (say) to document.head?
 
-This is subject to change as the CSS/stylesheet modules / constructible stylesheet proposals flap in the wind, but I'm thinking [TODO]:
+This is subject to change as the CSS/stylesheet modules / constructible stylesheet proposals flap in the wind, but this is currently implemented, with example syntax shown below:
 
 ```html
 <html>
@@ -306,10 +307,6 @@ conditionalImport(shadowDOMPeerElement, {
 });
 
 ```
-
-So if the first element of the import tuple is of type object, then we are not importing JS, but something else (specified by the type).
-
-All the other elements are shifted to the right by one.
 
 
 ## Are we being unfair to CSS?
