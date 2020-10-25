@@ -7,7 +7,7 @@ export async function preemptiveImport(arg: PreemptiveLoadingArgument){
     let linkTagId = arg[0];
     if(linkTagId !== undefined){
         if(typeof(linkTagId) === 'function'){
-            linkTagId = linkTagId(ctx);
+            linkTagId = linkTagId(ctx) as string;
         }
         ctx.path = linkTagId;
         const linkTag = self[linkTagId] as HTMLLinkElement | undefined;

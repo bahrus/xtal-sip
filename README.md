@@ -8,18 +8,10 @@
 
 Dynamically &#34;water&#34; a custom element tag with the necessary dependencies to sprout the tag from an inert seedling to a thing of beauty.
 
-<details>
-  <summary>Whither xtal-sip?</summary>
-
-**NB:** xtal-sip, the web component, has decided to part ways with Middle-earth, and reminds its protégés, described below, that "The road goes ever on and on". 
-
-xtal-sip's spirit lingers on in the hearts and minds of the functions contained in this package.  These functions are determined to carry out xtal-sip's mission.  They claim right of abode, and wish xtal-sip's next adventure be filled with peace and tranquility.
-
-</details>
 
 <details>
 <summary>
-Down the rabbit hole
+Down the rabbit hole of standards activities
 </summary>
 
 ### Frabjous
@@ -30,12 +22,13 @@ Dynamic imports of ES modules are shipping in every modern browser, which also s
 
 ### Mad Hatter Snark
 
-When it comes to cross-package resolution, on the other hand, the only proposal on the table is import maps. But whether import maps are going to be there for the long haul remains an open question, in my mind.  It has been [sitting behind a flag since version 74 in Chrome, and no release date has been announced](https://www.chromestatus.com/feature/5315286962012160).  Part of the reason for its languishing behind the flag, I think, is the lackluster response from other browser vendors.  It is [well-polyfilled](https://github.com/guybedford/es-module-shims), at least.  Firefox is taking a bit of an [Of course...](https://www.youtube.com/watch?v=VBn8XttrSew)  [approach to the question](https://github.com/mozilla/standards-positions/issues/146), which I suppose is more than can be said of Safari.  Relying on bare import resolution still feels much more tenuous than I'd like.  The strongest case for relying on bare import resolution is there is no better competing alternative, for now.  I think, though, without some assurance of the longevity of the specification via cross-browser positive gestures, it will be an uphill battle building the infrastructure around import maps that it so sorely needs.  VS Code / TypeScript support is quite confusing and inconsistent, as far as supporting bare import specifiers. Ironically, VSCode is more helpful in this regard if one sticks with JS.  I would be motivated to raise bug reports in VS Code / TypeScript's crushing sea of issues, but on what basis can I argue that they are under any obligation to support this "standard" without cross-browser endorsement?
+When it comes to cross-package resolution, on the other hand, the only proposal on the table is import maps. But whether import maps are going to be there for the long haul remains an open question, in my mind.  It has been [sitting behind a flag since version 74 in Chrome, and no release date has been announced](https://www.chromestatus.com/feature/5315286962012160).  Part of the reason for its languishing behind the flag, I think, is the lackluster response from other browser vendors.    Firefox is taking a bit of an [Of course...](https://www.youtube.com/watch?v=VBn8XttrSew)  [approach to the question](https://github.com/mozilla/standards-positions/issues/146), which I suppose is more than can be said of Safari.  Relying on bare import resolution still feels much more tenuous than I'd like.  The strongest case for relying on bare import resolution is there is no better competing alternative, for now.  I think, though, without some assurance of the longevity of the specification via cross-browser positive gestures, it will be an uphill battle building the infrastructure around import maps that it so sorely needs.  VS Code / TypeScript support is quite confusing and inconsistent, as far as supporting bare import specifiers. Ironically, VSCode is more helpful in this regard if one sticks with JS.  I would be motivated to raise bug reports in VS Code / TypeScript's crushing sea of issues, but on what basis can I argue that they are under any obligation to support this "standard" without cross-browser endorsement?
 
 ### Beamish Polyfills
 
-1.  It seems (by design) that the strict rules that govern import maps happen to be largely compatible with the considerably more lenient rules that bundling tools like webpack and Parcel support.  Tools which many -- but not all -- developers have grown used to / fond of using, even during development. 
-2.  For those of us who enjoy the lightweight, quick to load and reload, instantaneous, abstraction-free feedback of bundle-less development, the @web/dev-server does a great job of server-side "polyfilling" import maps (or bare import specifiers with package.json serving as a substitute for import maps, to be accurate).  Other solutions from snowpack and unpkg.com are also consistent with bare import specifiers.  Perhaps with HTTP3, the gap between what is convenient to this class of developers, and what runs best in production, will continue to narrow.
+1.  Import maps are [well-polyfilled](https://github.com/guybedford/es-module-shims).
+2.  It seems (by design) that the strict rules that govern import maps happen to be largely compatible with the considerably more lenient rules that bundling tools like webpack and Parcel support.  Tools which many -- but not all -- developers have grown used to / fond of using, even during development. 
+3.  For those of us who enjoy the lightweight, quick to load and reload, instantaneous, abstraction-free feedback of bundle-less development, the @web/dev-server does a great job of server-side "polyfilling" import maps (or bare import specifiers with package.json serving as a substitute for import maps, to be accurate).  Other solutions from snowpack and unpkg.com are also consistent with bare import specifiers.  Perhaps with HTTP3, the gap between what is convenient to this class of developers, and what runs best in production, will continue to narrow.
 
 ### JSX Bandersnatch
 
@@ -59,7 +52,7 @@ In addition to the problems discussed in detail in the "Down the rabbit hole" ad
 
 Most every web application can be recursively broken down into logical regions, building blocks which are assembled together to form the whole site.
 
-xtal-sip promulgated the philosophical stance that at the most micro level, utilizing highly reusable, generic custom elements -- elements that can extend the HTML vocabulary, elements that could be incorporated into the browser, even -- form a great foundation to build on.
+At the most micro level, utilizing highly reusable, generic custom elements -- elements that can extend the HTML vocabulary, elements that could be incorporated into the browser, even -- form a great foundation to build on.
 
 But as one zooms out from the micro to the macro, the nature of the components changes in significant ways.  
 
@@ -80,7 +73,7 @@ xtal-sip wishes to leave behind a world where:
 
 ## Lazy loading
 
-xtal-sip's first protégé, conditionalImport, operates on a "strongest to weakest" ordering of lazy load mappings.  At the strongest level are link tags contained either in the head, or, for lower priority resources, towards the end.  For example:
+*conditionalImport* operates on a "strongest to weakest" ordering of lazy load mappings.  At the strongest level are link tags contained either in the head, or, for lower priority resources, towards the end.  For example:
 
 ```html
 <!DOCTYPE html>
@@ -89,8 +82,8 @@ xtal-sip's first protégé, conditionalImport, operates on a "strongest to weake
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
-    <link id="shoelace.css" rel=preload as=style href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.21/dist/shoelace/shoelace.css">
-    <link id="shoelace.js" rel=modulepreload href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.21/dist/shoelace/shoelace.esm.js">
+    <link id="shoelace.css" integrity=... rel=preload as=style href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.21/dist/shoelace/shoelace.css">
+    <link id="shoelace.js" integrity=... rel=modulepreload href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.21/dist/shoelace/shoelace.esm.js">
 </head>
 <body>
   ...
@@ -124,12 +117,12 @@ With link references, we can define a slew of easily streamable mappings.  For e
 
 ```
 
-xtal-sip's apprentices  will be able to work with these link tags, without the benefit of import maps or bare import specifiers.  
+xtal-sip's import functions are able to work with these link tags, without the benefit of import maps or bare import specifiers.  
 
 Then your library references can look like:
 
 ```JavaScript
-conditionalImport(shadowDOMPeerElement, {
+conditionalImport(shadowDOMRef, {
   'my-element-1':[
     ['@myScope/dist/my-bundled-elements.js', () => import('@myScope/my-element-1.js'), '//unpkg.com/@myScope/my-element-1.js?module']
   ],
@@ -142,12 +135,13 @@ conditionalImport(shadowDOMPeerElement, {
 });
 ```
 
-1.  When element my-element-1 is encountered in the same ShadowDOM realm as shadowDOMPeerElement, then:
+1.  When element my-element-1 is encountered in the same ShadowDOM realm as shadowDOMRef, then:
     1.  If the first element of the array is defined, and if a corresponding link tag can be found with matching id (after waiting for DOMContentLoaded event if required), then the href from the link tag is loaded using import(...).  Note that id's become global constants.
     2.  If 1.i finds no link tag with matching id, or the first element is undefined, if the second element of the array is defined, try evaluating it.  This is where import maps can shine.
     3.  If 1.i and 1.ii fail or aren't defined, do an import() of the third element of the array, an (evergreen) link to a CDN.
+2.  shadowDOMRef can either be an element contained in a ShadowDOM realm, or the shadowRoot of the ShadowDOM realm.  Or it can be an element outside any ShadowDOM, like document.body or just document.
 
-Note that the @web/dev-server and most bundlers will resolve the second element of the array just fine (I think), so if no link tags are present, the second argument will come to the rescue.  The penalty of this approach is, of course, a more complicated import statement, but now we have lazy loading into memory, an optional backup for running the code on a plain http server like nginx, with or without bundling, and optional hash integrity checks.
+Note that the @web/dev-server and most bundlers will resolve the second element of the array just fine, so if no link tags are present, the second argument will come to the rescue.  The penalty of this approach is, of course, a more complicated import statement, but now we have lazy loading into memory, an optional backup for running the code on a plain http server like nginx, with or without bundling, and optional hash integrity checks.  And all three elements of the array are optional, so the size of the import statement could be fairly close what it is without the help of this function.
 
 As mentioned earlier, perhaps if such a system took hold, import maps could, in the future, be enhanced, also, to search the link tags for a tag with matching href, and apply whatever integrity attribute it finds in this case.
 
