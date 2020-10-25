@@ -16,16 +16,18 @@ export function conditionalImport(shadowOrShadowPeer, lookup) {
     }
     if (unloadedTags.length === 0)
         return;
-    const cssSelector = unloadedTags.join(',');
+    const parsedTags = unloadedTags.map(tag => parseTag(tag)).flat();
+    const cssSelector = parsedTags.join(',');
     const cssObserve = document.createElement('css-observe');
     cssObserve.observe = true;
     cssObserve.selector = cssSelector;
     cssObserve.addEventListener('latest-match-changed', (e) => {
         const tag = e.detail.value;
-        const loadingInstructions = lookup[tag.localName];
-        loadingInstructions.forEach(instruction => {
-            preemptiveImport(instruction);
-        });
+        // const loadingInstructions = lookup[tag.localName];
+        // loadingInstructions.forEach(instruction =>{
+        //     preemptiveImport(instruction as PreemptiveLoadingArgumentJS);
+        // });
+        doManualCheck(shadowOrShadowPeer, lookup, tag.localName);
     });
     switch (shadowOrShadowPeer.nodeType) {
         case 9:
@@ -55,7 +57,7 @@ function getContext(loadingInstruction) {
     }
     return importOptions;
 }
-function doManualCheck(shadowOrShadowPeer, lookup) {
+function doManualCheck(shadowOrShadowPeer, lookup, foundTag) {
     let host = shadowOrShadowPeer.nodeType === 11 ? shadowOrShadowPeer : shadowOrShadowPeer.getRootNode();
     if (host.nodeType === 9) {
         host = document.firstElementChild;
@@ -67,7 +69,7 @@ function doManualCheck(shadowOrShadowPeer, lookup) {
         for (const tagName2 of tags) {
             if (loadedTags.has(tagName2))
                 continue;
-            if (host.querySelector(tagName2) !== null) {
+            if (tagName2 === foundTag || host.querySelector(tagName2) !== null) {
                 loadedTags.add(tagName2);
                 loadingInstructions.forEach(loadingInstruction => {
                     const clonedLoadingInstruction = { ...loadingInstruction };

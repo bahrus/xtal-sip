@@ -19,16 +19,18 @@ export function conditionalImport(shadowOrShadowPeer: HTMLElement | DocumentFrag
         //loadedTags.add(tagName);
     }
     if(unloadedTags.length === 0) return;
-    const cssSelector = unloadedTags.join(',');
+    const parsedTags = unloadedTags.map(tag => parseTag(tag)).flat();
+    const cssSelector = parsedTags.join(',');
     const cssObserve = document.createElement('css-observe') as ICssObserve;
     cssObserve.observe = true;
     cssObserve.selector = cssSelector;
     cssObserve.addEventListener('latest-match-changed', (e: CustomEvent) => {
         const tag = e.detail.value as HTMLElement;
-        const loadingInstructions = lookup[tag.localName];
-        loadingInstructions.forEach(instruction =>{
-            preemptiveImport(instruction as PreemptiveLoadingArgumentJS);
-        });
+        // const loadingInstructions = lookup[tag.localName];
+        // loadingInstructions.forEach(instruction =>{
+        //     preemptiveImport(instruction as PreemptiveLoadingArgumentJS);
+        // });
+        doManualCheck(shadowOrShadowPeer, lookup, tag.localName);
     });
     switch(shadowOrShadowPeer.nodeType){
         case 9:
@@ -61,7 +63,7 @@ function getContext(loadingInstruction: ConditionalLoadingTuple){
     return importOptions;
 }
 
-function doManualCheck(shadowOrShadowPeer: HTMLElement | DocumentFragment, lookup: ConditionalLoadingLookup){
+function doManualCheck(shadowOrShadowPeer: HTMLElement | DocumentFragment, lookup: ConditionalLoadingLookup, foundTag?: string){
 
     let host = shadowOrShadowPeer.nodeType === 11 ? shadowOrShadowPeer : shadowOrShadowPeer.getRootNode() as Element;
     if(host.nodeType === 9){
@@ -73,7 +75,7 @@ function doManualCheck(shadowOrShadowPeer: HTMLElement | DocumentFragment, looku
         let count = 0;
         for(const tagName2 of tags){
             if(loadedTags.has(tagName2)) continue;
-            if(host.querySelector(tagName2) !== null){
+            if(tagName2 === foundTag || host.querySelector(tagName2) !== null){
                 loadedTags.add(tagName2);
                 loadingInstructions.forEach(loadingInstruction =>{
                     const clonedLoadingInstruction = {...loadingInstruction};
