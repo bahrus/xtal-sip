@@ -151,6 +151,24 @@ Hard-coding hash integrity attributes in raw code would be a maintenance nightma
 
 Note that link tags are going to be causing script to load.  Most lists of "dangerous tags" to filter out [include](https://stackoverflow.com/questions/17369559/html-dangerous-tags-to-avoid-while-developing-a-chat-application) the link tag, but do make sure that is the case for your server.
 
+## Discovering Missing Settings
+
+Both import maps and link tags impose a bit of a burden on the web site manager to provide the necessary lookups in index.html (typically).
+
+If none of the three options (evergreen CDN in addition to import maps and link tags) "pan out", the user sees an error:
+
+>Unable to resolve ${linkTagId} and ${dynamicImport.toString()}
+
+However, one big problem remains:  Let's say that you do want to take advantage of the hash integrity support that this package provides.  The problem is that without deep diving into the code, or proper documentation from all the component vendors, determining what link id's are being searched for would be a mystery.
+
+To get a log of link id's that aren't found, add a tag like this to index.html:
+
+```html
+<link rel=debug id=link-debug>
+```
+
+That will cause any missing link tags to be logged to the console.
+
 ## Drynk Me
 
 This seems pretty redundant:
@@ -165,7 +183,7 @@ Here we see the path '@yourScope/your-element-1.js' appear three times.  We can 
 ['@yourScope/your-element-1.js', ({path}) => import(path), ({path}) => `//unpkg.com/${path}?module`]
 ```
 
-And of course if have a lot of these, the savings can be even bigger:
+And of course if you have a lot of these, the savings can be even bigger:
 
 ```JavaScript
 const importFromPath = ({path}) => import(path);

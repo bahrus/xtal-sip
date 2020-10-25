@@ -17,6 +17,10 @@ export async function preemptiveImport(arg: PreemptiveLoadingArgument){
                     preemptiveImport(arg);
                 });
                 return;
+            }else{
+                if(self['link-debug']){
+                    console.warn(`link tag with id ${linkTagId} not found.`);
+                }
             }
         }else{
             if(linkTag.localName === 'link'){ //security precaution
@@ -82,7 +86,7 @@ export async function preemptiveImport(arg: PreemptiveLoadingArgument){
     const options = arg[4] || {cssScope: 'na'};
     if(CDNPath !== undefined){
         if(typeof CDNPath === 'function'){
-            CDNPath = CDNPath(ctx);
+            CDNPath = CDNPath(ctx) as string;
         }
         if(options !== undefined && options.cssScope !== 'na'){
             const cssScope = options.cssScope;
