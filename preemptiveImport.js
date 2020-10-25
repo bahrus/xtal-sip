@@ -16,6 +16,11 @@ export async function preemptiveImport(arg) {
                 });
                 return;
             }
+            else {
+                if (self['link-debug']) {
+                    console.warn(`link tag with id ${linkTagId} not found.`);
+                }
+            }
         }
         else {
             if (linkTag.localName === 'link') { //security precaution
