@@ -16,9 +16,9 @@ Down the rabbit hole of standards activities
 
 ### Frabjous
 
-Browsers now support ES modules, including relative imports between files.  Hip hip hooray!
+Browsers now support ES modules, including relative imports between files.  Callooh! Callay!
 
-Dynamic imports of ES modules are shipping in every modern browser, which also support relative references.  Hip hip hooray!
+Dynamic imports of ES modules are shipping in every modern browser, which also support relative references.  Callooh! Callay!
 
 ### Mad Hatter Snark
 
