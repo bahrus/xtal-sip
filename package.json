@@ -17,15 +17,15 @@
   "types": "types.d.ts",
   "license": "MIT",
   "dependencies": {
-    "trans-render": "0.0.267",
-    "xtal-element": "0.0.310",
-    "css-observe": "0.0.27"
+    "css-observe": "0.0.27",
+    "trans-render": "0.0.269",
+    "xtal-element": "0.0.315"
   },
   "devDependencies": {
-    "@webcomponents/webcomponentsjs": "2.4.4",
-    "xtal-test": "0.0.48",
-    "es-dev-server": "1.57.5",
-    "@skypack/package-check": "0.1.0"
+    "@skypack/package-check": "0.2.2",
+    "@webcomponents/webcomponentsjs": "2.5.0",
+    "es-dev-server": "1.60.1",
+    "xtal-test": "0.0.48"
   },
   "scripts": {
     "serve": "node node_modules/xtal-test/serve.js",
@@ -36,7 +36,7 @@
     "conditionalImport.js": {
       "import": "./conditionalImport.js"
     },
-    "preemptiveImport.js":{
+    "preemptiveImport.js": {
       "import": "./preemptiveImport.js"
     }
   },
