@@ -33,12 +33,9 @@
     "package-check": "package-check"
   },
   "exports": {
-    "conditionalImport.js": {
-      "import": "./conditionalImport.js"
-    },
-    "preemptiveImport.js": {
-      "import": "./preemptiveImport.js"
-    }
+    ".": "./conditionalImport.js",
+    "./conditionalImport.js": "./conditionalImport.js",
+    "./preemptiveImport.js": "./conditionalImport.js"
   },
   "files": [
     "*"
