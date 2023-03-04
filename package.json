@@ -25,7 +25,7 @@
     "@skypack/package-check": "0.2.2",
     "@webcomponents/webcomponentsjs": "2.5.0",
     "es-dev-server": "1.60.1",
-    "xtal-test": "0.0.48"
+    "xtal-test": "0.0.57"
   },
   "scripts": {
     "serve": "node node_modules/xtal-test/serve.js",
